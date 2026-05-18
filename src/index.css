@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", "Outfit", system-ui, sans-serif;
+    
+    /* Flutter Custom Colors */
+    --color-dark-turquoise: #145D6A;
+    --color-gold: #C4A052;
+    --color-bg-light: #F9F9F9;
+    --color-grey-text: #757575;
+}
+
+@layer base {
+    * {
+        @apply border-gray-200;
+    }
+
+    body {
+        @apply bg-[var(--color-bg-light)] text-gray-800 font-sans m-0;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    #root {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100svh;
+    }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(20, 93, 106, 0.2);
+    border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 93, 106, 0.4);
+}
+
+/* RTL Support */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+    text-align: right;
+}
+
