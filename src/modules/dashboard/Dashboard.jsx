@@ -40,8 +40,8 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchDashboard = async () => {
             try {
-                const res = await axiosClient.get('/admin/dashboard');
-                setData(res.data.data);
+                const res = await axiosClient.get('/dashboard/overview');
+                setData(res.data.data || res.data);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -99,23 +99,26 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Temporary fallback since we don't have exact campaigns list in our API response yet */}
-                            <tr>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">حملة رمضان</td>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">Saba Motors</td>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">$1000</td>
-                                <td className="py-3 px-1">
-                                    <span className="bg-[#2E7D32] text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded">أخضر مكتمل</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">عروض العيد</td>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">Tech Solutions</td>
-                                <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">$500</td>
-                                <td className="py-3 px-1">
-                                    <span className="bg-[var(--color-gold)] text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded">أصفر تفعيل</span>
-                                </td>
-                            </tr>
+                            {data?.recent_campaigns?.map((campaign, idx) => (
+                                <tr key={idx}>
+                                    <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">{campaign.title || 'حملة بدون عنوان'}</td>
+                                    <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">{campaign.user?.full_name || '—'}</td>
+                                    <td className="py-3 px-1 text-[10px] md:text-xs font-bold text-gray-800">${campaign.total_cost || '0'}</td>
+                                    <td className="py-3 px-1">
+                                        <span className={`text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded ${
+                                            campaign.status === 'Active' ? 'bg-[#2E7D32]' : 
+                                            campaign.status === 'Pending' ? 'bg-[var(--color-gold)]' : 'bg-gray-500'
+                                        }`}>
+                                            {campaign.status === 'Active' ? 'أخضر نشط' : campaign.status === 'Pending' ? 'أصفر مراجعة' : campaign.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                            {!data?.recent_campaigns?.length && (
+                                <tr>
+                                    <td colSpan="4" className="py-6 text-xs text-gray-500 font-bold">لا يوجد حملات حالية</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

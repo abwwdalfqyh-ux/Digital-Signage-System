@@ -11,10 +11,11 @@ const FinancialPage = () => {
     useEffect(() => {
         const fetchFinancials = async () => {
             try {
-                const res = await axiosClient.get('/admin/financials');
-                setData(res.data.data);
+                const res = await axiosClient.get('/financial/ledger');
+                setData(res.data?.data || res.data || { total_payments: 0, transactions: [] });
             } catch (error) {
                 console.error(error);
+                setData({ total_payments: 0, transactions: [] }); // Safe fallback
             } finally {
                 setLoading(false);
             }

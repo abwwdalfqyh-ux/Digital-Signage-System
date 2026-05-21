@@ -52,10 +52,11 @@ const useAuthStore = create((set, get) => ({
     },
 
     /**
-     * Check if the user is SuperAdmin
+     * Check if the user is SuperAdmin or Admin
      */
     isAdmin: () => {
-        return get().getRoleName() === 'SuperAdmin';
+        const role = get().getRoleName();
+        return role === 'SuperAdmin' || role === 'Admin';
     },
 
     /**

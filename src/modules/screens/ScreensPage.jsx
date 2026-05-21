@@ -76,15 +76,17 @@ const ScreensPage = () => {
         { key: 'status', header: 'الحالة', cell: (row) => <StatusBadge status={row.status} /> },
         { key: 'type.type_name', header: 'النوع', cell: (row) => row.type?.type_name || '—' },
         { key: 'owner.full_name', header: 'المالك', cell: (row) => row.owner?.full_name || '—' },
-        { key: 'street.name', header: 'الموقع', cell: (row) => {
-            const s = row.street;
-            if (!s) return '—';
-            return `${s.name}${s.region ? ` - ${s.region.name}` : ''}`;
-        }},
+        {
+            key: 'street.name', header: 'الموقع', cell: (row) => {
+                const s = row.street;
+                if (!s) return '—';
+                return `${s.name}${s.region ? ` - ${s.region.name}` : ''}`;
+            }
+        },
         {
             key: 'actions', header: 'إجراءات', cell: (row) => (
                 <div className="flex items-center justify-center gap-1">
-                    <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.screen_id)}} className="text-gray-500 hover:text-red-500 p-1.5 rounded-lg hover:bg-gray-100 transition-all">
+                    <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.screen_id) }} className="text-gray-500 hover:text-red-500 p-1.5 rounded-lg hover:bg-gray-100 transition-all">
                         <Trash2 className="w-5 h-5" />
                     </button>
                 </div>
@@ -97,7 +99,7 @@ const ScreensPage = () => {
 
     return (
         <div className="space-y-6" dir="rtl">
-            <PageHeader 
+            <PageHeader
                 title={
                     <span className="flex items-center gap-3">
                         <Monitor className="w-7 h-7 text-[var(--color-dark-turquoise)]" /> إدارة الشاشات
@@ -121,23 +123,23 @@ const ScreensPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-4" dir="rtl">
                     <div>
                         <label className={labelClass}>اسم الشاشة *</label>
-                        <input type="text" required value={form.screen_name} onChange={(e) => setForm(p => ({...p, screen_name: e.target.value}))} placeholder="مثال: شاشة شارع الستين" className={inputClass} />
+                        <input type="text" required value={form.screen_name} onChange={(e) => setForm(p => ({ ...p, screen_name: e.target.value }))} placeholder="مثال: شاشة شارع الستين" className={inputClass} />
                     </div>
                     <div>
                         <label className={labelClass}>معرّف الجهاز (MAC Address) *</label>
-                        <input type="text" required value={form.mac_address} onChange={(e) => setForm(p => ({...p, mac_address: e.target.value}))} placeholder="AA:BB:CC:DD:EE:FF" className={inputClass} dir="ltr" />
+                        <input type="text" required value={form.mac_address} onChange={(e) => setForm(p => ({ ...p, mac_address: e.target.value }))} placeholder="AA:BB:CC:DD:EE:FF" className={inputClass} dir="ltr" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className={labelClass}>نوع الشاشة</label>
-                            <select value={form.type_id} onChange={(e) => setForm(p => ({...p, type_id: e.target.value}))} className={inputClass}>
+                            <select value={form.type_id} onChange={(e) => setForm(p => ({ ...p, type_id: e.target.value }))} className={inputClass}>
                                 <option value="">اختر</option>
                                 {lookups.types.map(t => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
                             </select>
                         </div>
                         <div>
                             <label className={labelClass}>الموقع (الشارع)</label>
-                            <select value={form.street_id} onChange={(e) => setForm(p => ({...p, street_id: e.target.value}))} className={inputClass}>
+                            <select value={form.street_id} onChange={(e) => setForm(p => ({ ...p, street_id: e.target.value }))} className={inputClass}>
                                 <option value="">اختر</option>
                                 {lookups.streets.map(s => <option key={s.street_id} value={s.street_id}>{s.name} - {s.region?.name}</option>)}
                             </select>
@@ -145,14 +147,14 @@ const ScreensPage = () => {
                     </div>
                     <div>
                         <label className={labelClass}>المالك</label>
-                        <select value={form.owner_id} onChange={(e) => setForm(p => ({...p, owner_id: e.target.value}))} className={inputClass}>
+                        <select value={form.owner_id} onChange={(e) => setForm(p => ({ ...p, owner_id: e.target.value }))} className={inputClass}>
                             <option value="">اختر</option>
                             {lookups.owners.map(o => <option key={o.user_id} value={o.user_id}>{o.full_name}</option>)}
                         </select>
                     </div>
                     <div>
                         <label className={labelClass}>صورة الشاشة *</label>
-                        <input type="file" accept="image/*" required onChange={(e) => setForm(p => ({...p, photo: e.target.files[0]}))}
+                        <input type="file" accept="image/*" required onChange={(e) => setForm(p => ({ ...p, photo: e.target.files[0] }))}
                             className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[var(--color-dark-turquoise)]/10 file:text-[var(--color-dark-turquoise)] cursor-pointer" />
                     </div>
                     <button type="submit" className="w-full bg-[var(--color-dark-turquoise)] hover:opacity-90 text-white font-bold py-3 rounded-full transition-opacity mt-6 shadow-sm">

@@ -8,6 +8,7 @@ import useAuthStore from '../store/useAuthStore';
 // Role names from backend
 export const ROLES = {
     SUPER_ADMIN: 'SuperAdmin',
+    ADMIN: 'Admin',
     ADVERTISER: 'Advertiser',
     SCREEN_OWNER: 'ScreenOwner',
     MAINTENANCE: 'Maintenance',
@@ -21,7 +22,7 @@ const usePermission = () => {
     const user = useAuthStore(state => state.user);
     const roleName = user?.role?.role_name || null;
 
-    const isAdmin = roleName === ROLES.SUPER_ADMIN;
+    const isAdmin = roleName === ROLES.SUPER_ADMIN || roleName === ROLES.ADMIN;
     const isAdvertiser = roleName === ROLES.ADVERTISER;
     const isScreenOwner = roleName === ROLES.SCREEN_OWNER;
     const isMaintenance = roleName === ROLES.MAINTENANCE;

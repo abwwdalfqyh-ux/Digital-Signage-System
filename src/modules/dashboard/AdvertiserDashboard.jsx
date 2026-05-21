@@ -48,8 +48,8 @@ const AdvertiserDashboard = () => {
     const [chartTab, setChartTab] = useState('spending'); // 'spending' or 'impressions'
     const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'Active', 'Pending'
 
-    // Mock trend datasets for double tab chart
-    const trendData = {
+    // Mock trend datasets for double tab chart fallback
+    const fallbackTrendData = {
         spending: [
             { label: 'يناير', value: 120, count: 3 },
             { label: 'فبراير', value: 280, count: 5 },
@@ -68,13 +68,16 @@ const AdvertiserDashboard = () => {
         ]
     };
 
+    const trendData = data?.trends || fallbackTrendData;
+
     useEffect(() => {
         const fetchDashboard = async () => {
             try {
                 const res = await axiosClient.get('/advertiser/dashboard');
-                setData(res.data.data);
+                setData(res.data.data || res.data);
             } catch (error) {
                 console.error('Error fetching dashboard', error);
+                setData({}); // Safe fallback on 500 errors
             } finally {
                 setLoading(false);
             }
