@@ -6,6 +6,7 @@ import useToastStore from '../../store/useToastStore';
 import PageHeader from '../../shared/components/PageHeader';
 import DataTable from '../../shared/components/DataTable';
 import Modal from '../../shared/components/Modal';
+import usePermission from '../../hooks/usePermission';
 
 const PaymentMethodsPage = () => {
     const addToast = useToastStore(state => state.addToast);
@@ -14,6 +15,7 @@ const PaymentMethodsPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMethod, setEditingMethod] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { can } = usePermission();
 
     const [form, setForm] = useState({
         name: '',
@@ -51,7 +53,7 @@ const PaymentMethodsPage = () => {
                 account_details: method.account_details || '',
                 stripe_publishable_key: method.stripe_publishable_key || '',
                 stripe_secret_key: method.stripe_secret_key || '',
-                is_active: method.is_active == 1 || method.is_active === true
+                is_active: method.is_active == 1 || method.is_active === true || method.is_active === 'true'
             });
         } else {
             setEditingMethod(null);
@@ -76,7 +78,7 @@ const PaymentMethodsPage = () => {
         try {
             const payload = {
                 ...form,
-                is_active: form.is_active ? 1 : 0
+                is_active: form.is_active ? 'true' : 'false'
             };
 
             if (editingMethod) {
@@ -90,7 +92,13 @@ const PaymentMethodsPage = () => {
             closeModal();
             fetchMethods();
         } catch (error) {
-            addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ وسيلة الدفع', 'error');
+            const errList = error.response?.data?.errors;
+            if (errList) {
+                const firstErr = Object.values(errList)[0][0];
+                addToast(firstErr, 'error');
+            } else {
+                addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ وسيلة الدفع', 'error');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -109,26 +117,32 @@ const PaymentMethodsPage = () => {
     };
 
     const columns = [
-        { key: 'name', label: 'الاسم', render: (val) => <span className="font-bold text-[var(--color-dark-turquoise)]">{val}</span> },
-        { key: 'account_details', label: 'التفاصيل / الوصف', render: (val) => <span className="text-gray-600 line-clamp-1">{val}</span> },
+        { accessorKey: 'name', header: 'الاسم', cell: (row) => <span className="font-bold text-[var(--color-dark-turquoise)]">{row.name}</span> },
+        { accessorKey: 'account_details', header: 'التفاصيل / الوصف', cell: (row) => <span className="text-gray-600 line-clamp-1 truncate max-w-sm" title={row.account_details}>{row.account_details}</span> },
         {
-            key: 'is_active',
-            label: 'الحالة',
-            render: (val) => (
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    val == 1 || val === true ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                    {val == 1 || val === true ? 'مفعل' : 'معطل'}
-                </span>
-            )
-        },
-        {
-            key: 'actions',
-            label: 'إجراءات',
-            render: (_, row) => {
+            accessorKey: 'is_active',
+            header: 'الحالة',
+            cell: (row) => {
+                const isActive = row.is_active == 1 || row.is_active === true || row.is_active === 'true';
+                return (
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                        {isActive ? 'مفعل' : 'معطل'}
+                    </span>
+                );
+            }
+        }
+    ];
+
+    if (can('manage_all')) {
+        columns.push({
+            accessorKey: 'actions',
+            header: 'إجراءات',
+            cell: (row) => {
                 const id = row.method_id || row.id;
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-center items-center gap-2">
                         <button onClick={() => openModal(row)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                             <Edit2 className="w-4 h-4" />
                         </button>
@@ -138,8 +152,8 @@ const PaymentMethodsPage = () => {
                     </div>
                 );
             }
-        }
-    ];
+        });
+    }
 
     const inputClass = "w-full bg-gray-50 border-[1.5px] border-gray-200 rounded-xl py-2.5 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[var(--color-dark-turquoise)] focus:bg-white transition-all text-right";
     const labelClass = "text-xs font-bold text-[var(--color-dark-turquoise)] mb-1.5 block px-1";
@@ -152,21 +166,22 @@ const PaymentMethodsPage = () => {
                     description="إدارة طرق الدفع المتاحة وتفاصيل الحسابات"
                     icon={CreditCard}
                 />
-                <button
-                    onClick={() => openModal()}
-                    className="bg-[var(--color-gold)] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-                >
-                    <Plus className="w-5 h-5" /> إضافة وسيلة
-                </button>
+                {can('manage_all') && (
+                    <button
+                        onClick={() => openModal()}
+                        className="bg-[var(--color-gold)] hover:opacity-90 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+                    >
+                        <Plus className="w-5 h-5" /> إضافة وسيلة
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <DataTable
                     columns={columns}
-                    data={methods}
-                    isLoading={isLoading}
+                    data={methods.map(m => ({ ...m, id: m.method_id }))}
+                    loading={isLoading}
                     emptyMessage="لا توجد وسائل دفع مضافة حالياً"
-                    emptyIcon={CreditCard}
                 />
             </div>
 
@@ -182,6 +197,7 @@ const PaymentMethodsPage = () => {
                         <input
                             type="text"
                             required
+                            maxLength="255"
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             className={inputClass}

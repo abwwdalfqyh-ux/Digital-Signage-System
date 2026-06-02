@@ -4,6 +4,7 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
 import PageHeader from '../../shared/components/PageHeader';
+import { parseNotificationContent, getNotificationIconInfo } from './utils/notificationTranslator';
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
@@ -67,22 +68,7 @@ const NotificationsPage = () => {
         }
     };
 
-    const parseContent = (content) => {
-        if (!content) return '';
-        try {
-            const parsed = JSON.parse(content);
-            if (parsed.key) {
-                if (parsed.key === 'notif_title_payment_confirmed') return 'تم تأكيد الدفع بنجاح';
-                if (parsed.key === 'notif_msg_payment_confirmed') {
-                    return `تم تأكيد دفع مبلغ $${parsed.args?.amount || 0} للإعلان "${parsed.args?.title || ''}" وتوزيع الأرباح`;
-                }
-                return parsed.key;
-            }
-            return content;
-        } catch (e) {
-            return content;
-        }
-    };
+
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto" dir="rtl">
@@ -124,51 +110,54 @@ const NotificationsPage = () => {
             ) : (
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                     <div className="divide-y divide-gray-100">
-                        {notifications.map(notif => (
-                            <div 
-                                key={notif.notification_id} 
-                                className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
-                                    (notif.read_at === null || notif.is_read === false || notif.is_read === 'false') ? 'bg-[var(--color-dark-turquoise)]/5' : 'hover:bg-gray-50'
-                                }`}
-                            >
-                                <div className="flex-1 flex gap-4 items-start">
-                                    <div className={`p-2 rounded-full flex-shrink-0 mt-1 ${
-                                        (notif.read_at === null || notif.is_read === false || notif.is_read === 'false') ? 'bg-[var(--color-dark-turquoise)]/20 text-[var(--color-dark-turquoise)]' : 'bg-gray-100 text-gray-400'
-                                    }`}>
-                                        <Bell className="w-5 h-5" />
+                        {notifications.map(notif => {
+                            const isUnread = notif.read_at === null || notif.is_read === false || notif.is_read === 'false';
+                            const { Icon, colorClass } = getNotificationIconInfo(notif.title);
+                            return (
+                                <div 
+                                    key={notif.notification_id} 
+                                    className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors ${
+                                        isUnread ? 'bg-[var(--color-dark-turquoise)]/5' : 'hover:bg-gray-50'
+                                    }`}
+                                >
+                                    <div className="flex-1 flex gap-4 items-start">
+                                        <div className={`p-2 rounded-full flex-shrink-0 mt-1 ${isUnread ? colorClass : 'bg-gray-100 text-gray-400'}`}>
+                                            <Icon className="w-5 h-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className={`text-base font-bold mb-1 flex items-center gap-2 ${isUnread ? 'text-gray-900' : 'text-gray-700'}`}>
+                                                {parseNotificationContent(notif.title)}
+                                                {isUnread && <span className="w-2 h-2 rounded-full bg-[var(--color-dark-turquoise)] inline-block"></span>}
+                                            </h4>
+                                            <p className={`text-sm leading-relaxed ${isUnread ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
+                                                {parseNotificationContent(notif.message)}
+                                            </p>
+                                            <p className="text-xs text-gray-400 mt-2 font-medium" dir="ltr">
+                                                {new Date(notif.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h4 className={`text-base font-bold mb-1 ${(notif.read_at === null || notif.is_read === false || notif.is_read === 'false') ? 'text-gray-900' : 'text-gray-700'}`}>
-                                            {parseContent(notif.title)}
-                                        </h4>
-                                        <p className={`text-sm leading-relaxed ${(notif.read_at === null || notif.is_read === false || notif.is_read === 'false') ? 'text-gray-800 font-medium' : 'text-gray-500'}`}>
-                                            {parseContent(notif.message)}
-                                        </p>
-                                        <p className="text-xs text-gray-400 mt-2 font-medium" dir="ltr">
-                                            {new Date(notif.created_at).toLocaleString('ar-EG')}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 self-end md:self-center mr-12 md:mr-0">
-                                    {(notif.read_at === null || notif.is_read === false || notif.is_read === 'false') && (
+                                    <div className="flex items-center gap-2 self-end md:self-center mr-12 md:mr-0 shrink-0">
+                                        {isUnread && (
+                                            <button 
+                                                onClick={() => markAsRead(notif.notification_id)}
+                                                className="p-2 text-[var(--color-dark-turquoise)] hover:bg-[var(--color-dark-turquoise)]/10 rounded-lg transition-colors flex items-center justify-center"
+                                                title="تحديد كمقروء"
+                                            >
+                                                <CheckCircle2 className="w-5 h-5" />
+                                            </button>
+                                        )}
                                         <button 
-                                            onClick={() => markAsRead(notif.notification_id)}
-                                            className="p-2 text-[var(--color-dark-turquoise)] hover:bg-[var(--color-dark-turquoise)]/10 rounded-lg transition-colors flex items-center justify-center"
-                                            title="تحديد كمقروء"
+                                            onClick={() => deleteNotification(notif.notification_id)}
+                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center"
+                                            title="حذف الإشعار"
                                         >
-                                            <CheckCircle2 className="w-5 h-5" />
+                                            <Trash2 className="w-5 h-5" />
                                         </button>
-                                    )}
-                                    <button 
-                                        onClick={() => deleteNotification(notif.notification_id)}
-                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center"
-                                        title="حذف الإشعار"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}

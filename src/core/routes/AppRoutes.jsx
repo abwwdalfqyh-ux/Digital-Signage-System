@@ -34,6 +34,7 @@ import PeakHoursPage from '../../modules/admin/PeakHoursPage';
 import RolesPage from '../../modules/admin/RolesPage';
 import PaymentOperationsPage from '../../modules/admin/PaymentOperationsPage';
 import AdminProfilePage from '../../modules/admin/AdminProfilePage';
+import FrequencyPackagesPage from '../../modules/admin/FrequencyPackagesPage';
 /**
  * Protected Route - requires authentication
  */
@@ -129,6 +130,11 @@ const AppRoutes = () => {
                 <Route path="peak-hours" element={
                     <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
                         <PeakHoursPage />
+                    </RoleRoute>
+                } />
+                <Route path="frequency-packages" element={
+                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
+                        <FrequencyPackagesPage />
                     </RoleRoute>
                 } />
                 <Route path="roles" element={

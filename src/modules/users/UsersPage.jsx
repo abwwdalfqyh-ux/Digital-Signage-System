@@ -23,7 +23,11 @@ const UsersPage = () => {
         email: '',
         phone: '',
         password: '',
-        role_id: ''
+        role_id: '',
+        location: '',
+        bank_name: '',
+        account_name: '',
+        account_number: ''
     });
 
     useEffect(() => {
@@ -59,9 +63,24 @@ const UsersPage = () => {
 
     const handleOpenModal = (type, user = null) => {
         if (type === 'edit-role') {
-            setForm({ role_id: user.role_id || user.role?.role_id || '' });
+            setForm({ 
+                role_id: user.role_id || user.role?.role_id || '',
+                bank_name: '', 
+                account_name: '', 
+                account_number: '' 
+            });
         } else {
-            setForm({ full_name: '', email: '', phone: '', password: '', role_id: '' });
+            setForm({ 
+                full_name: '', 
+                email: '', 
+                phone: '', 
+                password: '', 
+                role_id: '',
+                location: '',
+                bank_name: '',
+                account_name: '',
+                account_number: ''
+            });
         }
         setModalConfig({ open: true, type, user });
     };
@@ -74,7 +93,12 @@ const UsersPage = () => {
                 await axiosClient.post(ENDPOINTS.USERS.ALL, form);
                 addToast('تم إضافة المستخدم بنجاح', 'success');
             } else if (modalConfig.type === 'edit-role') {
-                await axiosClient.put(ENDPOINTS.USERS.UPDATE_ROLE(modalConfig.user.user_id), { role_id: form.role_id });
+                await axiosClient.put(ENDPOINTS.USERS.UPDATE_ROLE(modalConfig.user.user_id), { 
+                    role_id: form.role_id,
+                    bank_name: form.bank_name,
+                    account_name: form.account_name,
+                    account_number: form.account_number
+                });
                 addToast('تم تعديل صلاحية المستخدم بنجاح', 'success');
             }
             setModalConfig({ open: false, type: '', user: null });
@@ -96,7 +120,9 @@ const UsersPage = () => {
             </span>
         )},
         { key: 'phone', header: 'رقم الهاتف', cell: (row) => <span dir="ltr">{row.phone || '—'}</span> },
-        { key: 'is_active', header: 'الحالة', cell: (row) => <StatusBadge status={row.is_active ? 'Active' : 'Inactive'} /> },
+        { key: 'location', header: 'الموقع', cell: (row) => row.location || '—' },
+        { key: 'account_status', header: 'حالة الحساب', cell: (row) => <StatusBadge status={row.account_status || 'Active'} /> },
+        { key: 'is_active', header: 'نشط', cell: (row) => <StatusBadge status={row.is_active ? 'Active' : 'Inactive'} /> },
         {
             key: 'actions', header: 'إجراءات', cell: (row) => (
                 <div className="flex items-center justify-center gap-1">
@@ -153,6 +179,10 @@ const UsersPage = () => {
                                 <label className={labelClass}>كلمة المرور *</label>
                                 <input type="password" required minLength={6} value={form.password} onChange={e => setForm({...form, password: e.target.value})} className={inputClass} />
                             </div>
+                            <div>
+                                <label className={labelClass}>الموقع / المحافظة</label>
+                                <input type="text" value={form.location} onChange={e => setForm({...form, location: e.target.value})} className={inputClass} />
+                            </div>
                         </>
                     )}
                     <div>
@@ -162,6 +192,25 @@ const UsersPage = () => {
                             {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
                         </select>
                     </div>
+                    {roles.find(r => (r.role_id || r.id) == form.role_id)?.role_name === 'ScreenOwner' && (
+                        <div className="bg-gray-50 p-4 rounded-xl space-y-4 border border-gray-200 mt-4">
+                            <h4 className="text-xs font-bold text-gray-700">البيانات البنكية (لمالك الشاشة)</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className={labelClass}>اسم البنك</label>
+                                    <input type="text" value={form.bank_name} onChange={e => setForm({...form, bank_name: e.target.value})} className={inputClass} />
+                                </div>
+                                <div>
+                                    <label className={labelClass}>اسم الحساب</label>
+                                    <input type="text" value={form.account_name} onChange={e => setForm({...form, account_name: e.target.value})} className={inputClass} placeholder="افتراضياً: نفس الاسم الكامل" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className={labelClass}>رقم الحساب البنكي / الآيبان</label>
+                                <input type="text" value={form.account_number} onChange={e => setForm({...form, account_number: e.target.value})} className={inputClass} dir="ltr" />
+                            </div>
+                        </div>
+                    )}
                     <button type="submit" disabled={formLoading} className="w-full bg-[var(--color-dark-turquoise)] text-white font-bold py-3 rounded-full hover:opacity-90 transition-all disabled:opacity-50 mt-4">
                         {formLoading ? 'جاري الحفظ...' : 'حفظ'}
                     </button>

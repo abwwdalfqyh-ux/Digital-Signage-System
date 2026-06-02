@@ -6,6 +6,7 @@ import useToastStore from '../../store/useToastStore';
 import PageHeader from '../../shared/components/PageHeader';
 import DataTable from '../../shared/components/DataTable';
 import Modal from '../../shared/components/Modal';
+import usePermission from '../../hooks/usePermission';
 
 const RolesPage = () => {
     const addToast = useToastStore(state => state.addToast);
@@ -14,6 +15,7 @@ const RolesPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { can } = usePermission();
 
     const [form, setForm] = useState({
         role_name: ''
@@ -77,7 +79,13 @@ const RolesPage = () => {
             closeModal();
             fetchRoles();
         } catch (error) {
-            addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ الدور', 'error');
+            const errList = error.response?.data?.errors;
+            if (errList) {
+                const firstErr = Object.values(errList)[0][0];
+                addToast(firstErr, 'error');
+            } else {
+                addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ الدور', 'error');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -97,21 +105,21 @@ const RolesPage = () => {
 
     const columns = [
         { 
-            key: 'role_name', 
-            label: 'اسم الدور', 
-            render: (val) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                        <Shield className="w-5 h-5" />
+            accessorKey: 'role_name', 
+            header: 'اسم الدور', 
+            cell: (row) => (
+                <div className="flex items-center justify-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-100 flexitems-center justify-center text-indigo-600 shrink-0 hidden md:flex">
+                        <Shield className="w-5 h-5 mx-auto mt-2.5" />
                     </div>
-                    <span className="font-bold text-gray-800">{val}</span>
+                    <span className="font-bold text-gray-800">{row.role_name}</span>
                 </div>
             ) 
         },
         { 
-            key: 'type', 
-            label: 'النوع', 
-            render: (_, row) => {
+            accessorKey: 'type', 
+            header: 'النوع', 
+            cell: (row) => {
                 const isProtected = PROTECTED_ROLES.includes(row.role_name);
                 return (
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -121,16 +129,19 @@ const RolesPage = () => {
                     </span>
                 );
             } 
-        },
-        {
-            key: 'actions',
-            label: 'إجراءات',
-            render: (_, row) => {
+        }
+    ];
+
+    if (can('manage_all')) {
+        columns.push({
+            accessorKey: 'actions',
+            header: 'إجراءات',
+            cell: (row) => {
                 const id = row.role_id || row.id;
                 const isProtected = PROTECTED_ROLES.includes(row.role_name);
                 
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex justify-center items-center gap-2">
                         <button onClick={() => openModal(row)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                             <Edit2 className="w-4 h-4" />
                         </button>
@@ -142,8 +153,8 @@ const RolesPage = () => {
                     </div>
                 );
             }
-        }
-    ];
+        });
+    }
 
     const inputClass = "w-full bg-gray-50 border-[1.5px] border-gray-200 rounded-xl py-2.5 px-4 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[var(--color-dark-turquoise)] focus:bg-white transition-all text-right";
     const labelClass = "text-xs font-bold text-[var(--color-dark-turquoise)] mb-1.5 block px-1";
@@ -156,21 +167,22 @@ const RolesPage = () => {
                     description="إضافة وتعديل أدوار المستخدمين في النظام"
                     icon={Shield}
                 />
-                <button
-                    onClick={() => openModal()}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-                >
-                    <Plus className="w-5 h-5" /> إضافة دور جديد
-                </button>
+                {can('manage_all') && (
+                    <button
+                        onClick={() => openModal()}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+                    >
+                        <Plus className="w-5 h-5" /> إضافة دور جديد
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                 <DataTable
                     columns={columns}
-                    data={roles}
-                    isLoading={isLoading}
+                    data={roles.map(r => ({ ...r, id: r.role_id }))}
+                    loading={isLoading}
                     emptyMessage="لا توجد أدوار مضافة حالياً"
-                    emptyIcon={Shield}
                 />
             </div>
 
@@ -186,6 +198,7 @@ const RolesPage = () => {
                         <input
                             type="text"
                             required
+                            maxLength="50"
                             value={form.role_name}
                             onChange={(e) => setForm({ role_name: e.target.value })}
                             className={inputClass}

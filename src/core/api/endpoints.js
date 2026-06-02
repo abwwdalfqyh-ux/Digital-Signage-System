@@ -36,10 +36,15 @@ export const ENDPOINTS = {
         DELETE: (id) => `/ads/${id}`
     },
     FREQUENCY_PACKAGES: {
-        ALL: '/frequency-packages'
+        ALL: '/frequency-packages',
+        CREATE: '/frequency-packages',
+        UPDATE: (id) => `/frequency-packages/${id}`,
+        DELETE: (id) => `/frequency-packages/${id}`
     },
     SCREEN_PRICING: {
-        ALL: '/screen-pricing-slots'
+        ALL: '/screen-pricing-slots',
+        UPDATE: (id) => `/screen-pricing-slots/${id}`,
+        DELETE: (id) => `/screen-pricing-slots/${id}`
     },
     FINANCIAL: {
         LEDGER: '/financial/ledger',
@@ -49,6 +54,10 @@ export const ENDPOINTS = {
     PAYMENT: {
         METHODS: '/payment-methods',
         METHOD: (id) => `/payment-methods/${id}`
+    },
+    PAYMENTS: {
+        STRIPE_CREATE_INTENT: '/payments/stripe/create-intent',
+        STRIPE_CONFIRM: '/payments/stripe/confirm'
     },
     LOOKUPS: {
         ROLES: '/lookups/roles',

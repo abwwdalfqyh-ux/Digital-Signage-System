@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Monitor, PlayCircle, Clock, Settings, Search } from 'lucide-react';
+import { Monitor, PlayCircle, Clock, Settings, Search, DollarSign } from 'lucide-react';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 
@@ -63,7 +63,12 @@ const Dashboard = () => {
     return (
         <div className="space-y-4" dir="rtl">
             {/* KPI Cards (Matches Flutter Row of 4 Expanded widgets) */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3">
+                <StatCard 
+                    title="إجمالي الإيرادات" 
+                    value={`$${data?.kpis?.total_revenue || '0'}`} 
+                    icon={DollarSign} 
+                />
                 <StatCard 
                     title="الشاشات النشطة" 
                     value={data?.kpis?.active_screens || '0'} 
