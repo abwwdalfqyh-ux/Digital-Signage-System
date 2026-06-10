@@ -24,6 +24,7 @@ export const ENDPOINTS = {
     },
     SCREENS: {
         ALL: '/screens',
+        UPDATE: (id) => `/screens/${id}`,
         DELETE: (id) => `/screens/${id}`,
         AVAILABILITY: (id) => `/screens/${id}/availability`,
         COMMAND: '/screens/command',
