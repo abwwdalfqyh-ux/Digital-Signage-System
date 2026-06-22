@@ -51,6 +51,7 @@ export const ENDPOINTS = {
         LEDGER: '/financial/ledger',
         MY_EARNINGS: '/financial/my-earnings',
         APPROVE: (id) => `/financial/approve-payment/${id}`,
+        RECORD_PAYMENT: '/financial/payments',
     },
     PAYMENT: {
         METHODS: '/payment-methods',
@@ -83,5 +84,8 @@ export const ENDPOINTS = {
     },
     DASHBOARD: {
         OVERVIEW: '/dashboard/overview'
+    },
+    OWNER: {
+        DASHBOARD: '/owner/dashboard'
     }
 };

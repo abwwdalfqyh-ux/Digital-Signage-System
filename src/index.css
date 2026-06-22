@@ -121,6 +121,42 @@
     }
 }
 
+/* ═══════════════════════════════════════════════════
+   Dark Mode Overrides  (data-theme="dark" on <html>)
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] {
+    /* Backgrounds */
+    --color-surface:                   #0f1117;
+    --color-background:                #0f1117;
+    --color-surface-container-lowest:  #151720;
+    --color-surface-container-low:     #1a1d2a;
+    --color-surface-container:         #1f2230;
+    --color-surface-container-high:    #252838;
+    --color-surface-container-highest: #2b2e40;
+    --color-surface-dim:               #0c0e15;
+    --color-bg-light:                  #0f1117;
+
+    /* Text */
+    --color-on-surface:         #e2e5f0;
+    --color-on-background:      #e2e5f0;
+    --color-on-surface-variant: #9ea3b8;
+    --color-outline:            #5a5e72;
+    --color-outline-variant:    #2e3145;
+
+    /* Primary */
+    --color-primary:            #b4c5ff;
+    --color-primary-container:  #3b63e8;
+    --color-on-primary:         #00174b;
+
+    /* Errors */
+    --color-error:              #ffb4ab;
+}
+
+[data-theme="dark"] body {
+    background-color: #0f1117;
+    color: #e2e5f0;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar              { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track        { background: transparent; }
