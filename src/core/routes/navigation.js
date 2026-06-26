@@ -32,8 +32,6 @@ export const getNavItems = (roleName) => {
                 { path: '/dashboard/users', icon: Users, label: 'المستخدمون' },
                 { path: '/dashboard/roles', icon: Shield, label: 'الصلاحيات' },
                 { path: '/dashboard/locations', icon: MapPin, label: 'المواقع' },
-                { path: '/dashboard/categories', icon: Layers, label: 'تصنيفات' },
-                { path: '/dashboard/peak-hours', icon: Clock, label: 'أوقات الذروة' },
                 { path: '/dashboard/frequency-packages', icon: Repeat, label: 'باقات التكرار' },
                 { path: '/dashboard/payment-methods', icon: CreditCard, label: 'طرق الدفع' },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: 'عمليات الدفع' },

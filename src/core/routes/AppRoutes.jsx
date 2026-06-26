@@ -28,7 +28,6 @@ import SettingsPage from '../../modules/settings/SettingsPage';
 import NotificationsPage from '../../modules/notifications/NotificationsPage';
 
 // Admin Modules
-import CategoriesPage from '../../modules/admin/CategoriesPage';
 import PaymentMethodsPage from '../../modules/admin/PaymentMethodsPage';
 import PeakHoursPage from '../../modules/admin/PeakHoursPage';
 import RolesPage from '../../modules/admin/RolesPage';
@@ -118,11 +117,6 @@ const AppRoutes = () => {
                 } />
 
                 {/* Admin Modules (Admin Only) */}
-                <Route path="categories" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
-                        <CategoriesPage />
-                    </RoleRoute>
-                } />
                 <Route path="payment-methods" element={
                     <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
                         <PaymentMethodsPage />
