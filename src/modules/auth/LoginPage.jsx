@@ -248,7 +248,7 @@ const LoginPage = () => {
                         {/* Logo Area */}
                         <div className="flex items-center flex-col">
                             <div className="mb-1 flex items-center justify-center drop-shadow-md">
-                                <img src="/src/assets/images/Main_app_logo.png" alt="SabaPost Logo" className="w-[140px] h-auto object-contain brightness-0 invert" />
+                                <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-[140px] h-auto object-contain brightness-0 invert" />
                             </div>
                         </div>
                         <div className="bg-white/10 border border-white/20 rounded-full px-5 py-2 backdrop-blur-md shadow-sm">

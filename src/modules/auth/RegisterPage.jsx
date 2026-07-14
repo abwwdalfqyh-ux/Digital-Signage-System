@@ -296,7 +296,7 @@ const RegisterPage = () => {
                         <div className="flex items-center flex-col">
                             <div className="mb-1 flex items-center justify-center drop-shadow-md">
                                 <img
-                                    src="/src/assets/images/Main_app_logo.png"
+                                    src="/Main_app_logo.png"
                                     alt="SabaPost Logo"
                                     className="w-[140px] h-auto object-contain brightness-0 invert"
                                 />
