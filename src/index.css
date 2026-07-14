@@ -1,0 +1,223 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+    --font-sans: "IBM Plex Sans Arabic", "Segoe UI", "Tahoma", system-ui, sans-serif;
+
+    /* ── Original brand colors ── */
+    --color-dark-turquoise: #145D6A;
+    --color-gold:           #C4A052;
+    --color-bg-light:       #F9F9F9;
+    --color-grey-text:      #757575;
+
+    /* ── Dashboard surface colors ── */
+    --color-cream:  #f7f2e8;
+    --color-card:   #faf6ec;
+    --color-border: #d4c07a;
+
+    /* ── Stitch Theme Colors ── */
+    --color-surface-container-highest: #dce2f7;
+    --color-surface-container: #e9edff;
+    --color-surface-bright: #f9f9ff;
+    --color-primary: #004ac6;
+    --color-on-primary-container: #eeefff;
+    --color-surface-variant: #dce2f7;
+    --color-inverse-primary: #b4c5ff;
+    --color-primary-container: #2563eb;
+    --color-inverse-on-surface: #edf0ff;
+    --color-surface-container-high: #e1e8fd;
+    --color-outline: #737686;
+    --color-on-surface-variant: #434655;
+    --color-surface: #f9f9ff;
+    --color-on-primary-fixed-variant: #003ea8;
+    --color-on-tertiary-fixed-variant: #004395;
+    --color-surface-dim: #d3daef;
+    --color-on-secondary-fixed: #001c39;
+    --color-secondary: #0060ac;
+    --color-on-secondary: #ffffff;
+    --color-secondary-fixed-dim: #a4c9ff;
+    --color-on-background: #141b2b;
+    --color-tertiary-fixed-dim: #adc6ff;
+    --color-primary-fixed: #dbe1ff;
+    --color-background: #f9f9ff;
+    --color-primary-fixed-dim: #b4c5ff;
+    --color-outline-variant: #c3c6d7;
+    --color-on-tertiary-fixed: #001a42;
+    --color-on-surface: #141b2b;
+    --color-on-secondary-container: #003c70;
+    --color-secondary-fixed: #d4e3ff;
+    --color-on-tertiary-container: #edf0ff;
+    --color-on-secondary-fixed-variant: #004883;
+    --color-error: #ba1a1a;
+    --color-tertiary-container: #0f69dc;
+    --color-on-primary-fixed: #00174b;
+    --color-on-primary: #ffffff;
+    --color-on-error-container: #93000a;
+    --color-surface-container-low: #f1f3ff;
+    --color-secondary-container: #64a8fe;
+    --color-on-error: #ffffff;
+    --color-tertiary: #0051b1;
+    --color-surface-container-lowest: #ffffff;
+    --color-inverse-surface: #293040;
+    --color-error-container: #ffdad6;
+    --color-surface-tint: #0053db;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-fixed: #d8e2ff;
+
+    /* ── Stitch Spacing ── */
+    --spacing-margin-desktop: 32px;
+    --spacing-margin-mobile: 16px;
+    --spacing-lg: 24px;
+    --spacing-md: 16px;
+    --spacing-sm: 8px;
+    --spacing-xs: 4px;
+    --spacing-base: 4px;
+
+    /* ── Stitch Fonts ── */
+    --text-headline-lg-mobile: 24px;
+    --text-headline-lg-mobile--line-height: 32px;
+    --text-headline-lg-mobile--font-weight: 600;
+    --text-body-md: 16px;
+    --text-body-md--line-height: 24px;
+    --text-body-lg: 18px;
+    --text-body-lg--line-height: 28px;
+    --text-display-lg: 48px;
+    --text-display-lg--line-height: 60px;
+    --text-display-lg--font-weight: 700;
+    --text-title-lg: 20px;
+    --text-title-lg--line-height: 28px;
+    --text-title-lg--font-weight: 600;
+    --text-headline-lg: 32px;
+    --text-headline-lg--line-height: 40px;
+    --text-headline-lg--font-weight: 600;
+    --text-headline-md: 24px;
+    --text-headline-md--line-height: 32px;
+    --text-headline-md--font-weight: 600;
+    --text-label-md: 14px;
+    --text-label-md--line-height: 20px;
+    --text-label-md--font-weight: 500;
+    --text-caption: 12px;
+    --text-caption--line-height: 16px;
+}
+
+@layer base {
+    * { box-sizing: border-box; }
+
+    body {
+        background-color: var(--color-bg-light);
+        color: #1a1a1a;
+        font-family: var(--font-sans);
+        margin: 0;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    #root {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100svh;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   Dark Mode Overrides  (data-theme="dark" on <html>)
+   ═══════════════════════════════════════════════════ */
+[data-theme="dark"] {
+    /* Backgrounds */
+    --color-surface:                   #0f1117;
+    --color-background:                #0f1117;
+    --color-surface-container-lowest:  #151720;
+    --color-surface-container-low:     #1a1d2a;
+    --color-surface-container:         #1f2230;
+    --color-surface-container-high:    #252838;
+    --color-surface-container-highest: #2b2e40;
+    --color-surface-dim:               #0c0e15;
+    --color-bg-light:                  #0f1117;
+
+    /* Text */
+    --color-on-surface:         #e2e5f0;
+    --color-on-background:      #e2e5f0;
+    --color-on-surface-variant: #9ea3b8;
+    --color-outline:            #5a5e72;
+    --color-outline-variant:    #2e3145;
+
+    /* Primary */
+    --color-primary:            #b4c5ff;
+    --color-primary-container:  #3b63e8;
+    --color-on-primary:         #00174b;
+
+    /* Errors */
+    --color-error:              #ffb4ab;
+}
+
+[data-theme="dark"] body {
+    background-color: #0f1117;
+    color: #e2e5f0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar              { width: 6px; height: 6px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: rgba(20,93,106,0.25); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover  { background: rgba(20,93,106,0.45); }
+
+.custom-scrollbar::-webkit-scrollbar             { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar-track       { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb       { background: rgba(20,93,106,0.2); border-radius: 999px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(20,93,106,0.4); }
+
+/* RTL inputs */
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select { text-align: right; }
+
+/* Animate pulse */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+}
+.animate-pulse { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+/* Ping animation for map markers */
+@keyframes ping {
+    0%   { transform: scale(0.8); opacity: 0.8; }
+    75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Leaflet base overrides */
+.leaflet-container {
+    z-index: 1 !important; /* Fix for Modals */
+}
+
+/* Leaflet popup overrides to match design system */
+.leaflet-popup-content-wrapper {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 30px -4px rgba(0,0,0,0.15) !important;
+    border: 1px solid #e5e7eb !important;
+    padding: 0 !important;
+}
+.leaflet-popup-content {
+    margin: 12px 14px !important;
+    font-family: 'Cairo', 'Segoe UI', sans-serif;
+}
+.leaflet-popup-tip-container { display: none; }
+.leaflet-control-zoom {
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e5e7eb !important;
+}
+.leaflet-control-zoom a {
+    color: #145d6a !important;
+    font-weight: 900 !important;
+}
+.leaflet-control-zoom a:hover { background: #f0fafa !important; }
+.leaflet-control-attribution {
+    font-size: 9px !important;
+    background: rgba(255,255,255,0.7) !important;
+    backdrop-filter: blur(4px);
+    border-radius: 8px !important;
+    padding: 2px 6px !important;
+}
