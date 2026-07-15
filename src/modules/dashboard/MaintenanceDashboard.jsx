@@ -544,10 +544,15 @@ const MaintenanceDashboard = () => {
     const navigate = useNavigate();
     const addToast = useToastStore(s => s.addToast);
 
-    const { data: screensData, isLoading: screensLoading } = useScreens();
-    const { data: ticketsData, isLoading: ticketsLoading } = useSupportTickets();
+    const { data: screensData, isLoading: screensLoading, refetch: refetchScreens } = useScreens();
+    const { data: ticketsData, isLoading: ticketsLoading, refetch: refetchTickets } = useSupportTickets();
     const { mutateAsync: updateScreenStatus } = useUpdateScreenStatus();
     const { mutateAsync: updateTicket } = useUpdateSupportTicket();
+
+    const loadScreens = () => {
+        refetchScreens();
+        refetchTickets();
+    };
 
     /* State */
     const [incidentFilter, setIncidentFilter] = useState('all');
