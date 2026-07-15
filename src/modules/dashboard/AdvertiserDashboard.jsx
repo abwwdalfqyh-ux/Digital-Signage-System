@@ -136,7 +136,7 @@ const AdvertiserDashboard = () => {
             {/* 1. Header (Matched to Admin Dashboard) */}
             <motion.div
                 variants={itemVariants}
-                className="flex items-end justify-between mb-2"
+                className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-2"
             >
                 <div>
                     <h1 className="text-[28px] font-bold text-on-background m-0 leading-tight font-sans">

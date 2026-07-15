@@ -8,6 +8,29 @@ import { useAdminDashboard } from '../../hooks/api/useDashboard';
 import useToastStore from '../../store/useToastStore';
 import RecentPlaybackLogs from './components/RecentPlaybackLogs';
 
+const dashboardStyles = `
+  .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .dash-charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .dash-header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+  .dash-header-actions { display: flex; gap: 10px; align-items: center; }
+  .dash-map-legend { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+
+  @media (max-width: 1200px) {
+    .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 992px) {
+    .dash-charts-grid { grid-template-columns: 1fr; }
+    .dash-map-legend { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; margin-top: 16px; }
+  }
+  @media (max-width: 768px) {
+    .dash-kpi-grid { grid-template-columns: 1fr; }
+    .dash-header-row { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .dash-header-actions { width: 100%; flex-direction: column; align-items: stretch; }
+    .dash-header-actions select { width: 100%; }
+    .dash-header-actions button { justify-content: center; width: 100%; }
+  }
+`;
+
 /* ─── Stitch colour tokens ─── */
 const S = {
     primary: '#004ac6',
@@ -364,20 +387,6 @@ const DonutChart = ({ data = [] }) => {
 };
 
 /* ══════════════════════════════════════════════════════
-                                            </span>
-                                        </button>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
-            </div>
-        </motion.div>
-    );
-};
-
-/* ══════════════════════════════════════════════════════
    SKELETON
 ══════════════════════════════════════════════════════ */
 const DashboardSkeleton = () => (
@@ -388,17 +397,26 @@ const DashboardSkeleton = () => (
               50% { opacity: 0.45; }
             }
             .stitch-skel { animation: stitchPulse 1.6s ease-in-out infinite; }
+            .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+            .dash-charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+            @media (max-width: 1024px) {
+                .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+                .dash-charts-grid { grid-template-columns: 1fr; }
+            }
+            @media (max-width: 600px) {
+                .dash-kpi-grid { grid-template-columns: 1fr; }
+            }
         `}</style>
         {/* title skeleton */}
         <div className="stitch-skel" style={{ height: '32px', width: '220px', borderRadius: '8px', background: S.surfaceContainerHigh, marginBottom: '24px' }} />
         {/* kpi row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '16px', marginBottom: '20px' }}>
+        <div className="dash-kpi-grid">
             {[...Array(4)].map((_, i) => (
                 <div key={i} className="stitch-skel"
                     style={{ height: '130px', borderRadius: '16px', background: S.surfaceContainerHigh, border: `1px solid ${S.outlineVariant}` }} />
             ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '16px', marginBottom: '16px' }}>
+        <div className="dash-charts-grid">
             <div className="stitch-skel" style={{ height: '280px', borderRadius: '16px', background: S.surfaceContainerHigh }} />
             <div className="stitch-skel" style={{ height: '280px', borderRadius: '16px', background: S.surfaceContainerHigh }} />
         </div>
@@ -539,18 +557,24 @@ const Dashboard = () => {
             paddingBottom: '40px',
             fontFamily: "'IBM Plex Sans Arabic', sans-serif",
         }}>
+            <style>{dashboardStyles + `
+                .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+                .dash-charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 20px; }
+                @media (max-width: 1024px) {
+                    .dash-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+                    .dash-charts-grid { grid-template-columns: 1fr; }
+                }
+                @media (max-width: 600px) {
+                    .dash-kpi-grid { grid-template-columns: 1fr; }
+                }
+            `}</style>
 
             {/* ── Page header ── */}
             <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4 }}
-                style={{
-                    marginBottom: '24px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                }}
+                className="dash-header-row"
             >
                 <div>
                     <h1 style={{
@@ -571,7 +595,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* action buttons */}
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div className="dash-header-actions">
                     {/* ── Period filter ── */}
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: '0',
@@ -626,12 +650,7 @@ const Dashboard = () => {
 
 
             {/* ── KPI CARDS ROW ── */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: '16px',
-                marginBottom: '20px',
-            }}>
+            <div className="dash-kpi-grid">
                 {/* Active Users */}
                 <KpiCard
                     index={0}
@@ -701,12 +720,7 @@ const Dashboard = () => {
             </div>
 
             {/* ── CHARTS ROW ── */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 1fr',
-                gap: '16px',
-                marginBottom: '20px',
-            }}>
+            <div className="dash-charts-grid">
                 {/* Weekly Revenue chart */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

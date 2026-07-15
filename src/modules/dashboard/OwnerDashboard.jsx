@@ -287,7 +287,7 @@ const OwnerDashboard = () => {
         <div className="p-6 md:p-8 space-y-6 max-w-[1600px] mx-auto w-full" style={{ direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             
             {/* ── Header ── */}
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="mb-6 flex justify-between items-end">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
                     <h1 className="text-3xl font-black text-[#141b2b] m-0 mb-2 tracking-tight">نظرة عامة على الأصول</h1>
                     <p className="text-sm font-medium text-gray-500 m-0">مراقبة الأداء، الإيرادات، والحالة التشغيلية لشاشاتك.</p>
