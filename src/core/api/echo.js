@@ -4,18 +4,14 @@ import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
 let echo = null;
+const pusherKey = import.meta.env.VITE_PUSHER_APP_KEY;
 
-const reverbHost = import.meta.env.VITE_REVERB_HOST;
-
-if (import.meta.env.VITE_REVERB_APP_KEY && reverbHost && reverbHost !== 'api.your-domain.com') {
+if (pusherKey) {
     echo = new Echo({
-        broadcaster: 'reverb',
-        key: import.meta.env.VITE_REVERB_APP_KEY,
-        wsHost: import.meta.env.VITE_REVERB_HOST,
-        wsPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
-        wssPort: import.meta.env.VITE_REVERB_PORT ?? 8080,
-        forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
-        enabledTransports: ['ws', 'wss'],
+        broadcaster: 'pusher',
+        key: pusherKey,
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER || 'us2',
+        forceTLS: true,
         authorizer: (channel, options) => {
             return {
                 authorize: (socketId, callback) => {
@@ -49,7 +45,7 @@ if (import.meta.env.VITE_REVERB_APP_KEY && reverbHost && reverbHost !== 'api.you
         }
     });
 } else {
-    console.warn("Laravel Echo: VITE_REVERB_APP_KEY is missing. WebSockets are disabled.");
+    console.warn("Laravel Echo: VITE_PUSHER_APP_KEY is missing. WebSockets are disabled.");
     const dummyChannel = { listen: () => dummyChannel };
     echo = {
         private: () => dummyChannel,
