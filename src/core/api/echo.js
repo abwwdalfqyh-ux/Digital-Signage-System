@@ -15,7 +15,7 @@ if (pusherKey) {
         authorizer: (channel, options) => {
             return {
                 authorize: (socketId, callback) => {
-                    const token = localStorage.getItem('token');
+                    const token = localStorage.getItem('sabapost_auth_token');
                     fetch(`${import.meta.env.VITE_API_URL}/broadcasting/auth`, {
                         method: 'POST',
                         headers: {
