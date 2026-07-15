@@ -111,7 +111,13 @@ const ScreenDetailPage = () => {
                             <div className="mb-4">
                                 <p className="text-xs text-gray-500 mb-2">آخر لقطة شاشة:</p>
                                 <div className="aspect-[16/9] bg-black rounded-lg overflow-hidden border border-gray-200 relative group">
-                                    <img src={screen.last_screenshot_url} alt="Screenshot" className="w-full h-full object-contain" />
+                                    <img 
+                                        src={screen.last_screenshot_url.includes('localhost') 
+                                            ? screen.last_screenshot_url.replace(/http:\/\/localhost(:\d+)?/, import.meta.env.VITE_API_URL.replace(/\/api$/, '')) 
+                                            : screen.last_screenshot_url} 
+                                        alt="Screenshot" 
+                                        className="w-full h-full object-contain" 
+                                    />
                                 </div>
                                 <p className="text-[10px] text-gray-400 mt-1 text-left" dir="ltr">{new Date(screen.last_screenshot_at).toLocaleString()}</p>
                             </div>
