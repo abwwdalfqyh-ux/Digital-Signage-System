@@ -274,8 +274,8 @@ const LoginPage = () => {
                                 </div>
                             </div>
                             {/* Core Icon */}
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.15)]">
-                                <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-32 h-32 object-contain drop-shadow-xl" />
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.15)]">
+                                <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-48 h-48 object-contain drop-shadow-2xl brightness-0 invert" />
                             </div>
                         </div>
 
