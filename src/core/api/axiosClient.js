@@ -69,6 +69,12 @@ axiosClient.interceptors.response.use(
 
         // 2. Handle 401 Unauthorized
         if (response.status === 401) {
+            // Do not force logout if the 401 came from the login attempt itself
+            if (error.config?.url?.includes('/login')) {
+                addToast(response.data?.message || "بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.", 'error');
+                return Promise.reject(error);
+            }
+            
             useAuthStore.getState().logout();
             addToast("انتهت صلاحية الجلسة أو تم تحديث صلاحياتك، يرجى تسجيل الدخول مرة أخرى.", 'error');
             return Promise.reject(error);
