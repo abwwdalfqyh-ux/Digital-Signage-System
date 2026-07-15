@@ -6,6 +6,7 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useAuthStore from '../../store/useAuthStore';
 import useToastStore from '../../store/useToastStore';
+import LegalModal from './LegalModal';
 
 const PremiumInput = ({ icon: Icon, englishLabel, arabicLabel, type = "text", value, onChange, isPassword, isObscure, onToggleObscure }) => {
     return (
@@ -54,6 +55,7 @@ const LoginPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isObscure, setIsObscure] = useState(true);
     const [rememberMe, setRememberMe] = useState(false);
+    const [legalModalConfig, setLegalModalConfig] = useState({ isOpen: false, type: 'privacy' });
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -258,8 +260,8 @@ const LoginPage = () => {
                     </div>
 
                     {/* Central Graphic & Animation */}
-                    <div className="flex-grow flex flex-col items-center justify-center z-10 pt-10">
-                        <div className="orbit-container mb-12">
+                    <div className="flex-grow flex flex-col items-center justify-center z-10 pt-4 pb-16">
+                        <div className="orbit-container mb-10">
                             {/* Orbits */}
                             <div className="orbit-circle-1">
                                 <div className="floating-icon icon-1">
@@ -279,21 +281,21 @@ const LoginPage = () => {
 
                         {/* Typography */}
                         <div className="text-center px-12 max-w-xl">
-                            <h2 className="text-4xl lg:text-[54px] font-black text-white mb-6 leading-tight drop-shadow-md">
+                            <h2 className="text-4xl lg:text-[52px] font-black text-white mb-4 leading-tight drop-shadow-md">
                                 أدر شاشاتك الذكية
-                                <span className="block text-[#d9a05b] mt-4">بكل احترافية</span>
+                                <span className="block text-[#d9a05b] mt-3">بكل احترافية</span>
                             </h2>
-                            <p className="text-white/80 text-[15px] leading-relaxed mt-8 font-medium">
+                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium max-w-sm mx-auto">
                                 نظام السبورة الذكية (Digital Signage) الأول. راقب أداء حملاتك، وتحكم بالمحتوى، وتفاعل مع عملائك في الوقت الفعلي بأمان وسرعة.
                             </p>
                         </div>
                     </div>
 
                     {/* Footer Links */}
-                    <div className="absolute bottom-0 left-0 right-0 p-10 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
+                    <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
                         <div className="flex gap-6">
-                            <Link to="#" className="hover:text-white transition-colors">سياسة الخصوصية</Link>
-                            <Link to="#" className="hover:text-white transition-colors">شروط الاستخدام</Link>
+                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</button>
+                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">شروط الاستخدام</button>
                         </div>
                         <div className="tracking-widest">
                             SABAPOST SECURE 2026 ©
@@ -307,6 +309,12 @@ const LoginPage = () => {
                 {/* END: Branding Section */}
             </main>
 
+            {/* Modal */}
+            <LegalModal 
+                isOpen={legalModalConfig.isOpen} 
+                onClose={() => setLegalModalConfig({ ...legalModalConfig, isOpen: false })} 
+                type={legalModalConfig.type} 
+            />
         </div>
     );
 };

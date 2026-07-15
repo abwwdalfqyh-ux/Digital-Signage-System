@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
+import LegalModal from './LegalModal';
 
 /* ──────────────────────────────────────────────
    Reusable Input – vertical layout, bilingual labels
@@ -89,6 +90,7 @@ const RegisterPage = () => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isObscure, setIsObscure] = useState(true);
+    const [legalModalConfig, setLegalModalConfig] = useState({ isOpen: false, type: 'privacy' });
 
     const handleChange = (e, field) => {
         setForm({ ...form, [field]: e.target.value });
@@ -312,7 +314,7 @@ const RegisterPage = () => {
                     <div className="flex-grow flex flex-col items-center justify-center z-10 pt-10">
 
                         {/* Decorative grid icon with floating elements */}
-                        <div className="mb-12 relative">
+                        <div className="mb-10 relative">
                             {/* Central grid */}
                             <div className="w-28 h-28 border-2 border-white/70 rounded-2xl grid grid-cols-2 gap-2.5 p-4 shadow-[0_0_30px_rgba(255,255,255,0.15)] bg-white/5 backdrop-blur-sm">
                                 <div className="border border-white/50 rounded-lg bg-white/10" />
@@ -340,21 +342,21 @@ const RegisterPage = () => {
                             className="text-center px-12 max-w-xl"
                             dir="rtl"
                         >
-                            <h2 className="text-4xl lg:text-[54px] font-black text-white mb-6 leading-tight drop-shadow-md">
+                            <h2 className="text-4xl lg:text-[52px] font-black text-white mb-4 leading-tight drop-shadow-md">
                                 انضم إلى شبكة
-                                <span className="block text-[#d9a05b] mt-4">الوكلاء والمعلنين</span>
+                                <span className="block text-[#d9a05b] mt-3">الوكلاء والمعلنين</span>
                             </h2>
-                            <p className="text-white/80 text-[15px] leading-relaxed mt-8 font-medium">
+                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium max-w-sm mx-auto">
                                 ابدأ في إدارة شاشاتك الإعلانية أو إنشاء حملاتك بكل سهولة عبر منصة متخصصة تلبي كافة احتياجاتك.
                             </p>
                         </motion.div>
                     </div>
 
                     {/* Footer */}
-                    <div className="absolute bottom-0 left-0 right-0 p-10 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
+                    <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
                         <div className="flex gap-6">
-                            <Link to="#" className="hover:text-white transition-colors">سياسة الخصوصية</Link>
-                            <Link to="#" className="hover:text-white transition-colors">شروط الاستخدام</Link>
+                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</button>
+                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">شروط الاستخدام</button>
                         </div>
                         <div className="tracking-widest">
                             SABAPOST SECURE 2026 ©
@@ -375,6 +377,13 @@ const RegisterPage = () => {
                 {/* ===== END: Branding Panel ===== */}
 
             </main>
+
+            {/* Modal */}
+            <LegalModal 
+                isOpen={legalModalConfig.isOpen} 
+                onClose={() => setLegalModalConfig({ ...legalModalConfig, isOpen: false })} 
+                type={legalModalConfig.type} 
+            />
         </div>
     );
 };
