@@ -15,10 +15,10 @@ let API_BASE_URL = import.meta.env.VITE_API_URL;
 
 if (!API_BASE_URL) {
     if (import.meta.env.DEV) {
-        API_BASE_URL = 'https://laravel-production-5dd8.up.railway.app/api';
-        console.warn('⚠️ No VITE_API_URL found. Defaulting to Railway URL.');
+        API_BASE_URL = 'https://laravel-1-h8ye.onrender.com/api';
+        console.warn('⚠️ No VITE_API_URL found. Defaulting to Render URL.');
     } else {
-        API_BASE_URL = 'https://laravel-production-5dd8.up.railway.app/api';
+        API_BASE_URL = 'https://laravel-1-h8ye.onrender.com/api';
     }
 }
 
