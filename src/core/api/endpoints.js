@@ -30,8 +30,16 @@ export const ENDPOINTS = {
         ALL: '/screens',
         UPDATE: (id) => `/screens/${id}`,
         DELETE: (id) => `/screens/${id}`,
+        UPDATE_STATUS: (id) => `/screens/${id}/status`,
         AVAILABILITY: (id) => `/screens/${id}/availability`,
         COMMAND: '/screens/command',
+    },
+    SUPPORT: {
+        ALL: '/support/tickets',
+        CREATE: '/support/tickets',
+        GET: (id) => `/support/tickets/${id}`,
+        UPDATE: (id) => `/support/tickets/${id}`,
+        DELETE: (id) => `/support/tickets/${id}`,
     },
     ADS: {
         ALL: '/ads',

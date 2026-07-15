@@ -14,6 +14,8 @@ import { ENDPOINTS } from '../../core/api/endpoints';
 import echo from '../../core/api/echo';
 import useToastStore from '../../store/useToastStore';
 import DrillDownMap from './DrillDownMap';
+import { useScreens, useUpdateScreenStatus } from '../../hooks/api/useScreens';
+import { useSupportTickets, useUpdateSupportTicket } from '../../hooks/api/useSupport';
 
 
 /* ──────────────────────────────────────────────────────────────
@@ -95,28 +97,6 @@ const STATUS_CONFIG = {
     maintenance:  { color: '#d97706', light: '#fef3c7', label: 'تحت الصيانة',    icon: '🟠', pulse: false, speed: null  },
     disconnected: { color: '#6b7280', light: '#f3f4f6', label: 'مفصولة',         icon: '⚫', pulse: false, speed: null  },
 };
-
-/* ──────────────────────────────────────────────────────────────
-   MOCK / FALLBACK DATA  (shown when API has no specific endpoint)
-────────────────────────────────────────────────────────────── */
-const MOCK_INCIDENTS = [
-    { id: 1, type: 'offline',  screen: 'شاشة صنعاء - التحرير',   location: 'صنعاء',  since: '12 دقيقة',  status: 'open',     priority: 'critical' },
-    { id: 2, type: 'warning',  screen: 'شاشة عدن - المعلا',       location: 'عدن',    since: '38 دقيقة',  status: 'inprogress', priority: 'high' },
-    { id: 3, type: 'offline',  screen: 'شاشة تعز - جمال',         location: 'تعز',    since: '1 ساعة',    status: 'open',     priority: 'critical' },
-    { id: 4, type: 'warning',  screen: 'شاشة مأرب - رئيسي',       location: 'مأرب',   since: '2 ساعة',    status: 'inprogress', priority: 'medium' },
-    { id: 5, type: 'resolved', screen: 'شاشة حضرموت - المكلا',    location: 'حضرموت', since: '3 ساعة',    status: 'resolved', priority: 'low' },
-    { id: 6, type: 'resolved', screen: 'شاشة إب - المركز',         location: 'إب',     since: '4 ساعة',    status: 'resolved', priority: 'low' },
-];
-
-const MOCK_ACTIVITY = [
-    { time: '23:38', msg: 'تم إعادة اتصال شاشة حضرموت - المكلا', type: 'online' },
-    { time: '23:22', msg: 'انقطع الاتصال بشاشة صنعاء - التحرير', type: 'offline' },
-    { time: '23:15', msg: 'تحذير: ارتفاع حرارة شاشة عدن - المعلا', type: 'warning' },
-    { time: '22:50', msg: 'تم إعادة اتصال شاشة إب - المركز',      type: 'online' },
-    { time: '22:41', msg: 'انقطع الاتصال بشاشة تعز - جمال',       type: 'offline' },
-    { time: '22:10', msg: 'تحذير: تأخر في بث الإعلانات (>30 ثانية)', type: 'warning' },
-    { time: '21:55', msg: 'تم تشغيل إعادة التشغيل التلقائي لشاشة مأرب', type: 'info' },
-];
 
 /* ──────────────────────────────────────────────────────────────
    HELPERS
@@ -564,13 +544,18 @@ const MaintenanceDashboard = () => {
     const navigate = useNavigate();
     const addToast = useToastStore(s => s.addToast);
 
+    const { data: screensData, isLoading: screensLoading } = useScreens();
+    const { data: ticketsData, isLoading: ticketsLoading } = useSupportTickets();
+    const { mutateAsync: updateScreenStatus } = useUpdateScreenStatus();
+    const { mutateAsync: updateTicket } = useUpdateSupportTicket();
+
     /* State */
-    const [screens, setScreens]       = useState([]);
-    const [loading, setLoading]       = useState(true);
-    const [lastRefresh, setLastRefresh] = useState(new Date());
     const [incidentFilter, setIncidentFilter] = useState('all');
     const [isLive, setIsLive]         = useState(true);
-    const intervalRef = useRef(null);
+
+    const screens = screensData || [];
+    const tickets = ticketsData || [];
+    const loading = screensLoading || ticketsLoading;
 
     /* Derived from screens — 4 states */
     const screenStatusList = screens.map(deriveScreenStatus);
@@ -580,62 +565,34 @@ const MaintenanceDashboard = () => {
     const disconnectedCount = screens.filter((s, i) => screenStatusList[i] === 'disconnected').length;
     const totalScreens      = screens.length;
     const uptimePct         = totalScreens > 0 ? Math.round((onlineCount / totalScreens) * 100) : 0;
-    const realIncidents = screens.filter(s => deriveScreenStatus(s) !== 'online').map((s, idx) => {
-        const status = deriveScreenStatus(s);
+    
+    // Merge real tickets into incidents
+    const realIncidents = tickets.map((t, idx) => {
         return {
-            id: s.id || idx,
-            mac_address: s.mac_address,
-            type: status === 'broken' ? 'offline' : (status === 'maintenance' ? 'warning' : 'offline'),
-            screen: s.name || s.screen_name,
-            location: s.street?.region?.governorate?.name || 'غير محدد',
-            since: s.disconnected_at ? new Date(s.disconnected_at).toLocaleString('ar-EG') : 'غير معروف',
-            status: status === 'maintenance' ? 'inprogress' : 'open',
-            priority: status === 'disconnected' ? 'critical' : 'high',
+            id: t.id,
+            mac_address: t.screen?.mac_address,
+            type: t.priority === 'urgent' ? 'offline' : (t.priority === 'high' ? 'warning' : 'info'),
+            screen: t.screen?.screen_name || 'شاشة غير محددة',
+            location: t.screen?.street?.region?.governorate?.name || 'غير محدد',
+            since: new Date(t.created_at).toLocaleString('ar-EG'),
+            status: t.status === 'open' ? 'open' : (t.status === 'resolved' ? 'resolved' : 'inprogress'),
+            priority: t.priority,
+            subject: t.subject
         };
     });
 
-    const realActivity = screens.filter(s => s.disconnected_at).map(s => ({
-        time: new Date(s.disconnected_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-        msg: `انقطع الاتصال بشاشة ${s.name || s.screen_name}`,
-        type: 'offline'
+    const realActivity = tickets.filter(t => t.admin_reply).map(t => ({
+        time: new Date(t.updated_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
+        msg: `رد على التذكرة: ${t.subject}`,
+        type: 'info'
     }));
 
-    const openIncidents     = realIncidents.filter(i => i.status === 'open').length;
-
-    /* Load screens */
-    const loadScreens = useCallback(async () => {
-        try {
-            const res = await axiosClient.get(ENDPOINTS.SCREENS.ALL);
-            const data = res.data.data || res.data || [];
-            
-            // Format Laravel API response to match UI expectations
-            const formatted = Array.isArray(data) ? data.map(scr => ({
-                ...scr,
-                id: scr.screen_id || scr.id,
-                name: scr.screen_name || scr.name,
-                lat: scr.latitude ?? scr.lat ?? null,
-                lng: scr.longitude ?? scr.lng ?? null,
-                gov_id: scr.street?.region?.gov_id || scr.gov_id,
-                region_id: scr.street?.region_id || scr.region_id,
-                street_id: scr.street_id,
-            })) : [];
-            
-            setScreens(formatted);
-        } catch {
-            // silently degrade — show mock KPIs
-            setScreens([]);
-        } finally {
-            setLoading(false);
-            setLastRefresh(new Date());
-        }
-    }, []);
+    const openIncidents = realIncidents.filter(i => i.status === 'open').length;
 
     useEffect(() => {
-        loadScreens();
-
+        if (!isLive) return;
         const channel = echo.private('admin.screens');
         channel.listen('ScreenUpdated', (e) => {
-            loadScreens();
             if (e.screen) {
                 addToast(`تحديث مباشر: حالة الشاشة (${e.screen.screen_name}) تغيّرت`, 'info');
             }
@@ -644,39 +601,23 @@ const MaintenanceDashboard = () => {
         return () => {
             echo.leave('admin.screens');
         };
-    }, [loadScreens, addToast]);
+    }, [isLive, addToast]);
+
 
     /* Update status to maintenance */
     const handleStartMaintenance = async (screen) => {
-        try {
-            // Optimistic update for UI feel
-            setScreens(prev => prev.map(s => s.id === screen.id ? { ...s, status: 'maintenance' } : s));
-            addToast(`تم تفعيل وضع الصيانة للشاشة (${screen.name})`, 'success');
-            
-            // Background API call
-            await axiosClient.patch(ENDPOINTS.SCREENS.UPDATE(screen.id), { status: 'maintenance' });
-        } catch (err) {
-            console.error('Failed to update screen status', err);
-            // Even if it fails locally it will show the toast, 
-            // the system will auto-revert within 30 seconds if the DB wasn't updated, 
-            // which is acceptable for NOC resilience.
-        }
+        if (!screen || !screen.screen_id) return addToast('الشاشة غير صالحة', 'error');
+        await updateScreenStatus({ id: screen.screen_id, status: 'maintenance' });
     };
 
-    /* Auto-refresh every 30 seconds when live */
-    useEffect(() => {
-        if (isLive) {
-            intervalRef.current = setInterval(() => {
-                loadScreens();
-            }, 30000);
-        } else {
-            clearInterval(intervalRef.current);
-        }
-        return () => clearInterval(intervalRef.current);
-    }, [isLive, loadScreens]);
+    const handleResolveTicket = async (ticketId) => {
+        await updateTicket({ id: ticketId, payload: { status: 'resolved', admin_reply: 'تم حل المشكلة' } });
+    };
 
-    /* Format lastRefresh */
-    const refreshTime = lastRefresh.toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const handleInProgressTicket = async (ticketId) => {
+        await updateTicket({ id: ticketId, payload: { status: 'in_progress' } });
+    };
+    const refreshTime = new Date().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
     /* Filtered incidents */
     const filteredIncidents = incidentFilter === 'all'
@@ -998,6 +939,24 @@ const MaintenanceDashboard = () => {
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '4px' }}>
+                                        {incident.status === 'open' && (
+                                            <button
+                                                onClick={() => handleInProgressTicket(incident.id)}
+                                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.warning, padding: '4px' }}
+                                                title="قيد المعالجة"
+                                            >
+                                                <AlertTriangle style={{ width: 15, height: 15 }} />
+                                            </button>
+                                        )}
+                                        {incident.status !== 'resolved' && (
+                                            <button
+                                                onClick={() => handleResolveTicket(incident.id)}
+                                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.online, padding: '4px' }}
+                                                title="إغلاق التذكرة كـ محلولة"
+                                            >
+                                                <CheckCircle2 style={{ width: 15, height: 15 }} />
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => handlePing(incident.mac_address)}
                                             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.info, padding: '4px' }}

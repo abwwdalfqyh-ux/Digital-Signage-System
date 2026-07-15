@@ -56,6 +56,24 @@ export const useUpdateScreen = () => {
     }
   });
 };
+export const useUpdateScreenStatus = () => {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore(state => state.addToast);
+
+  return useMutation({
+    mutationFn: async ({ id, status }) => {
+      const res = await axiosClient.put(ENDPOINTS.SCREENS.UPDATE_STATUS(id), { status });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['screens'] });
+      addToast('تم تحديث حالة الشاشة بنجاح', 'success');
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'فشل تحديث حالة الشاشة', 'error');
+    }
+  });
+};
 
 export const useDeleteScreen = () => {
   const queryClient = useQueryClient();
