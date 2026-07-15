@@ -5,7 +5,9 @@ window.Pusher = Pusher;
 
 let echo = null;
 
-if (import.meta.env.VITE_REVERB_APP_KEY) {
+const reverbHost = import.meta.env.VITE_REVERB_HOST;
+
+if (import.meta.env.VITE_REVERB_APP_KEY && reverbHost && reverbHost !== 'api.your-domain.com') {
     echo = new Echo({
         broadcaster: 'reverb',
         key: import.meta.env.VITE_REVERB_APP_KEY,
