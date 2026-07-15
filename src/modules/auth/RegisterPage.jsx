@@ -313,26 +313,23 @@ const RegisterPage = () => {
                     {/* Center Content */}
                     <div className="flex-grow flex flex-col items-center justify-center z-10 pt-10">
 
-                        {/* Decorative grid icon with floating elements */}
-                        <div className="mb-10 relative">
-                            {/* Central grid */}
-                            <div className="w-28 h-28 border-2 border-white/70 rounded-2xl grid grid-cols-2 gap-2.5 p-4 shadow-[0_0_30px_rgba(255,255,255,0.15)] bg-white/5 backdrop-blur-sm">
-                                <div className="border border-white/50 rounded-lg bg-white/10" />
-                                <div className="border border-white/50 rounded-lg bg-white/10" />
-                                <div className="border border-white/50 rounded-lg bg-white/10" />
-                                <div className="border border-white/50 rounded-lg bg-white/10" />
-                            </div>
+                            {/* Logo with floating elements */}
+                            <div className="mb-10 relative">
+                                {/* Core Logo Background/Container */}
+                                <div className="w-32 h-32 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.15)] relative z-10">
+                                    <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-24 h-24 object-contain drop-shadow-xl" />
+                                </div>
 
-                            {/* Floating element – top right */}
-                            <div className="absolute -top-5 -right-5 w-10 h-10 bg-white text-[#14506b] rounded-full flex items-center justify-center shadow-lg transform rotate-12">
-                                <LayoutDashboard className="w-5 h-5" />
-                            </div>
+                                {/* Floating element – top right */}
+                                <div className="absolute -top-3 -right-3 w-10 h-10 bg-white text-[#14506b] rounded-full flex items-center justify-center shadow-lg transform rotate-12 z-20">
+                                    <LayoutDashboard className="w-5 h-5" />
+                                </div>
 
-                            {/* Floating element – bottom left */}
-                            <div className="absolute -bottom-5 -left-7 w-12 h-12 bg-[#d9a05b] text-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 opacity-90">
-                                <Zap className="w-6 h-6" />
+                                {/* Floating element – bottom left */}
+                                <div className="absolute -bottom-3 -left-4 w-12 h-12 bg-[#d9a05b] text-white rounded-full flex items-center justify-center shadow-lg transform -rotate-12 opacity-90 z-20">
+                                    <Zap className="w-6 h-6" />
+                                </div>
                             </div>
-                        </div>
 
                         {/* Typography */}
                         <motion.div
