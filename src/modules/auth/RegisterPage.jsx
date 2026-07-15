@@ -346,7 +346,7 @@ const RegisterPage = () => {
                                 انضم إلى شبكة
                                 <span className="block text-[#d9a05b] mt-3">الوكلاء والمعلنين</span>
                             </h2>
-                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium max-w-sm mx-auto">
+                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
                                 ابدأ في إدارة شاشاتك الإعلانية أو إنشاء حملاتك بكل سهولة عبر منصة متخصصة تلبي كافة احتياجاتك.
                             </p>
                         </motion.div>

@@ -285,7 +285,7 @@ const LoginPage = () => {
                                 أدر شاشاتك الذكية
                                 <span className="block text-[#d9a05b] mt-3">بكل احترافية</span>
                             </h2>
-                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium max-w-sm mx-auto">
+                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
                                 نظام السبورة الذكية (Digital Signage) الأول. راقب أداء حملاتك، وتحكم بالمحتوى، وتفاعل مع عملائك في الوقت الفعلي بأمان وسرعة.
                             </p>
                         </div>
