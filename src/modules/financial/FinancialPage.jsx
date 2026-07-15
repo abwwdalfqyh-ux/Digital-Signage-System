@@ -230,19 +230,6 @@ const FinancialPage = () => {
         }
     ];
 
-    // Show full page loader only on initial load when there's no data at all
-    if (isLoading && !ledgerData) return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center flex-1 w-full py-20" dir="rtl">
-            <DynamicPageLoader 
-                messages={[
-                    "جاري مزامنة الإيرادات المالية...", 
-                    "يتم تدقيق المعاملات من قاعدة البيانات...",
-                    "يتم سحب السجلات المحاسبية..."
-                ]}
-                icon="payments"
-            />
-        </motion.div>
-    );
 
     return (
         <div className="w-full font-[IBM_Plex_Sans_Arabic] pb-20" dir="rtl">
@@ -425,7 +412,18 @@ const FinancialPage = () => {
                     </div>
                 </div>
 
-                {filteredTransactions.length === 0 ? (
+                {isLoading && !ledgerData ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center flex-1 w-full py-20" dir="rtl">
+                        <DynamicPageLoader 
+                            messages={[
+                                "جاري مزامنة الإيرادات المالية...", 
+                                "يتم تدقيق المعاملات من قاعدة البيانات...",
+                                "يتم سحب السجلات المحاسبية..."
+                            ]}
+                            icon="payments"
+                        />
+                    </motion.div>
+                ) : filteredTransactions.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center p-2xl text-center bg-surface-bright">
                         <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6 shadow-inner">
                             <span className="material-symbols-outlined text-5xl text-outline font-normal">receipt_long</span>

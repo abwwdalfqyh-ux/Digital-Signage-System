@@ -40,18 +40,6 @@ const AdvertiserFinancials = () => {
         )},
     ];
 
-    if (loading) return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center py-20" dir="rtl">
-            <DynamicPageLoader 
-                messages={[
-                    "جاري معالجة سجلاتك المالية...", 
-                    "يتم تدقيق أرصدة الحملات الإعلانية...",
-                    "لحظات ونعرض واجهة الدفع الخاصة بك..."
-                ]}
-                icon="account_balance_wallet"
-            />
-        </motion.div>
-    );
 
     return (
         <div className="space-y-6" dir="rtl">
@@ -86,7 +74,20 @@ const AdvertiserFinancials = () => {
                 </div>
             </div>
 
-            <DataTable columns={columns} data={data.transactions} loading={false} emptyMessage="لا توجد عمليات مالية" />
+            {loading ? (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center py-20" dir="rtl">
+                    <DynamicPageLoader 
+                        messages={[
+                            "جاري معالجة سجلاتك المالية...", 
+                            "يتم تدقيق أرصدة الحملات الإعلانية...",
+                            "لحظات ونعرض واجهة الدفع الخاصة بك..."
+                        ]}
+                        icon="account_balance_wallet"
+                    />
+                </motion.div>
+            ) : (
+                <DataTable columns={columns} data={data.transactions} loading={false} emptyMessage="لا توجد عمليات مالية" />
+            )}
         </div>
     );
 };
