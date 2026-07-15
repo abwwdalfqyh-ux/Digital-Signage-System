@@ -79,7 +79,8 @@ const LoginPage = () => {
                 addToast(res.data.message || 'فشل تسجيل الدخول', 'error');
             }
         } catch (error) {
-            addToast(error.response?.data?.message || 'بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى', 'error');
+            // Error is already handled and toasted by axiosClient global interceptor
+            console.error('Login failed', error);
         } finally {
             setIsLoading(false);
         }

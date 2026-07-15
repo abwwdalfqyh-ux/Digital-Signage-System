@@ -110,7 +110,8 @@ const RegisterPage = () => {
                 addToast(res.data.message || 'فشل إنشاء الحساب', 'error');
             }
         } catch (error) {
-            addToast(error.response?.data?.message || 'تعذر الاتصال بالخادم. يرجى التأكد من البيانات', 'error');
+            // Error is already handled and toasted by axiosClient global interceptor
+            console.error('Registration failed', error);
         } finally {
             setIsLoading(false);
         }
