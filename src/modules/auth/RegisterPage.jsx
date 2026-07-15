@@ -316,8 +316,8 @@ const RegisterPage = () => {
                             {/* Logo with floating elements */}
                             <div className="mb-10 relative">
                                 {/* Core Logo Background/Container */}
-                                <div className="w-32 h-32 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.15)] relative z-10">
-                                    <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-24 h-24 object-contain drop-shadow-xl" />
+                                <div className="w-40 h-40 flex items-center justify-center rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_0_60px_rgba(255,255,255,0.15)] relative z-10">
+                                    <img src="/Main_app_logo.png" alt="SabaPost Logo" className="w-32 h-32 object-contain drop-shadow-xl" />
                                 </div>
 
                                 {/* Floating element – top right */}
