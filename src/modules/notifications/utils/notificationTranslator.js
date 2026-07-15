@@ -1,4 +1,5 @@
 import { DollarSign, Monitor, UserPlus, Clock, CheckCircle2, Calendar, AlertCircle, Bell } from 'lucide-react';
+import useUIStore from '../../../store/useUIStore';
 
 export const parseNotificationContent = (content) => {
     if (!content) return '';
@@ -16,53 +17,58 @@ export const parseNotificationContent = (content) => {
 };
 
 const formatMessage = (key, args) => {
+    const isEn = useUIStore.getState().language === 'en';
+
     switch(key) {
         // Titles
-        case 'notif_title_payment_confirmed': return 'تم تأكيد الدفع بنجاح';
-        case 'notif_title_ad_paid_online': return 'دفعة إلكترونية جديدة';
-        case 'notif_title_new_screen': return 'تسجيل شاشة جديدة';
-        case 'notif_title_new_user': return 'تسجيل مستخدم جديد';
-        case 'notif_title_new_ad_pending': return 'تم إرسال الإعلان للمراجعة';
-        case 'notif_title_ad_pending_review': return 'إعلان جديد بانتظار المراجعة';
-        case 'notif_title_new_receipt': return 'إيصال دفع جديد بانتظار الاعتماد';
-        case 'notif_title_ad_approved_for_payment': return 'تهانينا! تمت الموافقة على إعلانك';
-        case 'notif_title_ad_approved': return 'تم الموافقة على إعلانك';
-        case 'notif_title_ad_scheduled': return 'تم جدولة الإعلان';
-        case 'notif_title_ad_rejected': return 'تم رفض الإعلان';
+        case 'notif_title_payment_confirmed': return isEn ? 'Payment Confirmed' : 'تم تأكيد الدفع بنجاح';
+        case 'notif_title_ad_paid_online': return isEn ? 'New Online Payment' : 'دفعة إلكترونية جديدة';
+        case 'notif_title_new_screen': return isEn ? 'New Screen Registered' : 'تسجيل شاشة جديدة';
+        case 'notif_title_screen_empty': return isEn ? 'Screen Requires Content' : 'الشاشة لا تبث أي إعلان!';
+        case 'notif_title_new_user': return isEn ? 'New User Registered' : 'تسجيل مستخدم جديد';
+        case 'notif_title_new_ad_pending': return isEn ? 'Ad Submitted for Review' : 'تم إرسال الإعلان للمراجعة';
+        case 'notif_title_ad_pending_review': return isEn ? 'New Ad Pending Review' : 'إعلان جديد بانتظار المراجعة';
+        case 'notif_title_new_receipt': return isEn ? 'New Payment Receipt' : 'إيصال دفع جديد بانتظار الاعتماد';
+        case 'notif_title_ad_approved_for_payment': return isEn ? 'Ad Approved (Pending Payment)' : 'تهانينا! تمت الموافقة على إعلانك';
+        case 'notif_title_ad_approved': return isEn ? 'Ad Approved' : 'تم الموافقة على إعلانك';
+        case 'notif_title_ad_scheduled': return isEn ? 'Ad Scheduled' : 'تم جدولة الإعلان';
+        case 'notif_title_ad_rejected': return isEn ? 'Ad Rejected' : 'تم رفض الإعلان';
 
-        case 'notif_title_payout_requested': return 'طلب سحب رصيد جديد';
-        case 'notif_title_payout_approved': return 'تم اعتماد طلب السحب';
-        case 'notif_title_payout_rejected': return 'تم رفض طلب السحب';
+        case 'notif_title_payout_requested': return isEn ? 'New Payout Request' : 'طلب سحب رصيد جديد';
+        case 'notif_title_payout_approved': return isEn ? 'Payout Approved' : 'تم اعتماد طلب السحب';
+        case 'notif_title_payout_rejected': return isEn ? 'Payout Rejected' : 'تم رفض طلب السحب';
 
         // Messages
         case 'notif_msg_payment_confirmed': 
-            return `تم تأكيد دفع مبلغ $${args.amount} للإعلان "${args.title}" وتوزيع الأرباح على ملاك الشاشات.`;
+            return isEn ? `Payment of $${args.amount} confirmed for ad "${args.title}".` : `تم تأكيد دفع مبلغ $${args.amount} للإعلان "${args.title}" وتوزيع الأرباح على ملاك الشاشات.`;
         case 'notif_msg_ad_paid_online': 
-            return `تم استلام دفعة إلكترونية عبر Stripe للإعلان "${args.title}".`;
+            return isEn ? `Online payment received for ad "${args.title}".` : `تم استلام دفعة إلكترونية عبر Stripe للإعلان "${args.title}".`;
         case 'notif_msg_new_screen': 
-            return `تم تسجيل شاشة جديدة في النظام باسم "${args.name}".`;
+            return isEn ? `A new screen "${args.name}" has been registered.` : `تم تسجيل شاشة جديدة في النظام باسم "${args.name}".`;
+        case 'notif_msg_screen_empty': 
+            return isEn ? `The screen requires an ad to be published, or it will display a default image.` : `الشاشة تحتاج لرفع إعلان لتبدأ البث وإلا ستعرض الصورة الافتراضية.`;
         case 'notif_msg_new_user': 
-            return `مستخدم جديد انضم إلى النظام: ${args.name}.`;
+            return isEn ? `New user joined: ${args.name}.` : `مستخدم جديد انضم إلى النظام: ${args.name}.`;
         case 'notif_msg_new_ad_pending': 
-            return `إعلانك "${args.title}" قيد المراجعة حالياً. سيقوم الفريق بمراجعته قريباً.`;
+            return isEn ? `Your ad "${args.title}" is currently under review.` : `إعلانك "${args.title}" قيد المراجعة حالياً. سيقوم الفريق بمراجعته قريباً.`;
         case 'notif_msg_ad_pending_review': 
-            return `المعلن ${args.advertiser} قام برفع إعلان جديد "${args.title}". يرجى مراجعته.`;
+            return isEn ? `Advertiser ${args.advertiser} submitted a new ad "${args.title}".` : `المعلن ${args.advertiser} قام برفع إعلان جديد "${args.title}". يرجى مراجعته.`;
         case 'notif_msg_new_receipt': 
-            return `المعلن ${args.advertiser} أرفق إيصالاً بمبلغ $${args.cost}. يرجى مراجعته بقسم العمليات.`;
+            return isEn ? `Advertiser ${args.advertiser} uploaded a receipt for $${args.cost}.` : `المعلن ${args.advertiser} أرفق إيصالاً بمبلغ $${args.cost}. يرجى مراجعته بقسم العمليات.`;
         case 'notif_msg_ad_approved_for_payment': 
-            return `الإعلان "${args.title}" اجتاز المراجعة وهو جاهز للدفع لكي يتم نشره.`;
+            return isEn ? `Ad "${args.title}" approved and is ready for payment.` : `الإعلان "${args.title}" اجتاز المراجعة وهو جاهز للدفع لكي يتم نشره.`;
         case 'notif_msg_ad_approved': 
-            return `مبارك، تم الموافقة على إعلانك "${args.title}" وبدء تفعيله.`;
+            return isEn ? `Congratulations, your ad "${args.title}" was approved.` : `مبارك، تم الموافقة على إعلانك "${args.title}" وبدء تفعيله.`;
         case 'notif_msg_ad_scheduled': 
-            return `تم جدولة إعلانك "${args.title}" على الشاشة "${args.screen}" ليبدأ العرض بتاريخ ${args.start}.`;
+            return isEn ? `Your ad "${args.title}" is scheduled on screen "${args.screen}" starting ${args.start}.` : `تم جدولة إعلانك "${args.title}" على الشاشة "${args.screen}" ليبدأ العرض بتاريخ ${args.start}.`;
         case 'notif_msg_ad_rejected': 
-            return `نأسف، تم رفض إعلانك "${args.title}". السبب: ${args.reason}.`;
+            return isEn ? `Sorry, your ad "${args.title}" was rejected. Reason: ${args.reason}.` : `نأسف، تم رفض إعلانك "${args.title}". السبب: ${args.reason}.`;
         case 'notif_msg_payout_requested':
-            return `يوجد طلب سحب رصيد جديد في انتظار المراجعة والاعتماد.`;
+            return isEn ? `A new payout request is pending review.` : `يوجد طلب سحب رصيد جديد في انتظار المراجعة والاعتماد.`;
         case 'notif_msg_payout_approved':
-            return `تم اعتماد تحويل أرباحك بنجاح، يرجى مراجعة حسابك البنكي.`;
+            return isEn ? `Your payout has been approved successfully.` : `تم اعتماد تحويل أرباحك بنجاح، يرجى مراجعة حسابك البنكي.`;
         case 'notif_msg_payout_rejected':
-            return `تعذر تنفيذ طلب السحب الخاص بك. يرجى مراجعة التفاصيل في سجل الأرباح.`;
+            return isEn ? `Your payout request could not be processed.` : `تعذر تنفيذ طلب السحب الخاص بك. يرجى مراجعة التفاصيل في سجل الأرباح.`;
 
         default:
             return key;
