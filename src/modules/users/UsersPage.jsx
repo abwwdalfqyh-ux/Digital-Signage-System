@@ -6,6 +6,7 @@ import Modal from '../../shared/components/Modal';
 import useToastStore from '../../store/useToastStore';
 import { useUsers, useCreateUser, useUpdateUser, useUpdateUserRole, useUpdateUserStatus, useDeleteUser } from '../../hooks/api/useUsers';
 import { useRoles } from '../../hooks/api/useLookups';
+import useTranslation from '../../i18n/useTranslation';
 
 const StatCard = ({ title, value, icon, colorClass }) => (
     <div className="bg-surface border border-outline-variant rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow">
@@ -24,6 +25,7 @@ const StatCard = ({ title, value, icon, colorClass }) => (
 const UsersPage = () => {
     const { data: users = [], isLoading: usersLoading } = useUsers();
     const { data: roles = [] } = useRoles();
+    const { t, dir } = useTranslation();
     
     const { mutateAsync: createUser } = useCreateUser();
     const { mutateAsync: updateUser } = useUpdateUser();
@@ -178,7 +180,7 @@ const UsersPage = () => {
             (u.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
             (u.phone || '').includes(searchTerm);
             
-        const matchesRole = filterRole === 'ALL' || (u.role?.role_name === filterRole);
+        const matchesRole = filterRole === 'ALL' || (String(u.role_id) === String(filterRole));
         const matchesLocation = filterLocation === 'ALL' || (u.location && u.location.includes(filterLocation));
         
         let matchesStatus = true;
@@ -192,9 +194,9 @@ const UsersPage = () => {
     const stats = {
         total: filteredUsers.length,
         active: filteredUsers.filter(u => u.is_active || u.account_status === 'Active' || !u.account_status).length,
-        admin: filteredUsers.filter(u => u.role?.role_name === 'Administrator' || u.role?.role_name === 'SuperAdmin').length,
-        advertiser: filteredUsers.filter(u => u.role?.role_name === 'Advertiser').length,
-        owner: filteredUsers.filter(u => u.role?.role_name === 'ScreenOwner').length,
+        admin: filteredUsers.filter(u => u.role_id === 1 || u.role_id === 7).length,
+        advertiser: filteredUsers.filter(u => u.role_id === 2).length,
+        owner: filteredUsers.filter(u => u.role_id === 3).length,
     };
 
     const uniqueLocations = [...new Set(users.map(u => u.location).filter(Boolean))].sort();
@@ -209,15 +211,13 @@ const UsersPage = () => {
 
 
 
-    const renderRoleBadge = (roleName) => {
-        if (roleName === 'Administrator' || roleName === 'SuperAdmin') {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-error/10 text-error border border-error/20">SuperAdmin</span>;
-        } else if (roleName === 'Advertiser') {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container/20 text-secondary border border-secondary/20">Advertiser</span>;
-        } else if (roleName === 'ScreenOwner') {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#a855f7]/10 text-[#9333ea] border border-[#a855f7]/20">ScreenOwner</span>;
-        } else if (roleName === 'Accountant') {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#f97316]/10 text-[#ea580c] border border-[#f97316]/20">Accountant</span>;
+    const renderRoleBadge = (roleId, roleName) => {
+        if (roleId === 1 || roleId === 7) {
+            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-error/10 text-error border border-error/20">{roleName || 'SuperAdmin'}</span>;
+        } else if (roleId === 2) {
+            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container/20 text-secondary border border-secondary/20">{roleName || 'Advertiser'}</span>;
+        } else if (roleId === 3) {
+            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#a855f7]/10 text-[#9333ea] border border-[#a855f7]/20">{roleName || 'ScreenOwner'}</span>;
         }
         return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-outline-variant/30 text-on-surface-variant border border-outline-variant/50">{roleName || '—'}</span>;
     };
@@ -226,22 +226,22 @@ const UsersPage = () => {
         <div className="flex flex-col gap-8">
             <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface mb-1">إدارة المستخدمين</h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">إدارة وتحديث بيانات المستخدمين وصلاحياتهم في النظام</p>
+                    <h2 className="font-headline-lg text-headline-lg text-on-surface mb-1">{t('users.manage_users')}</h2>
+                    <p className="font-body-md text-body-md text-on-surface-variant">{t('users.manage_users_desc')}</p>
                 </div>
                 <button onClick={() => handleOpenModal('add')} className="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all">
                     <span className="material-symbols-outlined">add</span>
-                    <span>توثيق حساب جديد</span>
+                    <span>{t('users.add_new_user')}</span>
                 </button>
             </section>
 
             {!loading && (
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <StatCard title="إجمالي المسجلين" value={stats.total} icon="group" colorClass="bg-primary/10 text-primary" />
-                    <StatCard title="حسابات نشطة" value={stats.active} icon="person_check" colorClass="bg-[#22c55e]/10 text-[#22c55e]" />
-                    <StatCard title="أعضاء الإدارة" value={stats.admin} icon="admin_panel_settings" colorClass="bg-secondary-container/20 text-secondary" />
-                    <StatCard title="كبار المعلنين" value={stats.advertiser} icon="campaign" colorClass="bg-[#eab308]/10 text-[#eab308]" />
-                    <StatCard title="ملاك الشاشات" value={stats.owner} icon="monitor" colorClass="bg-[#a855f7]/10 text-[#a855f7]" />
+                    <StatCard title={t('users.total_registered')} value={stats.total} icon="group" colorClass="bg-primary/10 text-primary" />
+                    <StatCard title={t('users.active_accounts')} value={stats.active} icon="person_check" colorClass="bg-[#22c55e]/10 text-[#22c55e]" />
+                    <StatCard title={t('users.admin_members')} value={stats.admin} icon="admin_panel_settings" colorClass="bg-secondary-container/20 text-secondary" />
+                    <StatCard title={t('users.top_advertisers')} value={stats.advertiser} icon="campaign" colorClass="bg-[#eab308]/10 text-[#eab308]" />
+                    <StatCard title={t('users.screen_owners')} value={stats.owner} icon="monitor" colorClass="bg-[#a855f7]/10 text-[#a855f7]" />
                 </section>
             )}
 
@@ -255,7 +255,7 @@ const UsersPage = () => {
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                                 className="w-full bg-background border border-outline-variant rounded-lg py-2.5 pr-10 pl-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-shadow"
-                                placeholder="البحث بالاسم، البريد أو الهاتف..."
+                                placeholder={t('users.search_placeholder')}
                                 type="text"
                             />
                         </div>
@@ -268,8 +268,8 @@ const UsersPage = () => {
                                 className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
                                 style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
                             >
-                                <option value="ALL">جميع الصلاحيات</option>
-                                {roles.map(r => <option key={r.role_id || r.id} value={r.role_name}>{r.role_name}</option>)}
+                                <option value="ALL">{t('users.all_roles')}</option>
+                                {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
                             </select>
 
                             <select
@@ -278,7 +278,7 @@ const UsersPage = () => {
                                 className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
                                 style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
                             >
-                                <option value="ALL">كل المحافظات</option>
+                                <option value="ALL">{t('users.all_locations')}</option>
                                 {uniqueLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                             </select>
 
@@ -288,9 +288,9 @@ const UsersPage = () => {
                                 className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
                                 style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
                             >
-                                <option value="ALL">كل الحالات</option>
-                                <option value="ACTIVE">الحسابات النشطة</option>
-                                <option value="SUSPENDED">الحسابات الموقوفة</option>
+                                <option value="ALL">{t('users.all_statuses')}</option>
+                                <option value="ACTIVE">{t('users.active_accounts_filter')}</option>
+                                <option value="SUSPENDED">{t('users.suspended_accounts_filter')}</option>
                             </select>
                         </div>
                     </div>
@@ -306,9 +306,9 @@ const UsersPage = () => {
                             <div className="w-16 h-16 bg-surface-container-lowest rounded-full flex items-center justify-center mb-4 border border-outline-variant">
                                 <span className="material-symbols-outlined text-outline text-3xl">warning</span>
                             </div>
-                            <h4 className="font-headline-md text-headline-md text-on-surface mb-2">النظام قيد الانتظار</h4>
+                            <h4 className="font-headline-md text-headline-md text-on-surface mb-2">{t('users.system_waiting')}</h4>
                             <p className="font-body-md text-body-md text-on-surface-variant max-w-[320px] mx-auto">
-                                لا توجد بيانات مسجلين لعرضها حالياً.
+                                {t('users.no_users_data')}
                             </p>
                         </div>
                     ) : (
@@ -316,27 +316,27 @@ const UsersPage = () => {
                             <thead className="bg-background/80 border-b border-outline-variant font-label-md text-label-md text-on-surface-variant whitespace-nowrap">
                                 <tr>
                                     <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('full_name')}>
-                                        <div className="flex items-center gap-1">الاسم <SortIcon columnKey="full_name" /></div>
+                                        <div className="flex items-center gap-1">{t('users.name')} <SortIcon columnKey="full_name" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('email')}>
-                                        <div className="flex items-center gap-1">البريد الإلكتروني <SortIcon columnKey="email" /></div>
+                                        <div className="flex items-center gap-1">{t('users.email')} <SortIcon columnKey="email" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('role.role_name')}>
-                                        <div className="flex items-center gap-1">الصلاحية <SortIcon columnKey="role.role_name" /></div>
+                                        <div className="flex items-center gap-1">{t('users.role')} <SortIcon columnKey="role.role_name" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('phone')}>
-                                        <div className="flex items-center gap-1">رقم الهاتف <SortIcon columnKey="phone" /></div>
+                                        <div className="flex items-center gap-1">{t('users.phone')} <SortIcon columnKey="phone" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('location')}>
-                                        <div className="flex items-center gap-1">الموقع <SortIcon columnKey="location" /></div>
+                                        <div className="flex items-center gap-1">{t('users.location')} <SortIcon columnKey="location" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('account_status')}>
-                                        <div className="flex items-center justify-center gap-1">حالة الحساب <SortIcon columnKey="account_status" /></div>
+                                        <div className="flex items-center justify-center gap-1">{t('users.account_status')} <SortIcon columnKey="account_status" /></div>
                                     </th>
                                     <th className="py-4 px-6 font-medium text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('is_active')}>
-                                        <div className="flex items-center justify-center gap-1">نشط <SortIcon columnKey="is_active" /></div>
+                                        <div className="flex items-center justify-center gap-1">{t('users.active')} <SortIcon columnKey="is_active" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-center">إجراءات</th>
+                                    <th className="py-4 px-6 font-medium text-center">{t('users.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="font-body-md text-body-md text-on-surface divide-y divide-outline-variant">
@@ -354,7 +354,7 @@ const UsersPage = () => {
                                             {item.email}
                                         </td>
                                         <td className="py-4 px-6">
-                                            {renderRoleBadge(item.role?.role_name)}
+                                            <div>{renderRoleBadge(item.role?.role_id, item.role?.role_name)}</div>
                                         </td>
                                         <td className="py-4 px-6 dir-ltr text-right">
                                             {item.phone || '—'}
@@ -369,12 +369,12 @@ const UsersPage = () => {
                                             {item.account_status === 'Active' || !item.account_status ? (
                                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#22c55e]/10 text-[#16a34a]">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                                                    نشط
+                                                    {t('users.status_active')}
                                                 </span>
                                             ) : (
                                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-outline-variant/30 text-on-surface-variant">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
-                                                    غير نشط
+                                                    {t('users.status_inactive')}
                                                 </span>
                                             )}
                                         </td>
@@ -386,11 +386,11 @@ const UsersPage = () => {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center justify-center gap-2">
-                                                <button onClick={(e) => { e.stopPropagation(); handleOpenModal('edit', item) }} className="text-on-surface-variant hover:text-primary transition-colors p-1" title="تعديل الحساب">
+                                                <button onClick={(e) => { e.stopPropagation(); handleOpenModal('edit', item) }} className="text-on-surface-variant hover:text-primary transition-colors p-1" title={t('users.edit_account')}>
                                                     <span className="material-symbols-outlined text-xl">edit</span>
                                                 </button>
 
-                                                <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(item.user_id) }} className="text-on-surface-variant hover:text-error transition-colors p-1" title="حذف">
+                                                <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(item.user_id) }} className="text-on-surface-variant hover:text-error transition-colors p-1" title={t('users.delete_account')}>
                                                     <span className="material-symbols-outlined text-xl">delete</span>
                                                 </button>
                                             </div>
@@ -405,7 +405,7 @@ const UsersPage = () => {
                 {!loading && filteredUsers.length > 0 && (
                     <div className="p-4 border-t border-outline-variant bg-surface flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="font-caption text-caption text-on-surface-variant">
-                            عرض <span className="font-medium text-on-surface">{(currentPage - 1) * itemsPerPage + 1}</span> إلى <span className="font-medium text-on-surface">{Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> من أصل <span className="font-medium text-on-surface">{filteredUsers.length}</span> مستخدم
+                            {t('common.showing')} <span className="font-medium text-on-surface">{(currentPage - 1) * itemsPerPage + 1}</span> {t('common.to')} <span className="font-medium text-on-surface">{Math.min(currentPage * itemsPerPage, filteredUsers.length)}</span> {t('common.of')} <span className="font-medium text-on-surface">{filteredUsers.length}</span> {t('users.users_count')}
                         </p>
                         <div className="flex items-center gap-2">
                             <button
@@ -438,7 +438,7 @@ const UsersPage = () => {
                 )}
             </section>
 
-            <Modal isOpen={modalConfig.open} onClose={() => setModalConfig({ open: false, type: '', user: null })} title={modalConfig.type === 'add' ? 'تسجيل عضوية النظام' : modalConfig.type === 'details' ? 'استعراض تفاصيل المستخدم' : modalConfig.type === 'edit' ? 'تعديل بيانات المستخدم' : 'تحديث الصلاحيات'} size="md">
+            <Modal isOpen={modalConfig.open} onClose={() => setModalConfig({ open: false, type: '', user: null })} title={modalConfig.type === 'add' ? t('users.modal_add_title') : modalConfig.type === 'details' ? t('users.modal_details_title') : modalConfig.type === 'edit' ? t('users.modal_edit_title') : t('users.modal_role_title')} size="md">
                 {modalConfig.type === 'details' && modalConfig.user ? (
                     <div className="space-y-4 mt-4" dir="rtl">
                         <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant flex flex-col md:flex-row items-center md:items-start gap-4">
@@ -451,35 +451,35 @@ const UsersPage = () => {
                                     <span className="material-symbols-outlined text-[16px]">mail</span> <span className="dir-ltr">{modalConfig.user.email}</span>
                                 </p>
                                 <p className="font-body-md text-body-md text-on-surface-variant justify-center md:justify-start flex items-center gap-1 mt-1">
-                                    <span className="material-symbols-outlined text-[16px]">phone</span> <span className="dir-ltr">{modalConfig.user.phone || 'غير متوفر'}</span>
+                                    <span className="material-symbols-outlined text-[16px]">phone</span> <span className="dir-ltr">{modalConfig.user.phone || t('common.unavailable')}</span>
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">الصلاحية (الدور)</span>
-                                <div>{renderRoleBadge(modalConfig.user.role?.role_name)}</div>
+                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.role')}</span>
+                                <div>{renderRoleBadge(modalConfig.user.role?.role_id, modalConfig.user.role?.role_name)}</div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">الموقع / المحافظة</span>
+                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.location')}</span>
                                 <div className="font-body-md text-on-surface flex items-center gap-1 text-sm">
                                     <span className="material-symbols-outlined text-[18px] text-on-surface-variant">location_on</span>
-                                    {modalConfig.user.location || 'غير متوفر'}
+                                    {modalConfig.user.location || t('common.unavailable')}
                                 </div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">حالة الحساب</span>
+                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.account_status')}</span>
                                 <div className="font-body-md text-on-surface flex items-center gap-1 text-sm font-medium">
                                     {modalConfig.user.account_status === 'Active' || !modalConfig.user.account_status ? (
-                                        <span className="text-[#16a34a] flex items-center gap-1.5 px-2.5 py-1 bg-[#22c55e]/10 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> نشط للوصول</span>
+                                        <span className="text-[#16a34a] flex items-center gap-1.5 px-2.5 py-1 bg-[#22c55e]/10 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> {t('users.status_active')}</span>
                                     ) : (
-                                        <span className="text-on-surface-variant flex items-center gap-1.5 px-2.5 py-1 bg-outline-variant/30 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span> تم الإيقاف</span>
+                                        <span className="text-on-surface-variant flex items-center gap-1.5 px-2.5 py-1 bg-outline-variant/30 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span> {t('users.status_inactive')}</span>
                                     )}
                                 </div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">تاريخ التسجيل</span>
+                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.registration_date')}</span>
                                 <div className="font-body-md text-on-surface flex items-center gap-1 text-sm dir-ltr justify-end text-on-surface-variant">
                                     {modalConfig.user.created_at ? new Date(modalConfig.user.created_at).toLocaleDateString('en-GB') : '—'}
                                 </div>
@@ -487,7 +487,7 @@ const UsersPage = () => {
                         </div>
 
                         <button type="button" onClick={() => setModalConfig({ open: false, type: '', user: null })} className="w-full bg-surface-container-low text-on-surface font-label-md hover:bg-surface-container transition-colors py-3 rounded-xl border border-outline-variant shadow-sm mt-6">
-                            الرجوع وإغلاق النافذة
+                            {t('common.close')}
                         </button>
                     </div>
                 ) : (
@@ -495,12 +495,12 @@ const UsersPage = () => {
                         <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-4">
                             <div className="flex items-center gap-2 mb-2 text-primary">
                                 <span className="material-symbols-outlined text-xl">admin_panel_settings</span>
-                                <h4 className="font-label-md text-label-md">هيكل الصلاحيات الوصولية</h4>
+                                <h4 className="font-label-md text-label-md">{t('users.role_structure')}</h4>
                             </div>
                             <div>
-                                <label className={labelClass}>تصنيف الصلاحية <span className="text-error">*</span></label>
+                                <label className={labelClass}>{t('users.role_category')} <span className="text-error">*</span></label>
                                 <select required value={form.role_id} onChange={e => setForm({ ...form, role_id: e.target.value })} className={inputClass}>
-                                    <option value="">-- اضغط لتعيين الدور الإداري --</option>
+                                    <option value="">-- {t('users.select_role')} --</option>
                                     {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
                                 </select>
                             </div>
@@ -510,30 +510,30 @@ const UsersPage = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className={labelClass}>الاسم الكامل <span className="text-error">*</span></label>
-                                        <input type="text" required value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} className={inputClass} placeholder="الاسم" />
+                                        <label className={labelClass}>{t('users.full_name')} <span className="text-error">*</span></label>
+                                        <input type="text" required value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} className={inputClass} placeholder={t('users.name_placeholder')} />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>الموقع / المحافظة</label>
-                                        <input type="text" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputClass} placeholder="الموقع" />
+                                        <label className={labelClass}>{t('users.location')}</label>
+                                        <input type="text" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} className={inputClass} placeholder={t('users.location_placeholder')} />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className={labelClass}>البريد الإلكتروني <span className="text-error">*</span></label>
+                                        <label className={labelClass}>{t('users.email')} <span className="text-error">*</span></label>
                                         <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputClass} dir="ltr" placeholder="user@example.com" />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>رقم الهاتف</label>
-                                        <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputClass} dir="ltr" placeholder="رقم الهاتف" />
+                                        <label className={labelClass}>{t('users.phone')}</label>
+                                        <input type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputClass} dir="ltr" placeholder={t('users.phone_placeholder')} />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>كلمة المرور {modalConfig.type === 'add' && <span className="text-error">*</span>}</label>
+                                    <label className={labelClass}>{t('users.password')} {modalConfig.type === 'add' && <span className="text-error">*</span>}</label>
                                     <div className="relative">
-                                        <input type={showPassword ? "text" : "password"} required={modalConfig.type === 'add'} minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={`${inputClass} !pl-10`} placeholder={modalConfig.type === 'edit' ? "اتركه فارغاً للحفاظ على كلمة المرور الحالية" : "••••••••"} dir={form.password ? 'ltr' : 'rtl'} />
+                                        <input type={showPassword ? "text" : "password"} required={modalConfig.type === 'add'} minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={`${inputClass} !pl-10`} placeholder={modalConfig.type === 'edit' ? t('users.password_edit_placeholder') : "••••••••"} dir={form.password ? 'ltr' : 'rtl'} />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface outline-none flex items-center justify-center">
                                             <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
                                         </button>
@@ -542,32 +542,32 @@ const UsersPage = () => {
                             </div>
                         )}
 
-                        {roles.find(r => (r.role_id || r.id) == form.role_id)?.role_name === 'ScreenOwner' && (
+                        {Number(form.role_id) === 3 && (
                             <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-4 mt-2">
                                 <div className="flex items-center gap-2 mb-2 text-[#a855f7]">
                                     <span className="material-symbols-outlined text-xl">account_balance</span>
-                                    <h4 className="font-label-md text-label-md">السجل المالي</h4>
+                                    <h4 className="font-label-md text-label-md">{t('users.financial_record')}</h4>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className={labelClass}>البنك المصرفي</label>
+                                        <label className={labelClass}>{t('users.bank_name')}</label>
                                         <input type="text" value={form.bank_name} onChange={e => setForm({ ...form, bank_name: e.target.value })} className={inputClass} />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>اسم المستفيد</label>
+                                        <label className={labelClass}>{t('users.account_name')}</label>
                                         <input type="text" value={form.account_name} onChange={e => setForm({ ...form, account_name: e.target.value })} className={inputClass} />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className={labelClass}>رقم الحساب / الآيبان (IBAN)</label>
+                                    <label className={labelClass}>{t('users.account_number')}</label>
                                     <input type="text" value={form.account_number} onChange={e => setForm({ ...form, account_number: e.target.value })} className={inputClass} dir="ltr" />
                                 </div>
                             </div>
                         )}
 
                         <button type="submit" disabled={formLoading} className="w-full bg-primary text-on-primary font-label-md hover:bg-primary/90 py-3 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6">
-                            {formLoading ? 'جاري المعالجة...' : 'تأكيد الحفظ'}
+                            {formLoading ? t('common.processing') : t('common.save_confirm')}
                         </button>
                     </form>
                 )}
@@ -577,9 +577,9 @@ const UsersPage = () => {
                 isOpen={!!deleteTarget}
                 onClose={() => setDeleteTarget(null)}
                 onConfirm={handleDelete}
-                title="إلغاء نشاط المستخدم وحذفه"
-                message="هل أنت متأكد من إسقاط هذا الحساب من سجلات الوصول نهائياً؟ في حال حذفه لن يتمكن صاحبه من الدخول مستقبلاً وهذا الإجراء دائم."
-                confirmText="نعم، موافق على الإلغاء"
+                title={t('users.delete_dialog_title')}
+                message={t('users.delete_dialog_message')}
+                confirmText={t('users.delete_dialog_confirm')}
             />
         </div>
     );

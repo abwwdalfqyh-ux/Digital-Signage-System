@@ -38,42 +38,55 @@ const useAuthStore = create((set, get) => ({
     },
 
     /**
-     * Set a temporary role for impersonation (Admin only)
+     * Set a temporary role ID for impersonation (Admin only)
      */
-    setImpersonatedRole: (roleName) => {
-        set({ impersonatedRole: roleName });
+    setImpersonatedRole: (roleId) => {
+        set({ impersonatedRole: roleId });
     },
 
     /**
-     * Get user's role name (from the nested role object)
+     * Get user's role ID
+     */
+    getRoleId: () => {
+        const impersonated = get().impersonatedRole;
+        if (impersonated) return impersonated;
+        const user = get().user;
+        return user?.role_id || user?.role?.role_id || null;
+    },
+
+    /**
+     * Get user's role name (for display)
      */
     getRoleName: () => {
         const impersonated = get().impersonatedRole;
-        if (impersonated) return impersonated;
+        if (impersonated) {
+            const map = { 1: 'SuperAdmin', 2: 'Advertiser', 3: 'ScreenOwner', 4: 'Maintenance', 5: 'Accountant', 6: 'Secretary' };
+            return map[impersonated] || 'Unknown';
+        }
         const user = get().user;
         return user?.role?.role_name || null;
     },
 
     /**
-     * Check if the user has a specific role
+     * Check if the user has a specific role ID
      */
-    hasRole: (roleName) => {
-        return get().getRoleName() === roleName;
+    hasRole: (roleId) => {
+        return get().getRoleId() === roleId;
     },
 
     /**
-     * Check if the user is SuperAdmin or Admin
+     * Check if the user is SuperAdmin (1) or Admin (7)
      */
     isAdmin: () => {
-        const role = get().getRoleName();
-        return role === 'SuperAdmin' || role === 'Admin';
+        const roleId = get().getRoleId();
+        return roleId === 1 || roleId === 7;
     },
 
     /**
-     * Check if the user is Advertiser
+     * Check if the user is Advertiser (2)
      */
     isAdvertiser: () => {
-        return get().getRoleName() === 'Advertiser';
+        return get().getRoleId() === 2;
     },
 }));
 

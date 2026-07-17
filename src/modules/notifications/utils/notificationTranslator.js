@@ -70,6 +70,27 @@ const formatMessage = (key, args) => {
         case 'notif_msg_payout_rejected':
             return isEn ? `Your payout request could not be processed.` : `تعذر تنفيذ طلب السحب الخاص بك. يرجى مراجعة التفاصيل في سجل الأرباح.`;
 
+        // تعويض الإعلانات عند عودة الشاشة
+        case 'notif_title_ad_compensated': return isEn ? 'Ad Compensated Automatically 🎁' : 'تم تعويض إعلانك تلقائياً 🎁';
+        case 'notif_title_ad_compensated_admin': return isEn ? 'Auto Ad Compensation 🔄' : 'تعويض إعلان تلقائي 🔄';
+        case 'notif_msg_ad_compensated':
+            return isEn ? `Your ad "${args.title}" was extended by ${args.minutes} minutes to compensate for downtime on screen "${args.screen}".` : `تم تمديد فترة إعلانك "${args.title}" بمقدار ${args.minutes} دقيقة كتعويض عن فترة انقطاع في شاشة: ${args.screen}.`;
+        case 'notif_msg_ad_compensated_admin':
+            return isEn ? `Ad "${args.title}" was extended by ${args.minutes} minutes due to screen "${args.screen}" coming back online.` : `تم تعويض الإعلان "${args.title}" بـ ${args.minutes} دقيقة بسبب عودة شاشة "${args.screen}" للعمل.`;
+
+        // سند دفع يدوي
+        case 'notif_title_manual_payment': return isEn ? 'New Manual Payment Receipt' : 'سند دفع يدوي جديد';
+        case 'notif_msg_manual_payment':
+            return isEn ? `A manual payment receipt was submitted for ad #${args.ad_id} via ${args.method}.` : `تم رفع سند دفع يدوي للإعلان رقم ${args.ad_id} عبر ${args.method}.`;
+
+        // رفض الدفع
+        case 'notif_title_payment_rejected': return isEn ? 'Payment Rejected' : 'تم رفض الدفعة';
+        case 'notif_msg_payment_rejected':
+            return isEn ? `Payment for ad "${args.title}" was rejected.` : `تم رفض الدفعة الخاصة بالإعلان "${args.title}".`;
+
+        // شاشة فارغة
+        case 'notif_title_screen_empty': return isEn ? 'Screen Requires Content' : 'الشاشة لا تبث أي إعلان!';
+
         default:
             return key;
     }
@@ -119,7 +140,7 @@ export const getNotificationLink = (titleKey) => {
         } catch(e) { return titleKey; }
     })();
 
-    const roleName = useAuthStore.getState().getRoleName();
+    const roleId = useAuthStore.getState().getRoleId();
 
     switch(key) {
         case 'notif_title_payment_confirmed':
@@ -128,9 +149,9 @@ export const getNotificationLink = (titleKey) => {
         case 'notif_title_payout_requested':
         case 'notif_title_payout_approved':
         case 'notif_title_payout_rejected':
-            if (roleName === 'Advertiser') return '/dashboard/my-financials';
-            if (roleName === 'ScreenOwner') return '/dashboard/earnings';
-            if (roleName === 'Secretary') return '/dashboard/payment-ops';
+            if (roleId === 2) return '/dashboard/my-financials';
+            if (roleId === 3) return '/dashboard/earnings';
+            if (roleId === 6) return '/dashboard/payment-ops';
             return '/dashboard/financial'; // Default for Admin/SuperAdmin
 
         case 'notif_title_new_screen':

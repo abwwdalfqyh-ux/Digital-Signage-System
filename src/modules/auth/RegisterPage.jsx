@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
+import useTranslation from '../../i18n/useTranslation';
 import LegalModal from './LegalModal';
 
 /* ──────────────────────────────────────────────
@@ -91,6 +92,7 @@ const RegisterPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isObscure, setIsObscure] = useState(true);
     const [legalModalConfig, setLegalModalConfig] = useState({ isOpen: false, type: 'privacy' });
+    const { t, dir } = useTranslation();
 
     const handleChange = (e, field) => {
         setForm({ ...form, [field]: e.target.value });
@@ -99,17 +101,17 @@ const RegisterPage = () => {
     const handleRegister = async (e) => {
         e.preventDefault();
         if (!form.full_name.trim() || !form.email.trim() || !form.password) {
-            addToast('يرجى تعبئة جميع الحقول المطلوبة', 'error');
+            addToast(t('auth.register_validation'), 'error');
             return;
         }
         setIsLoading(true);
         try {
             const res = await axiosClient.post(ENDPOINTS.AUTH.REGISTER, form);
             if (res.data.success || res.status === 201) {
-                addToast('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
+                addToast(t('auth.register_success'), 'success');
                 navigate('/login');
             } else {
-                addToast(res.data.message || 'فشل إنشاء الحساب', 'error');
+                addToast(res.data.message || t('auth.register_failed'), 'error');
             }
         } catch (error) {
             // Error is already handled and toasted by axiosClient global interceptor
@@ -120,7 +122,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f4f6f8] font-sans p-4 md:p-8" dir="rtl">
+        <div className="min-h-screen flex items-center justify-center bg-[#f4f6f8] font-sans p-4 md:p-8" dir={dir}>
             {/* Main Container */}
             <main className="w-full max-w-[1400px] min-h-[85vh] bg-[#f4f6f8] rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] relative">
 
@@ -137,8 +139,8 @@ const RegisterPage = () => {
                         transition={{ delay: 0.05 }}
                         className="text-center mb-8 mt-2"
                     >
-                        <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">إنشاء حساب جديد</h1>
-                        <p className="text-[#6B7280] text-[15px] font-bold">انضم إلى شبكة سبأ بوست لإدارة إعلاناتك بذكاء</p>
+                        <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">{t('auth.register_title')}</h1>
+                        <p className="text-[#6B7280] text-[15px] font-bold">{t('auth.register_subtitle')}</p>
                     </motion.div>
 
                     {/* Form — vertical stacked fields */}
@@ -153,7 +155,7 @@ const RegisterPage = () => {
                             <PremiumInput
                                 icon={User}
                                 englishLabel="FULL NAME"
-                                arabicLabel="الاسم الكامل"
+                                arabicLabel={t('auth.full_name')}
                                 value={form.full_name}
                                 onChange={(e) => handleChange(e, 'full_name')}
                                 required
@@ -169,7 +171,7 @@ const RegisterPage = () => {
                             <PremiumInput
                                 icon={Mail}
                                 englishLabel="EMAIL ADDRESS"
-                                arabicLabel="البريد الإلكتروني"
+                                arabicLabel={t('auth.email')}
                                 type="email"
                                 value={form.email}
                                 onChange={(e) => handleChange(e, 'email')}
@@ -186,7 +188,7 @@ const RegisterPage = () => {
                             <PremiumInput
                                 icon={Phone}
                                 englishLabel="PHONE NUMBER"
-                                arabicLabel="رقم الجوال"
+                                arabicLabel={t('auth.phone')}
                                 type="tel"
                                 value={form.phone}
                                 onChange={(e) => handleChange(e, 'phone')}
@@ -202,7 +204,7 @@ const RegisterPage = () => {
                             <PremiumInput
                                 icon={MapPin}
                                 englishLabel="LOCATION"
-                                arabicLabel="الموقع / المحافظة"
+                                arabicLabel={t('auth.location')}
                                 value={form.location}
                                 onChange={(e) => handleChange(e, 'location')}
                             />
@@ -217,7 +219,7 @@ const RegisterPage = () => {
                             <PremiumInput
                                 icon={Lock}
                                 englishLabel="PASSWORD"
-                                arabicLabel="كلمة المرور"
+                                arabicLabel={t('auth.password')}
                                 value={form.password}
                                 onChange={(e) => handleChange(e, 'password')}
                                 isPassword
@@ -227,8 +229,8 @@ const RegisterPage = () => {
                             />
                             {/* Password hint */}
                             <div className="flex justify-between mt-1.5 px-1 text-[11px] text-[#9ca3af] font-medium">
-                                <span>مطلوب</span>
-                                <span>يجب أن تحتوي على 8 أحرف على الأقل</span>
+                                <span>{t('auth.required')}</span>
+                                <span>{t('auth.password_min_length')}</span>
                             </div>
                         </motion.div>
 
@@ -256,7 +258,7 @@ const RegisterPage = () => {
                                             className="flex items-center gap-2"
                                         >
                                             <div className="w-5 h-5 border-[2.5px] border-white/30 border-t-white rounded-full animate-spin" />
-                                            <span>جاري التسجيل...</span>
+                                            <span>{t('common.processing')}</span>
                                         </motion.div>
                                     ) : (
                                         <motion.span
@@ -266,7 +268,7 @@ const RegisterPage = () => {
                                             exit={{ opacity: 0 }}
                                             className="relative z-10"
                                         >
-                                            إنشاء حساب
+                                            {t('auth.register_btn')}
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
@@ -281,9 +283,9 @@ const RegisterPage = () => {
                         transition={{ delay: 0.45 }}
                         className="mt-8 text-center text-[13px] font-bold text-[#111827]"
                     >
-                        <span>لديك حساب بالفعل؟ </span>
+                        <span>{t('auth.have_account')} </span>
                         <Link to="/login" className="text-[#14506b] hover:text-[#0f3c50] hover:underline underline-offset-4 transition-colors">
-                            تسجيل الدخول
+                            {t('auth.login_link')}
                         </Link>
                     </motion.div>
 
@@ -337,14 +339,14 @@ const RegisterPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
                             className="text-center px-12 max-w-xl"
-                            dir="rtl"
+                            dir={dir}
                         >
                             <h2 className="text-4xl lg:text-[52px] font-black text-white mb-4 leading-tight drop-shadow-md">
-                                انضم إلى شبكة
-                                <span className="block text-[#d9a05b] mt-3">الوكلاء والمعلنين</span>
+                                {t('auth.join_network_line1')}
+                                <span className="block text-[#d9a05b] mt-3">{t('auth.join_network_line2')}</span>
                             </h2>
                             <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
-                                ابدأ في إدارة شاشاتك الإعلانية أو إنشاء حملاتك بكل سهولة عبر منصة متخصصة تلبي كافة احتياجاتك.
+                                {t('auth.join_network_desc')}
                             </p>
                         </motion.div>
                     </div>
@@ -352,8 +354,8 @@ const RegisterPage = () => {
                     {/* Footer */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
                         <div className="flex gap-6">
-                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</button>
-                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">شروط الاستخدام</button>
+                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">{t('auth.privacy_policy')}</button>
+                            <button type="button" onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">{t('auth.terms_of_use')}</button>
                         </div>
                         <div className="tracking-widest">
                             SABAPOST SECURE 2026 ©

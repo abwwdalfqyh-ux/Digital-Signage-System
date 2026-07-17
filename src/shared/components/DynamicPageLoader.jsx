@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useTranslation from '../../i18n/useTranslation';
 
 /**
  * DynamicPageLoader: An enterprise-grade, progressive loading state component.
@@ -10,24 +11,28 @@ import { motion, AnimatePresence } from 'framer-motion';
  * @param {boolean} minHeight - Minimum height to prevent layout shift.
  */
 const DynamicPageLoader = ({ 
-    messages = [
-        "جاري الاتصال الآمن بالسيرفر...",
-        "يتم الآن تجميع البيانات...",
-        "جاري المعالجة والأمان...",
-        "لحظات وننتهي من ترتيب واجهتك..."
-    ], 
+    messages, 
     icon = "cloud_sync",
     minHeight = "min-h-[400px]"
 }) => {
+    const { t } = useTranslation();
+    const defaultMessages = [
+        t('common.loader_msg_1'),
+        t('common.loader_msg_2'),
+        t('common.loader_msg_3'),
+        t('common.loader_msg_4')
+    ];
+    const displayMessages = messages || defaultMessages;
+    
     const [messageIdx, setMessageIdx] = useState(0);
 
     useEffect(() => {
         setMessageIdx(0); // Reset on mount
         const interval = setInterval(() => {
-            setMessageIdx((prev) => (prev + 1) % messages.length);
+            setMessageIdx((prev) => (prev + 1) % displayMessages.length);
         }, 1800);
         return () => clearInterval(interval);
-    }, [messages]);
+    }, [displayMessages]);
 
     return (
         <div className={`flex flex-col items-center justify-center p-10 md:p-16 space-y-8 ${minHeight} w-full`}>
@@ -54,11 +59,11 @@ const DynamicPageLoader = ({
                         transition={{ duration: 0.3, ease: 'easeOut' }}
                         className="text-lg md:text-xl font-bold text-on-surface absolute top-0 w-full text-center px-4"
                     >
-                        {messages[messageIdx]}
+                        {displayMessages[messageIdx]}
                     </motion.p>
                 </AnimatePresence>
                 <p className="text-sm font-medium text-outline mt-8 md:mt-10">
-                    يرجى الانتظار، جاري الجلب بأمان...
+                    {t('common.loader_please_wait')}
                 </p>
             </div>
 

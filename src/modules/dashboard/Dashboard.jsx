@@ -7,6 +7,7 @@ import { ENDPOINTS } from '../../core/api/endpoints';
 import { useAdminDashboard } from '../../hooks/api/useDashboard';
 import useToastStore from '../../store/useToastStore';
 import RecentPlaybackLogs from './components/RecentPlaybackLogs';
+import useTranslation from '../../i18n/useTranslation';
 
 const dashboardStyles = `
   .dash-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
@@ -428,6 +429,7 @@ const DashboardSkeleton = () => (
    MAIN DASHBOARD
 ══════════════════════════════════════════════════════ */
 const Dashboard = () => {
+    const { t, dir } = useTranslation();
     const navigate = useNavigate();
     const { data: dashboardData, isLoading: loading, error: fetchError, refetch: load } = useAdminDashboard();
     
@@ -474,36 +476,18 @@ const Dashboard = () => {
     if (loading) return <DashboardSkeleton />;
 
     if (error && !data) return (
-        <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            justifyContent: 'center', padding: '80px 16px',
-            direction: 'rtl', gap: '16px', textAlign: 'center',
-        }}>
-            <div style={{
-                width: 72, height: 72, borderRadius: '20px',
-                background: S.errorContainer,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-                <AlertCircle style={{ width: 36, height: 36, color: S.error }} />
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: S.onBackground, margin: 0, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                تعذر تحميل بيانات اللوحة
-            </h3>
-            <p style={{ fontSize: '13px', color: S.onSurfaceVariant, margin: 0, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                يرجى التحقق من الاتصال والمحاولة مرة أخرى.
+        <div className="flex flex-col items-center justify-center p-12 bg-red-50 rounded-3xl text-red-600 mt-6 shadow-sm border border-red-100">
+            <AlertCircle className="w-16 h-16 mb-4 animate-bounce" />
+            <h3 className="text-xl font-bold mb-2">{t('dashboard.load_error')}</h3>
+            <p className="text-red-500/80 mb-6 text-center max-w-md">
+                {t('dashboard.load_error_desc')}
             </p>
             <button
                 onClick={load}
-                style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: '10px 28px', borderRadius: '10px',
-                    background: S.primaryContainer, color: '#fff',
-                    fontSize: '13px', fontWeight: 600, border: 'none', cursor: 'pointer',
-                    fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                }}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors"
             >
-                <RefreshCw style={{ width: 16, height: 16 }} />
-                إعادة المحاولة
+                <RefreshCw className="w-5 h-5 mr-2 ml-2" />
+                {t('dashboard.retry')}
             </button>
         </div>
     );
@@ -583,7 +567,7 @@ const Dashboard = () => {
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                         lineHeight: 1.2,
                     }}>
-                        نظرة عامة على لوحة التحكم
+                        {t('dashboard.overview_title')}
                     </h1>
                     <p style={{
                         margin: '4px 0 0', fontSize: '13px',
@@ -642,8 +626,8 @@ const Dashboard = () => {
                             cursor: 'pointer', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                             boxShadow: '0 2px 8px rgba(37,99,235,0.30)',
                         }}>
-                        <Plus style={{ width: 15, height: 15 }} />
-                        إعلان جديد
+                        <Plus className="w-5 h-5 ml-2" />
+                        {t('dashboard.new_ad_btn')}
                     </button>
                 </div>
             </motion.div>
@@ -653,11 +637,9 @@ const Dashboard = () => {
             <div className="dash-kpi-grid">
                 {/* Active Users */}
                 <KpiCard
-                    index={0}
-                    label="المستخدمون النشطون"
-                    sublabel="Active Users"
+                    label={t('dashboard.active_users_label')}
                     value={activeUsers}
-                    note="+12% من الشهر الماضي"
+                    note={t('dashboard.active_users_note')}
                     noteIcon={TrendingUp}
                     noteColor={S.primaryContainer}
                     Icon={Users}
@@ -666,12 +648,10 @@ const Dashboard = () => {
                 />
                 {/* Pending Ads */}
                 <KpiCard
-                    index={1}
-                    label="إعلانات قيد المراجعة"
-                    sublabel="Pending Ads"
+                    label={t('dashboard.secretary_pending_ads')}
                     value={pendingAds}
-                    note="يتطلب إجراء"
-                    noteIcon={Info}
+                    note={t('dashboard.pending_ads_note')}
+                    noteIcon={AlertCircle}
                     noteColor={S.error}
                     Icon={Monitor}
                     iconBg={S.errorContainer}
@@ -680,9 +660,7 @@ const Dashboard = () => {
                 />
                 {/* Active Screens */}
                 <KpiCard
-                    index={2}
-                    label="الشاشات النشطة"
-                    sublabel="Active Screens"
+                    label={t('dashboard.active_screens_label')}
                     value={activeScreens}
                     valueSmall={`/ ${totalScreens}`}
                     Icon={Monitor}
@@ -705,11 +683,9 @@ const Dashboard = () => {
                 />
                 {/* Total Revenue */}
                 <KpiCard
-                    index={3}
-                    label="إجمالي الأرباح"
-                    sublabel="Total Revenue"
+                    label={t('dashboard.report_total_profit')}
                     value={`$${Number(totalRevenue).toLocaleString()}`}
-                    note="+5.4% هذا الأسبوع"
+                    note={t('dashboard.total_profit_note')}
                     noteIcon={TrendingUp}
                     noteColor={S.primaryContainer}
                     accentColor={S.primaryContainer}
@@ -732,29 +708,13 @@ const Dashboard = () => {
                         display: 'flex', alignItems: 'center',
                         justifyContent: 'space-between', marginBottom: '16px',
                     }}>
-                        <h3 style={{
-                            margin: 0, fontSize: '16px', fontWeight: 600,
-                            color: S.onBackground,
-                            fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                        }}>
-                            الأرباح الأسبوعية الكلية
-                        </h3>
+                        <h3 className="font-title-md text-title-md text-on-surface font-bold">{t('dashboard.total_weekly_profit')}</h3>
                         <select
                             value={govSel}
                             onChange={e => setGovSel(e.target.value)}
-                            style={{
-                                fontSize: '12px', fontWeight: 500,
-                                color: S.onSurface,
-                                border: `1px solid ${S.outlineVariant}`,
-                                borderRadius: '8px',
-                                padding: '5px 12px',
-                                background: S.surfaceContainerLow,
-                                outline: 'none', cursor: 'pointer',
-                                direction: 'rtl',
-                                fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                            }}
+                            className="bg-surface border-none text-on-surface font-body-sm text-body-sm focus:ring-0 cursor-pointer"
                         >
-                            <option value="all">كل المحافظات</option>
+                            <option value="all">{t('dashboard.all_governorates')}</option>
                             {screensByGov.map(g => (
                                 <option key={g.name} value={g.name}>{g.name}</option>
                             ))}
@@ -770,13 +730,7 @@ const Dashboard = () => {
                     transition={{ duration: 0.5, delay: 0.4 }}
                     style={{ ...glassCard, padding: '22px' }}
                 >
-                    <h3 style={{
-                        margin: '0 0 18px', fontSize: '16px', fontWeight: 600,
-                        color: S.onBackground,
-                        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                    }}>
-                        الشاشات حسب المحافظة
-                    </h3>
+                    <h3 className="font-title-md text-title-md text-on-surface font-bold mb-4">{t('dashboard.screens_by_gov')}</h3>
                     {screensByGov.length > 0 ? (
                         <DonutChart data={screensByGov} />
                     ) : (

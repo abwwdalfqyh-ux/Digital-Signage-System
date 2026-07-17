@@ -41,7 +41,7 @@ import PeakHoursPage from '../../modules/admin/PeakHoursPage';
 import RolesPage from '../../modules/admin/RolesPage';
 import PaymentOperationsPage from '../../modules/admin/PaymentOperationsPage';
 import AdminProfilePage from '../../modules/admin/AdminProfilePage';
-import FrequencyPackagesPage from '../../modules/admin/FrequencyPackagesPage';
+
 import SessionsPage from '../../modules/sessions/SessionsPage';
 /**
  * Protected Route - requires authentication
@@ -63,10 +63,10 @@ const PublicRoute = ({ children }) => {
  * Role-Based Route - restricts access to specific roles
  */
 const RoleRoute = ({ children, allowedRoles }) => {
-    const { isAuthenticated, getRoleName } = useAuthStore();
-    const roleName = getRoleName();
+    const { isAuthenticated, getRoleId } = useAuthStore();
+    const roleId = getRoleId();
     if (!isAuthenticated) return <Navigate to="/login" replace />;
-    if (allowedRoles && !allowedRoles.includes(roleName)) return <Navigate to="/dashboard" replace />;
+    if (allowedRoles && !allowedRoles.includes(roleId)) return <Navigate to="/dashboard" replace />;
     return children;
 };
 
@@ -74,11 +74,11 @@ const RoleRoute = ({ children, allowedRoles }) => {
  * Smart Dashboard - renders different dashboard based on role
  */
 const SmartDashboard = () => {
-    const { roleName } = usePermission();
-    if (roleName === ROLES.ADVERTISER)  return <AdvertiserDashboard />;
-    if (roleName === ROLES.MAINTENANCE) return <MaintenanceDashboard />;
-    if (roleName === ROLES.SECRETARY)   return <SecretaryDashboard />;
-    if (roleName === ROLES.SCREEN_OWNER) return <OwnerDashboard />;
+    const { roleId } = usePermission();
+    if (roleId === ROLES.ADVERTISER)  return <AdvertiserDashboard />;
+    if (roleId === ROLES.MAINTENANCE) return <MaintenanceDashboard />;
+    if (roleId === ROLES.SECRETARY)   return <SecretaryDashboard />;
+    if (roleId === ROLES.SCREEN_OWNER) return <OwnerDashboard />;
     return <Dashboard />;
 };
 
@@ -139,11 +139,7 @@ const AppRoutes = () => {
                         <PeakHoursPage />
                     </RoleRoute>
                 } />
-                <Route path="frequency-packages" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.ADMIN]}>
-                        <FrequencyPackagesPage />
-                    </RoleRoute>
-                } />
+
                 <Route path="roles" element={
                     <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.ADMIN]}>
                         <RolesPage />

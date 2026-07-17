@@ -1,10 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import useTranslation from '../../i18n/useTranslation';
+
 /**
  * Full-screen loading overlay with premium animation.
  */
-const LoadingOverlay = ({ isVisible, message = 'جاري التحميل...' }) => {
+const LoadingOverlay = ({ isVisible, message }) => {
+    const { t } = useTranslation();
+    const finalMessage = message || t('common.loading');
     return (
         <AnimatePresence>
             {isVisible && (
@@ -19,7 +23,7 @@ const LoadingOverlay = ({ isVisible, message = 'جاري التحميل...' }) =
                         <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
                         <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-indigo-500 animate-spin"></div>
                     </div>
-                    <p className="text-white/80 text-sm font-bold tracking-wide">{message}</p>
+                    <p className="text-white/80 text-sm font-bold tracking-wide">{finalMessage}</p>
                 </motion.div>
             )}
         </AnimatePresence>

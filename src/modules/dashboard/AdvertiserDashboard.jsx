@@ -20,6 +20,7 @@ import { ENDPOINTS } from '../../core/api/endpoints';
 import useAuthStore from '../../store/useAuthStore';
 import useToastStore from '../../store/useToastStore';
 import { useAdvertiserDashboard } from '../../hooks/api/useDashboard';
+import useTranslation from '../../i18n/useTranslation';
 
 // Animation variants
 const containerVariants = {
@@ -62,9 +63,9 @@ const DashboardError = ({ onRetry }) => (
             <AlertCircle className="w-10 h-10 text-red-500" />
         </div>
         <div>
-            <h3 className="text-xl font-black text-gray-900 mb-2">تعذر تحميل لوحة المعلن</h3>
+            <h3 className="text-xl font-black text-gray-900 mb-2">{t('common.error')}</h3>
             <p className="text-sm font-medium text-gray-500 max-w-[320px] mx-auto leading-relaxed">
-                واجهنا مشكلة أثناء جلب الإحصائيات أو التحقق من بياناتك.
+                {t('dashboard.system_under_dev')}
             </p>
         </div>
         <button
@@ -72,7 +73,7 @@ const DashboardError = ({ onRetry }) => (
             className="flex items-center gap-2 px-6 py-3 mt-2 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
         >
             <RefreshCw className="w-4 h-4" />
-            إعادة المحاولة
+            {t('common.retry')}
         </button>
     </div>
 );
@@ -88,6 +89,7 @@ const AdvertiserDashboard = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const addToast = useToastStore(state => state.addToast);
+    const { t, dir } = useTranslation();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -108,9 +110,9 @@ const AdvertiserDashboard = () => {
 
     const getGreeting = () => {
         const hour = new Date().getHours();
-        if (hour < 12) return 'صباح الخير والبركة';
-        if (hour < 18) return 'مساء الخير والسرور';
-        return 'مساء الخير الهادئ';
+        if (hour < 12) return t('common.good_morning');
+        if (hour < 18) return t('common.good_afternoon');
+        return t('common.good_evening');
     };
 
     if (loading) return <DashboardSkeleton />;
@@ -131,7 +133,7 @@ const AdvertiserDashboard = () => {
             initial="hidden"
             animate="show"
             className="space-y-6 pb-12 font-sans w-full max-w-[1600px] mx-auto min-h-screen"
-            dir="rtl"
+            dir={dir}
         >
             {/* 1. Header (Matched to Admin Dashboard) */}
             <motion.div
@@ -140,7 +142,7 @@ const AdvertiserDashboard = () => {
             >
                 <div>
                     <h1 className="text-[28px] font-bold text-on-background m-0 leading-tight font-sans">
-                        نظرة عامة على لوحة التحكم
+                        {t('dashboard.overview')}
                     </h1>
                     <p className="mt-1 text-[13px] text-outline font-sans">
                         Dashboard Overview
@@ -151,7 +153,7 @@ const AdvertiserDashboard = () => {
                     <button
                         onClick={handleRefresh}
                         disabled={isRefreshing}
-                        title="تحديث البيانات"
+                        title={t('common.refresh')}
                         className="w-10 h-10 flex items-center justify-center rounded-[10px] bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm"
                     >
                         <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#2563EB]' : ''}`} />
@@ -161,7 +163,7 @@ const AdvertiserDashboard = () => {
                         className="flex items-center gap-1.5 px-4 py-2 rounded-[10px] bg-[#2563EB] text-white text-[13px] font-bold cursor-pointer font-sans shadow-[0_2px_8px_rgba(37,99,235,0.30)] hover:bg-[#1D4ED8] transition-colors border-none"
                     >
                         <PlusCircle className="w-[15px] h-[15px]" />
-                        إطلاق حملة إعلانية
+                        {t('ads.create')}
                     </button>
                 </div>
             </motion.div>
@@ -182,7 +184,7 @@ const AdvertiserDashboard = () => {
                     <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
                     <div className="flex justify-between items-start mb-6 relative z-10">
                         <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">إعلانات نشطة الآن</p>
+                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.active_ads_now')}</p>
                             <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">{data?.active_ads_count || '0'}</h3>
                         </div>
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${statusFilter === 'Active' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'}`}>
@@ -192,9 +194,9 @@ const AdvertiserDashboard = () => {
                     <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-[10px] md:text-xs font-bold transition-colors">
                         <div className="flex items-center gap-2 text-emerald-600">
                             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                            <span>متصل بالشبكة</span>
+                            <span>{t('dashboard.online_status')}</span>
                         </div>
-                        <span className="text-gray-400">{statusFilter === 'Active' ? 'إلغاء التصفية' : 'تصفية الجدول'}</span>
+                        <span className="text-gray-400">{statusFilter === 'Active' ? t('dashboard.clear_filter') : t('dashboard.filter_table')}</span>
                     </div>
                 </div>
 
@@ -209,7 +211,7 @@ const AdvertiserDashboard = () => {
                     <div className="absolute top-0 left-0 w-32 h-32 bg-[var(--color-gold)]/10 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
                     <div className="flex justify-between items-start mb-6 relative z-10">
                         <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">قيد المراجعة</p>
+                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.under_review')}</p>
                             <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">{data?.pending_ads_count || '0'}</h3>
                         </div>
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${statusFilter === 'Pending' ? 'bg-[var(--color-gold)] text-white shadow-lg shadow-[var(--color-gold)]/30' : 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] group-hover:bg-[var(--color-gold)]/20'}`}>
@@ -219,9 +221,9 @@ const AdvertiserDashboard = () => {
                     <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-[10px] md:text-xs font-bold transition-colors">
                         <div className="flex items-center gap-2 text-amber-600">
                             <Clock className="w-3.5 h-3.5" />
-                            <span>تنتظر الموافقة</span>
+                            <span>{t('dashboard.waiting_approval')}</span>
                         </div>
-                        <span className="text-gray-400">{statusFilter === 'Pending' ? 'إلغاء التصفية' : 'تصفية الجدول'}</span>
+                        <span className="text-gray-400">{statusFilter === 'Pending' ? t('dashboard.clear_filter') : t('dashboard.filter_table')}</span>
                     </div>
                 </div>
 
@@ -230,7 +232,7 @@ const AdvertiserDashboard = () => {
                     <div className="absolute top-0 left-0 w-32 h-32 bg-[var(--color-dark-turquoise)]/5 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
                     <div className="flex justify-between items-start mb-6 relative z-10">
                         <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">إجمالي المصروفات</p>
+                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.total_expenses')}</p>
                             <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">${data?.total_spent || '0'}</h3>
                         </div>
                         <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 bg-[var(--color-dark-turquoise)]/10 text-[var(--color-dark-turquoise)] group-hover:bg-[var(--color-dark-turquoise)]/20">
@@ -239,7 +241,7 @@ const AdvertiserDashboard = () => {
                     </div>
                     <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex items-center gap-2 text-gray-500 text-[10px] md:text-xs font-bold">
                         <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-                        <span>حساب الفواتير المعتمدة</span>
+                        <span>{t('dashboard.approved_invoices')}</span>
                     </div>
                 </div>
             </motion.div>
@@ -257,17 +259,17 @@ const AdvertiserDashboard = () => {
                         </div>
                         <div>
                             <h3 className="text-xl font-black text-gray-900 tracking-tight mb-1">
-                                سجل الإعلانات الحديثة
+                                {t('dashboard.recent_ads_registry')}
                             </h3>
                             <p className="text-xs text-gray-500 font-bold">
                                 {statusFilter !== 'all' ? (
                                     <span className="text-[var(--color-dark-turquoise)] flex items-center gap-1.5">
-                                        يتم عرض فئة ({statusFilter === 'Active' ? 'نشط' : 'قيد المراجعة'}) فقط.
+                                        {statusFilter === 'Active' ? t('dashboard.filter_active_only') : t('dashboard.filter_pending_only')}
                                         <button onClick={() => setStatusFilter('all')} className="underline hover:text-[#005e6b] flex items-center gap-1 ml-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                            <RotateCcw className="w-3 h-3" /> إعادة ضبط
+                                            <RotateCcw className="w-3 h-3" /> {t('common.reset')}
                                         </button>
                                     </span>
-                                ) : 'تصفح آخر الإعلانات والحملات التي قمت بإطلاقها'}
+                                ) : t('dashboard.browse_latest_ads')}
                             </p>
                         </div>
                     </div>
@@ -276,7 +278,7 @@ const AdvertiserDashboard = () => {
                     <div className="relative w-full lg:w-auto lg:min-w-[320px]">
                         <input
                             type="text"
-                            placeholder="ابحث باسم الإعلان أو الحملة..."
+                            placeholder={t('dashboard.search_ads')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 px-12 text-sm font-bold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[var(--color-dark-turquoise)] focus:bg-white focus:ring-4 focus:ring-[var(--color-dark-turquoise)]/10 transition-all text-right"
@@ -290,10 +292,10 @@ const AdvertiserDashboard = () => {
                     <table className="w-full text-right border-collapse min-w-[800px]">
                         <thead className="bg-gray-50/80 sticky top-0 z-10 backdrop-blur-sm">
                             <tr className="border-b border-gray-100">
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">عنوان الإعلان</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">تاريخ الحملة</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-right">التكلفة الإجمالية</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-center">حالة النشر</th>
+                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">{t('ads.ad_title')}</th>
+                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">{t('ads.campaign_date')}</th>
+                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-right">{t('ads.total_cost')}</th>
+                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-center">{t('ads.publish_status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -301,20 +303,20 @@ const AdvertiserDashboard = () => {
                                 {filteredAds.map((ad, idx) => {
                                     const status = ad.status;
                                     let statusClass = 'bg-gray-100 text-gray-600 border-gray-200';
-                                    let statusText = 'غير معروف';
+                                    let statusText = t('screens.unknown');
 
                                     if (status === 'Active') {
                                         statusClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-                                        statusText = 'نشط حالياً';
+                                        statusText = t('ads.status_active');
                                     } else if (status === 'Pending') {
                                         statusClass = 'bg-amber-50 text-amber-700 border border-amber-200';
-                                        statusText = 'قيد المراجعة';
+                                        statusText = t('ads.status_pending');
                                     } else if (status === 'waiting_payment') {
                                         statusClass = 'bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A]';
-                                        statusText = 'بانتظار الدفع';
+                                        statusText = t('ads.status_waiting_payment');
                                     } else if (status === 'Rejected') {
                                         statusClass = 'bg-rose-50 text-rose-700 border border-rose-200';
-                                        statusText = 'مرفوض';
+                                        statusText = t('ads.status_rejected');
                                     }
 
                                     return (
@@ -333,16 +335,16 @@ const AdvertiserDashboard = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-black text-gray-900 leading-snug mb-1 truncate max-w-[250px]" title={ad.title}>
-                                                            {ad.title || 'بدون عنوان'}
+                                                            {ad.title || t('ads.no_title')}
                                                         </p>
-                                                        <p className="text-[10px] text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded-md inline-block">المدة: {ad.duration || '0'} ثانية</p>
+                                                        <p className="text-[10px] text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded-md inline-block">{t('ads.duration')}: {ad.duration || '0'} {t('ads.seconds')}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-5 px-6 md:px-8 text-xs font-bold text-gray-500">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-gray-900">من: <span className="font-sans">{ad.start_date || '--'}</span></span>
-                                                    <span className="text-gray-400">إلى: <span className="font-sans">{ad.end_date || '--'}</span></span>
+                                                    <span className="text-gray-900">{t('ads.from')}: <span className="font-sans">{ad.start_date || '--'}</span></span>
+                                                    <span className="text-gray-400">{t('ads.to')}: <span className="font-sans">{ad.end_date || '--'}</span></span>
                                                 </div>
                                             </td>
                                             <td className="py-5 px-6 md:px-8 text-sm font-black text-gray-900">
@@ -374,12 +376,12 @@ const AdvertiserDashboard = () => {
                                                 </div>
                                             </div>
                                             <h4 className="text-lg font-black text-gray-900 mb-2 whitespace-nowrap">
-                                                {searchQuery || statusFilter !== 'all' ? 'لا توجد نتائج مطابقة' : 'لا يوجد محتوى إعلاني حتى الآن'}
+                                                {searchQuery || statusFilter !== 'all' ? t('dashboard.no_matches') : t('dashboard.no_ads_yet')}
                                             </h4>
                                             <p className="text-sm font-medium text-gray-500 mb-8 leading-relaxed">
                                                 {searchQuery || statusFilter !== 'all'
-                                                    ? 'حاول تغيير الفلاتر أو استخدام كلمات بحث مختلفة للوصول إلى الحملة المطلوبة.'
-                                                    : 'أنت في المكان الصحيح لبدء رحلتك. قم بإنشاء أول حملة إعلانية لك وشاهد النتائج.'}
+                                                    ? t('dashboard.try_changing_filters')
+                                                    : t('dashboard.start_first_campaign')}
                                             </p>
                                             {!searchQuery && statusFilter === 'all' && (
                                                 <button
@@ -387,7 +389,7 @@ const AdvertiserDashboard = () => {
                                                     className="px-8 py-3.5 bg-[var(--color-dark-turquoise)] text-white text-sm font-bold rounded-xl hover:opacity-90 shadow-[0_8px_16px_rgba(20,93,106,0.2)] transition-opacity flex items-center gap-2"
                                                 >
                                                     <PlusCircle className="w-5 h-5" />
-                                                    بدء حملة إعلانية جديدة
+                                                    {t('ads.start_new_campaign')}
                                                 </button>
                                             )}
                                         </motion.div>

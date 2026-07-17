@@ -6,6 +6,7 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useAuthStore from '../../store/useAuthStore';
 import useToastStore from '../../store/useToastStore';
+import useTranslation from '../../i18n/useTranslation';
 import LegalModal from './LegalModal';
 
 const PremiumInput = ({ icon: Icon, englishLabel, arabicLabel, type = "text", value, onChange, isPassword, isObscure, onToggleObscure }) => {
@@ -49,6 +50,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const login = useAuthStore(state => state.login);
     const addToast = useToastStore(state => state.addToast);
+    const { t, isRTL, dir } = useTranslation();
 
     const [loginId, setLoginId] = useState('');
     const [password, setPassword] = useState('');
@@ -60,7 +62,7 @@ const LoginPage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         if (!loginId.trim() || !password) {
-            addToast('يرجى إدخال البريد الإلكتروني أو رقم الهاتف وكلمة المرور', 'warning');
+            addToast(t('auth.login_validation'), 'warning');
             return;
         }
 
@@ -75,10 +77,10 @@ const LoginPage = () => {
             if (res.data.token) {
                 const { token, user } = res.data;
                 login(user, token);
-                addToast(`مرحباً بك مجدداً، ${user.full_name}! 👋`, 'success');
+                addToast(t('common.welcome_back', { name: user.full_name }), 'success');
                 navigate('/dashboard');
             } else {
-                addToast(res.data.message || 'فشل تسجيل الدخول', 'error');
+                addToast(res.data.message || t('auth.login_failed'), 'error');
             }
         } catch (error) {
             // Error is already handled and toasted by axiosClient global interceptor
@@ -89,7 +91,7 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f4f6f8] font-sans p-4 md:p-8" dir="rtl">
+        <div className="min-h-screen flex items-center justify-center bg-[#f4f6f8] font-sans p-4 md:p-8" dir={dir}>
             <style>
                 {`
                 .orbit-container {
@@ -148,8 +150,8 @@ const LoginPage = () => {
                     
                     {/* Header */}
                     <div className="text-center mb-12 mt-4">
-                        <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">تسجيل الدخول</h1>
-                        <p className="text-[#6B7280] text-[15px] font-bold">مرحباً بك مجدداً في منصة سبأ بوست</p>
+                        <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">{t('auth.login_title')}</h1>
+                        <p className="text-[#6B7280] text-[15px] font-bold">{t('auth.login_subtitle')}</p>
                     </div>
 
                     {/* Form */}
@@ -158,7 +160,7 @@ const LoginPage = () => {
                         <PremiumInput 
                             icon={User}
                             englishLabel="Email or Phone"
-                            arabicLabel="البريد الإلكتروني أو رقم الهاتف"
+                            arabicLabel={t('auth.email_or_phone')}
                             value={loginId}
                             onChange={(e) => setLoginId(e.target.value)}
                         />
@@ -166,7 +168,7 @@ const LoginPage = () => {
                         <PremiumInput 
                             icon={Lock}
                             englishLabel="Password"
-                            arabicLabel="كلمة المرور"
+                            arabicLabel={t('auth.password')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             isPassword={true}
@@ -186,12 +188,12 @@ const LoginPage = () => {
                                     className="h-4 w-4 text-[#14506b] focus:ring-2 focus:ring-[#14506b] border-[#E5E7EB] rounded-[4px] cursor-pointer accent-[#14506b] transition-all" 
                                 />
                                 <label htmlFor="remember-me" className="mr-2.5 block text-[13px] text-[#111827] cursor-pointer font-bold select-none">
-                                    تذكرني
+                                    {t('auth.remember_me')}
                                 </label>
                             </div>
                             <div>
                                 <Link to="/forgot-password" className="text-[13px] font-bold text-[#14506b] hover:text-[#0f3c50] transition-colors underline-offset-4 hover:underline">
-                                    هل نسيت كلمة المرور؟
+                                    {t('auth.forgot_password')}
                                 </Link>
                             </div>
                         </div>
@@ -215,7 +217,7 @@ const LoginPage = () => {
                                             className="flex items-center gap-2"
                                         >
                                             <div className="w-5 h-5 border-[2.5px] border-white/30 border-t-white rounded-full animate-spin"></div>
-                                            <span>جاري...</span>
+                                            <span>{t('common.processing')}</span>
                                         </motion.div>
                                     ) : (
                                         <motion.span 
@@ -225,7 +227,7 @@ const LoginPage = () => {
                                             exit={{ opacity: 0 }}
                                             className="relative z-10"
                                         >
-                                            تسجيل الدخول
+                                            {t('auth.login_btn')}
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
@@ -235,9 +237,9 @@ const LoginPage = () => {
 
                     {/* Footer Link */}
                     <div className="mt-12 text-center text-[13px] font-bold text-[#111827]">
-                        <span>ليس لديك حساب؟ </span>
+                        <span>{t('auth.no_account')} </span>
                         <Link to="/register" className="text-[#14506b] hover:text-[#0f3c50] hover:underline underline-offset-4 transition-colors">
-                            أنشئ حساباً جديداً
+                            {t('auth.create_account')}
                         </Link>
                     </div>
                 </section>
@@ -282,11 +284,11 @@ const LoginPage = () => {
                         {/* Typography */}
                         <div className="text-center px-12 max-w-xl">
                             <h2 className="text-4xl lg:text-[52px] font-black text-white mb-4 leading-tight drop-shadow-md">
-                                أدر شاشاتك الذكية
-                                <span className="block text-[#d9a05b] mt-3">بكل احترافية</span>
+                                {t('auth.branding_title')}
+                                <span className="block text-[#d9a05b] mt-3">{t('auth.branding_highlight')}</span>
                             </h2>
                             <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
-                                نظام السبورة الذكية (Digital Signage) الأول. راقب أداء حملاتك، وتحكم بالمحتوى، وتفاعل مع عملائك في الوقت الفعلي بأمان وسرعة.
+                                {t('auth.branding_desc')}
                             </p>
                         </div>
                     </div>
@@ -294,8 +296,8 @@ const LoginPage = () => {
                     {/* Footer Links */}
                     <div className="absolute bottom-0 left-0 right-0 p-8 flex justify-between items-center z-20 text-[12px] text-white/60 font-medium">
                         <div className="flex gap-6">
-                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">سياسة الخصوصية</button>
-                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">شروط الاستخدام</button>
+                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'privacy' })} className="hover:text-white transition-colors cursor-pointer">{t('auth.privacy_policy')}</button>
+                            <button onClick={() => setLegalModalConfig({ isOpen: true, type: 'terms' })} className="hover:text-white transition-colors cursor-pointer">{t('auth.terms_of_use')}</button>
                         </div>
                         <div className="tracking-widest">
                             SABAPOST SECURE 2026 ©

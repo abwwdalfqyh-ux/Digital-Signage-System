@@ -12,6 +12,7 @@ import DynamicPageLoader from '../../shared/components/DynamicPageLoader';
 import { guessDeviceType, DeviceIcon, formatDateTime, timeAgo } from './components/SessionsTable';
 import BlocklistTable from './components/BlocklistTable';
 import BlockDeviceModal from './components/BlockDeviceModal';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Animation Variants ─── */
 const containerVariants = {
@@ -27,6 +28,7 @@ const itemVariants = {
    Mobile Session Card
    ═══════════════════════════════ */
 const SessionCard = ({ session, isSuperAdmin, onRevoke }) => {
+    const { t } = useTranslation();
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
@@ -60,11 +62,11 @@ const SessionCard = ({ session, isSuperAdmin, onRevoke }) => {
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-xs mb-1">
                             <span className="font-label-md text-label-md text-on-surface truncate">
-                                {session.device_name || 'جهاز غير معروف'}
+                                {session.device_name || t('sessions.unknown_device')}
                             </span>
                             {session.is_current && (
                                 <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold whitespace-nowrap">
-                                    الحالية
+                                    {t('sessions.current_session')}
                                 </span>
                             )}
                         </div>
@@ -99,7 +101,7 @@ const SessionCard = ({ session, isSuperAdmin, onRevoke }) => {
                                             className="w-full flex items-center gap-sm px-4 py-3 font-label-md text-label-md text-error hover:bg-error-container transition-colors"
                                         >
                                             <span className="material-symbols-outlined text-xl">logout</span>
-                                            إنهاء هذه الجلسة
+                                            {t('sessions.terminate_this_session')}
                                         </button>
                                     </motion.div>
                                 )}
@@ -120,7 +122,7 @@ const SessionCard = ({ session, isSuperAdmin, onRevoke }) => {
                     )}
                     <div className="flex items-center gap-sm text-on-surface-variant font-caption text-caption">
                         <span className="material-symbols-outlined text-[16px]">calendar_today</span>
-                        <span>بدأت: {formatDateTime(session.created_at)}</span>
+                        <span>{t('sessions.started_at', { date: formatDateTime(session.created_at) })}</span>
                     </div>
                 </div>
 
@@ -131,7 +133,7 @@ const SessionCard = ({ session, isSuperAdmin, onRevoke }) => {
                         className="mt-md w-full flex items-center justify-center gap-xs py-sm rounded-lg font-label-md text-label-md text-error border border-error/30 hover:bg-error-container hover:border-error transition-all group"
                     >
                         <span className="material-symbols-outlined text-lg">logout</span>
-                        إنهاء الجلسة
+                        {t('sessions.terminate_session')}
                     </button>
                 )}
             </div>
@@ -157,7 +159,9 @@ const MobileSkeletonCard = () => (
 );
 
 /* ─── Page-level Error State (non-table) ─── */
-const PageErrorState = ({ onRetry }) => (
+const PageErrorState = ({ onRetry }) => {
+    const { t } = useTranslation();
+    return (
     <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -166,37 +170,38 @@ const PageErrorState = ({ onRetry }) => (
         <div className="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mb-md border border-error/20">
             <span className="material-symbols-outlined text-error text-3xl">warning</span>
         </div>
-        <h4 className="font-title-lg text-title-lg text-on-surface mb-xs">تعذّر تحميل الجلسات</h4>
-        <p className="font-body-md text-body-md text-on-surface-variant mb-lg text-center max-w-xs">
-            حدث خطأ أثناء جلب بيانات الجلسات. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.
-        </p>
+        <h4 className="font-title-lg text-title-lg text-on-surface mb-xs">{t('sessions.load_failed')}</h4>
+            {t('sessions.load_failed_desc')}
         <button
             onClick={onRetry}
             className="flex items-center gap-xs px-md py-sm rounded-lg font-label-md text-label-md text-on-primary bg-primary hover:opacity-90 transition-opacity shadow-sm"
         >
             <span className="material-symbols-outlined text-lg">refresh</span>
-            إعادة المحاولة
+            {t('sessions.retry')}
         </button>
     </motion.div>
-);
+    );
+};
 
 /* ─── Page-level Empty State ─── */
-const PageEmptyState = () => (
+const PageEmptyState = () => {
+    const { t } = useTranslation();
+    return (
     <div className="flex flex-col items-center justify-center py-24 bg-surface-container-lowest rounded-xl border border-outline-variant">
         <div className="w-20 h-20 bg-surface-container-low rounded-full flex items-center justify-center mb-md border border-outline-variant">
             <span className="material-symbols-outlined text-outline text-4xl">lock</span>
         </div>
-        <h4 className="font-title-lg text-title-lg text-on-surface mb-xs">لا توجد جلسات نشطة</h4>
-        <p className="font-body-md text-body-md text-on-surface-variant max-w-xs text-center">
-            لم يتم العثور على أي جلسات نشطة حالياً
-        </p>
+        <h4 className="font-title-lg text-title-lg text-on-surface mb-xs">{t('sessions.no_active_sessions')}</h4>
+            {t('sessions.no_active_sessions_desc')}
     </div>
-);
+    );
+};
 
 /* ═══════════════════════════════════════════════════
    Main Page
    ═══════════════════════════════════════════════════ */
 const SessionsPage = () => {
+    const { t } = useTranslation();
     const [sessions, setSessions]         = useState([]);
     const [loading, setLoading]           = useState(true);
     const [refreshing, setRefreshing]     = useState(false);
@@ -210,8 +215,8 @@ const SessionsPage = () => {
     const [blockedList, setBlockedList]   = useState([]);
 
     const addToast     = useToastStore(state => state.addToast);
-    const { roleName } = usePermission();
-    const isSuperAdmin = roleName === ROLES.SUPER_ADMIN;
+    const { roleId } = usePermission();
+    const isSuperAdmin = roleId === ROLES.SUPER_ADMIN;
 
     /* ── Fetch ── */
     const fetchSessions = useCallback(async (silent = false) => {
@@ -253,14 +258,14 @@ const SessionsPage = () => {
         try {
             if (revokeTarget.type === 'others') {
                 await axiosClient.delete(ENDPOINTS.SESSIONS.REVOKE_OTHERS);
-                addToast('تم إنهاء جميع الجلسات الأخرى بنجاح', 'success');
+                addToast(t('sessions.terminate_others_success'), 'success');
             } else {
                 await axiosClient.delete(ENDPOINTS.SESSIONS.REVOKE(revokeTarget.session.id));
-                addToast('تم إنهاء الجلسة المحددة بنجاح', 'success');
+                addToast(t('sessions.terminate_single_success'), 'success');
             }
             await fetchSessions(true);
         } catch (err) {
-            addToast(err.response?.data?.message || 'فشل إنهاء الجلسة', 'error');
+            addToast(err.response?.data?.message || t('sessions.terminate_failed'), 'error');
         } finally {
             setRevoking(false);
             setRevokeTarget(null);
@@ -282,9 +287,9 @@ const SessionsPage = () => {
             // Remove from current sessions to reflect UI change
             setSessions(prev => prev.filter(s => s.id !== blockTarget.id));
             
-            addToast(`تم حظر الجهاز (${blockTarget.device_name || 'الغير معروف'}) وعنوان الـ IP بنجاح`, 'success');
+            addToast(t('sessions.block_success', { device: blockTarget.device_name || t('sessions.unknown_device') }), 'success');
         } catch (err) {
-            addToast('فشل حظر الجهاز', 'error');
+            addToast(t('sessions.block_failed'), 'error');
         } finally {
             setBlockTarget(null);
         }
@@ -293,7 +298,7 @@ const SessionsPage = () => {
     const handleUnblockConfirm = () => {
         if (!unblockTarget) return;
         setBlockedList(prev => prev.filter(b => b.id !== unblockTarget.id));
-        addToast('تم فك الحظر بنجاح', 'success');
+        addToast(t('sessions.unblock_success'), 'success');
         setUnblockTarget(null);
     };
 
@@ -303,18 +308,18 @@ const SessionsPage = () => {
 
     /* ── Confirmation dialog texts ── */
     const dialogTitle = revokeTarget?.type === 'others'
-        ? 'إنهاء جميع الجلسات الأخرى'
-        : 'إنهاء الجلسة المحددة';
+        ? t('sessions.terminate_others_title')
+        : t('sessions.terminate_single_title');
 
     const dialogMessage = revokeTarget?.type === 'others'
-        ? `سيتم إنهاء جميع الجلسات الأخرى (${otherSessions.length}) فوراً وستحتاج إلى إعادة تسجيل الدخول عليها. هل أنت متأكد؟`
-        : `سيتم إنهاء جلسة "${revokeTarget?.session?.device_name || 'هذا الجهاز'}" فوراً. هل تريد المتابعة؟`;
+        ? t('sessions.terminate_others_confirm', { count: otherSessions.length })
+        : t('sessions.terminate_single_confirm', { device: revokeTarget?.session?.device_name || t('sessions.unknown_device') });
 
     const dialogConfirmText = revoking
-        ? 'جاري الإنهاء...'
+        ? t('sessions.terminating')
         : revokeTarget?.type === 'others'
-            ? 'نعم، إنهاء الكل'
-            : 'نعم، إنهاء الجلسة';
+            ? t('sessions.yes_terminate_all')
+            : t('sessions.yes_terminate');
 
     /* ════════════════════════════════════
        Render
@@ -329,11 +334,11 @@ const SessionsPage = () => {
                         <span className="material-symbols-outlined text-3xl">security</span>
                     </div>
                     <div>
-                        <h2 className="font-headline-lg text-headline-lg text-on-surface">إدارة الجلسات</h2>
+                        <h2 className="font-headline-lg text-headline-lg text-on-surface">{t('sessions.manage_sessions_title')}</h2>
                         <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
                             {isSuperAdmin
-                                ? 'عرض ومراقبة جلسات جميع المستخدمين في النظام وإنهاء أي جلسة مشبوهة فوراً.'
-                                : 'عرض ومراقبة أجهزتك المسجّلة وإنهاء أي جلسة غير معروفة بضغطة واحدة.'}
+                                ? t('sessions.manage_sessions_admin_desc')
+                                : t('sessions.manage_sessions_desc')}
                         </p>
                     </div>
                 </div>
@@ -345,7 +350,7 @@ const SessionsPage = () => {
                         className="flex items-center gap-xs px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <span className={`material-symbols-outlined text-sm ${refreshing ? 'animate-spin' : ''}`}>sync</span>
-                        تحديث
+                        {t('sessions.refresh')}
                     </button>
                     {/* Revoke others — only shown when there are other sessions */}
                     {!loading && !error && otherSessions.length > 0 && (
@@ -354,7 +359,7 @@ const SessionsPage = () => {
                             className="flex items-center gap-xs px-md py-sm bg-error-container text-on-error-container rounded-lg font-label-md text-label-md hover:bg-error hover:text-on-error transition-colors shadow-sm"
                         >
                             <span className="material-symbols-outlined text-sm">cancel</span>
-                            إنهاء الجلسات الأخرى
+                            {t('sessions.terminate_other_btn')}
                         </button>
                     )}
                 </div>
@@ -371,9 +376,9 @@ const SessionsPage = () => {
                 >
                     <DynamicPageLoader 
                         messages={[
-                            "جاري فحص حالة الأمان...", 
-                            "يتم جلب سجلات الأجهزة المتصلة...",
-                            "لحظات ويتم العرض بأمان..."
+                            t('sessions.loading_security_1'), 
+                            t('sessions.loading_security_2'),
+                            t('sessions.loading_security_3')
                         ]}
                         icon="admin_panel_settings"
                     />
@@ -392,7 +397,7 @@ const SessionsPage = () => {
                             className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${activeTab === 'sessions' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}
                         >
                             <span className="material-symbols-outlined text-[18px]">devices</span>
-                            الجلسات النشطة
+                            {t('sessions.active_sessions_tab')}
                             <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">
                                 {sessions.length}
                             </span>
@@ -402,7 +407,7 @@ const SessionsPage = () => {
                             className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${activeTab === 'blocklist' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}
                         >
                             <span className="material-symbols-outlined text-[18px]">block</span>
-                            قائمة الحظر
+                            {t('sessions.blocklist_tab')}
                             {blockedList.length > 0 && (
                                 <span className="bg-error/10 text-error text-xs px-2 py-0.5 rounded-full">
                                     {blockedList.length}
@@ -438,14 +443,14 @@ const SessionsPage = () => {
                                 <div>
                                     <h3 className="font-title-lg text-title-lg text-[#92400E]">
                                         {isSuperAdmin
-                                            ? `تنبيه أمني: يوجد ${otherSessions.length} جلسة نشطة من أجهزة أخرى.`
-                                            : `تنبيه أمني: يوجد ${otherSessions.length} جلسة نشطة من أجهزة أخرى.`
+                                            ? t('sessions.security_alert', { count: otherSessions.length })
+                                            : t('sessions.security_alert', { count: otherSessions.length })
                                         }
                                     </h3>
                                     <p className="font-body-md text-body-md text-[#B45309] mt-xs">
                                         {isSuperAdmin
-                                            ? 'راجعها وأنهِ أي جلسة مشبوهة.'
-                                            : 'إذا لم تكن أنت، أنهِها فوراً وغيّر كلمة المرور.'
+                                            ? t('sessions.security_alert_admin_action')
+                                            : t('sessions.security_alert_action')
                                         }
                                     </p>
                                 </div>
@@ -488,7 +493,7 @@ const SessionsPage = () => {
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse block" />
                                             <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
-                                                الجلسة الحالية
+                                                {t('sessions.current_session_title')}
                                             </h3>
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -507,7 +512,7 @@ const SessionsPage = () => {
                                         <div className="flex items-center gap-2 mb-3">
                                             <span className="w-2 h-2 rounded-full bg-gray-300 block" />
                                             <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">
-                                                جلسات أخرى ({otherSessions.length})
+                                                {t('sessions.other_sessions_title', { count: otherSessions.length })}
                                             </h3>
                                         </div>
                                         <AnimatePresence mode="popLayout">
@@ -537,9 +542,9 @@ const SessionsPage = () => {
                 isOpen={!!unblockTarget}
                 onClose={() => setUnblockTarget(null)}
                 onConfirm={handleUnblockConfirm}
-                title="تأكيد فك الحظر"
-                message={`هل أنت متأكد من فك الحظر عن هذا الجهاز (${unblockTarget?.device_name || 'الغير معروف'})؟ سيتمكن من الوصول للنظام مجدداً.`}
-                confirmText="نعم، فك الحظر"
+                title={t('sessions.confirm_unblock_title')}
+                message={t('sessions.confirm_unblock_message', { device: unblockTarget?.device_name || t('sessions.unknown_device') })}
+                confirmText={t('sessions.yes_unblock')}
                 variant="primary"
             />
 
@@ -549,7 +554,7 @@ const SessionsPage = () => {
                 onClose={() => !revoking && setRevokeTarget(null)}
                 onConfirm={handleRevokeConfirm}
                 title={dialogTitle}
-                message={revoking ? 'جاري معالجة الطلب، يرجى الانتظار...' : dialogMessage}
+                message={revoking ? t('sessions.processing') : dialogMessage}
                 confirmText={dialogConfirmText}
                 variant="danger"
             />
@@ -564,7 +569,7 @@ const SessionsPage = () => {
             />
 
             {/* ── View Details Modal ── */}
-            <Modal isOpen={!!viewTarget} onClose={() => setViewTarget(null)} title="التفاصيل الأمنية للجلسة">
+            <Modal isOpen={!!viewTarget} onClose={() => setViewTarget(null)} title={t('sessions.session_details_title')}>
                 {viewTarget && (
                     <div className="flex flex-col pt-2" dir="rtl">
                         <div className="flex items-center gap-4 mb-6 p-4 bg-surface-container-low rounded-2xl border border-outline-variant shadow-sm">
@@ -572,9 +577,9 @@ const SessionsPage = () => {
                                 <DeviceIcon deviceName={viewTarget.device_name} className="text-3xl" />
                             </div>
                             <div>
-                                <h4 className="font-bold text-on-surface text-lg mb-1">{viewTarget.device_name || 'جهاز غير معروف'}</h4>
+                                <h4 className="font-bold text-on-surface text-lg mb-1">{viewTarget.device_name || t('sessions.unknown_device')}</h4>
                                 <p className="text-sm text-on-surface-variant font-mono bg-surface-container rounded px-2 py-0.5 inline-block" dir="ltr">
-                                    IP: {viewTarget.ip_address || '192.168.1.1 (افتراضي)'}
+                                    IP: {viewTarget.ip_address || t('sessions.ip_default')}
                                 </p>
                             </div>
                         </div>
@@ -582,7 +587,7 @@ const SessionsPage = () => {
                             <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
                                 <span className="text-sm text-on-surface-variant flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[18px]">public</span> 
-                                    نظام التشغيل والمتصفح:
+                                    {t('sessions.os_browser')}
                                 </span>
                                 <span className="text-xs font-medium text-on-surface font-mono max-w-[200px] truncate" title={viewTarget.user_agent}>
                                     {viewTarget.user_agent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
@@ -591,29 +596,29 @@ const SessionsPage = () => {
                             <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
                                 <span className="text-sm text-on-surface-variant flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[18px]">login</span>
-                                    أول تسجيل دخول:
+                                    {t('sessions.first_login')}
                                 </span>
                                 <span className="text-sm font-medium text-on-surface">{formatDateTime(viewTarget.created_at)}</span>
                             </div>
                             <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
                                 <span className="text-sm text-on-surface-variant flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[18px]">update</span>
-                                    آخر نشاط التقط:
+                                    {t('sessions.last_activity')}
                                 </span>
                                 <span className="text-sm font-medium text-on-surface">{viewTarget.last_used_at ? formatDateTime(viewTarget.last_used_at) : '—'}</span>
                             </div>
                             <div className="flex justify-between items-center pt-2">
                                 <span className="text-sm text-on-surface-variant flex items-center gap-2">
                                     <span className="material-symbols-outlined text-[18px]">policy</span>
-                                    حالة الجلسة:
+                                    {t('sessions.session_status')}
                                 </span>
                                 {viewTarget.is_current ? (
                                     <span className="text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-full shadow-sm">
-                                        الحالية ومستقرة
+                                        {t('sessions.active_now')}
                                     </span>
                                 ) : (
                                     <span className="text-xs font-bold text-orange-700 bg-orange-100 border border-orange-200 px-3 py-1 rounded-full shadow-sm">
-                                        تعمل بالخلفية متصلة
+                                        {t('sessions.active')}
                                     </span>
                                 )}
                             </div>
@@ -622,7 +627,7 @@ const SessionsPage = () => {
                             onClick={() => setViewTarget(null)} 
                             className="mt-8 mb-2 w-full bg-surface-container text-on-surface py-3 rounded-xl font-bold text-sm hover:bg-outline-variant hover:text-surface-container-lowest transition-all"
                         >
-                            إغلاق النافذة
+                            {t('sessions.close')}
                         </button>
                     </div>
                 )}

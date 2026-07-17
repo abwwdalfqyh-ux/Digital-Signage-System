@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
 import { parseNotificationContent, getNotificationIconInfo, getNotificationLink } from './utils/notificationTranslator';
 import Modal from '../../shared/components/Modal';
+import useTranslation from '../../i18n/useTranslation';
 
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
@@ -22,7 +23,8 @@ const NotificationsPage = () => {
     
     const addToast = useToastStore(state => state.addToast);
     const { user } = useAuthStore();
-    const isOwner = user?.role?.role_name === 'ScreenOwner' || user?.role === 'ScreenOwner';
+    const { t, dir } = useTranslation();
+    const isOwner = user?.role_id === 3;
     
     const navigate = useNavigate();
 
@@ -40,10 +42,10 @@ const NotificationsPage = () => {
     };
 
     const loadingMessages = [
-        "جاري الاتصال الآمن بالسيرفر...",
-        "يتم الآن تجميع إشعاراتك الحديثة...",
-        "جاري مزامنة التحديثات المالية والأمنية...",
-        "لحظات وننتهي من ترتيب واجهتك..."
+        t('notifications.loading_messages.0'),
+        t('notifications.loading_messages.1'),
+        t('notifications.loading_messages.2'),
+        t('notifications.loading_messages.3')
     ];
 
     const fetchNotifications = async () => {
@@ -61,7 +63,7 @@ const NotificationsPage = () => {
                 setUnreadCount(count);
             }
         } catch (error) {
-            addToast('حدث خطأ أثناء جلب الإشعارات', 'error');
+            addToast(t('common.error'), 'error');
         } finally {
             setLoading(false);
         }
@@ -88,7 +90,7 @@ const NotificationsPage = () => {
             setNotifications(prev => prev.map(n => n.notification_id === id ? { ...n, is_read: 'true', read_at: new Date().toISOString() } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (error) {
-            addToast('تعذر تحديث حالة الإشعار', 'error');
+            addToast(t('common.error'), 'error');
         }
     };
 
@@ -97,20 +99,20 @@ const NotificationsPage = () => {
             await axiosClient.put(ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ);
             setNotifications(prev => prev.map(n => ({ ...n, is_read: 'true', read_at: new Date().toISOString() })));
             setUnreadCount(0);
-            addToast('تم تحديد جميع الإشعارات كمقروءة', 'success');
+            addToast(t('notifications.all_marked_read'), 'success');
         } catch (error) {
-            addToast('تعذر تحديث الإشعارات', 'error');
+            addToast(t('common.error'), 'error');
         }
     };
 
     const deleteReadNotifications = async () => {
-        if (!window.confirm('هل أنت متأكد من مسح جميع الإشعارات المقروءة نهائياً؟')) return;
+        if (!window.confirm(t('notifications.confirm_clear_read'))) return;
         try {
             const res = await axiosClient.delete(ENDPOINTS.NOTIFICATIONS.DELETE_READ);
             setNotifications(prev => prev.filter(n => n.read_at === null || n.is_read === false || n.is_read === 'false'));
-            addToast(res.data?.message || 'تم مسح الإشعارات المقروءة', 'success');
+            addToast(res.data?.message || t('notifications.notification_deleted'), 'success');
         } catch (error) {
-            addToast('تعذر مسح الإشعارات', 'error');
+            addToast(t('common.error'), 'error');
         }
     };
 
@@ -120,9 +122,9 @@ const NotificationsPage = () => {
             const res = await axiosClient.delete(ENDPOINTS.NOTIFICATIONS.ARCHIVE, { data: { months: parseInt(archiveMonths) } });
             fetchNotifications(); // Refresh list to reflect changes
             setIsArchiveModalOpen(false);
-            addToast(res.data?.message || 'تم أرشفة ومسح الإشعارات القديمة', 'success');
+            addToast(res.data?.message || t('notifications.archive_success'), 'success');
         } catch (error) {
-            addToast(error.response?.data?.message || 'تعذر مسح الإشعارات القديمة', 'error');
+            addToast(error.response?.data?.message || t('common.error'), 'error');
         } finally {
             setIsArchiving(false);
         }
@@ -138,9 +140,9 @@ const NotificationsPage = () => {
                 }
                 return prev.filter(n => n.notification_id !== id);
             });
-            addToast('تم حذف الإشعار بنجاح', 'success');
+            addToast(t('notifications.notification_deleted'), 'success');
         } catch (error) {
-            addToast('تعذر حذف الإشعار', 'error');
+            addToast(t('common.error'), 'error');
         }
     };
 
@@ -156,10 +158,10 @@ const NotificationsPage = () => {
     const readNotifications = totalNotifications - unreadCount;
 
     return (
-        <div className="p-margin-mobile md:p-gutter max-w-7xl mx-auto w-full font-sans pb-20" dir="rtl">
+        <div className="p-margin-mobile md:p-gutter max-w-7xl mx-auto w-full font-sans pb-20" dir={dir}>
             {/* Header Section */}
             <div className="mb-xl text-right">
-                <h2 className="text-2xl md:text-3xl font-bold text-on-surface mb-xs">مركز الإشعارات</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-on-surface mb-xs">{t('notifications.page_title')}</h2>
             </div>
 
             {/* Summary Statistics Cards */}
@@ -169,7 +171,7 @@ const NotificationsPage = () => {
                     <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-sm text-primary">
                         <span className="material-symbols-outlined text-3xl" data-icon="mark_email_read">mark_email_read</span>
                     </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">إجمالي الرسائل الإشعارية</p>
+                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('sessions.total_sessions')}</p>
                     <p className="text-3xl md:text-4xl font-bold text-on-surface">{totalNotifications}</p>
                 </div>
                 
@@ -181,7 +183,7 @@ const NotificationsPage = () => {
                             <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-error rounded-full border-2 border-white animate-pulse"></span>
                         )}
                     </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">الرسائل الجديدة (غير مقروءة)</p>
+                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('notifications.unread')}</p>
                     <p className="text-3xl md:text-4xl font-bold text-error">{unreadCount}</p>
                 </div>
                 
@@ -190,7 +192,7 @@ const NotificationsPage = () => {
                     <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-sm text-on-surface-variant">
                         <span className="material-symbols-outlined text-3xl" data-icon="archive">archive</span>
                     </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">الرسائل المؤرشفة (مقروءة)</p>
+                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('notifications.read')}</p>
                     <p className="text-3xl md:text-4xl font-bold text-on-surface">{readNotifications}</p>
                 </div>
             </div>
@@ -198,36 +200,36 @@ const NotificationsPage = () => {
             {/* Notification List Area */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden min-h-[400px]">
                 <div className="px-lg py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-on-surface">أحدث الإشعارات</h3>
+                    <h3 className="text-xl font-bold text-on-surface">{t('notifications.latest_notifications')}</h3>
                     <div className="flex flex-wrap items-center gap-2">
                         {unreadCount > 0 && (
                             <button 
                                 onClick={markAllAsRead} 
                                 className="text-primary hover:bg-primary-container/20 px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
-                                title="تحديد الكل كمقروء"
+                                title={t('notifications.mark_all_read')}
                             >
                                 <span className="material-symbols-outlined text-xl" data-icon="done_all">done_all</span>
-                                <span className="hidden sm:inline">تحديد الكل مقروء</span>
+                                <span className="hidden sm:inline">{t('notifications.mark_all_read')}</span>
                             </button>
                         )}
                         {readNotifications > 0 && (
                             <button 
                                 onClick={deleteReadNotifications} 
                                 className="text-error hover:bg-error-container/20 px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
-                                title="مسح الإشعارات المقروءة"
+                                title={t('notifications.delete_read')}
                             >
                                 <span className="material-symbols-outlined text-xl" data-icon="delete_sweep">delete_sweep</span>
-                                <span className="hidden sm:inline">مسح المقروء</span>
+                                <span className="hidden sm:inline">{t('notifications.delete_read')}</span>
                             </button>
                         )}
                         {notifications.length > 0 && (
                             <button 
                                 onClick={() => setIsArchiveModalOpen(true)} 
                                 className="text-on-surface-variant hover:bg-surface-container-high px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
-                                title="تنظيف حسب التاريخ"
+                                title={t('notifications.archive_old')}
                             >
                                 <span className="material-symbols-outlined text-xl" data-icon="auto_delete">auto_delete</span>
-                                <span className="hidden sm:inline">تنظيف الأرشيف</span>
+                                <span className="hidden sm:inline">{t('notifications.archive_old')}</span>
                             </button>
                         )}
                     </div>
@@ -240,14 +242,14 @@ const NotificationsPage = () => {
                             onClick={() => setFilterTab('all')} 
                             className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterTab === 'all' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
                         >
-                            جميع الإشعارات
+                            {t('notifications.all')}
                         </button>
                         <button 
                             onClick={() => setFilterTab('screens')} 
                             className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-1 ${filterTab === 'screens' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
                         >
                             <span className="material-symbols-outlined text-lg" data-icon="monitor">monitor</span>
-                            إشعارات شاشاتي
+                            {t('notifications.my_screens_notifs')}
                         </button>
                     </div>
                 )}
@@ -272,7 +274,7 @@ const NotificationsPage = () => {
                                     {loadingMessages[loadingMessageIdx]}
                                 </motion.p>
                             </AnimatePresence>
-                            <p className="text-sm font-medium text-outline mt-8 md:mt-10">يرجى الانتظار، لا تقم بتحديث الصفحة...</p>
+                            <p className="text-sm font-medium text-outline mt-8 md:mt-10">{t('common.loading_wait')}</p>
                         </div>
                         <div className="w-full max-w-2xl space-y-4 pt-4 opacity-40 pointer-events-none hidden md:block">
                             <div className="w-full h-24 bg-surface-variant rounded-2xl animate-pulse"></div>
@@ -286,9 +288,9 @@ const NotificationsPage = () => {
                             <span className="material-symbols-outlined text-5xl text-outline-variant absolute -top-2 -right-2 rotate-12">sparkles</span>
                             <span className="material-symbols-outlined text-6xl text-primary opacity-80">inbox</span>
                         </div>
-                        <h3 className="text-2xl font-bold text-on-surface mb-2">صندوق الوارد فارغ تماماً</h3>
+                        <h3 className="text-2xl font-bold text-on-surface mb-2">{t('notifications.no_notifications')}</h3>
                         <p className="text-base text-on-surface-variant font-medium whitespace-nowrap">
-                            أنت متصل تماماً ولا توجد إشعارات معلقة. يمكنك الاسترخاء الآن، وسنقوم بتنبيهك عند توفر أي جديد.
+                            {t('notifications.no_notifications_desc')}
                         </p>
                     </motion.div>
                 ) : (
@@ -328,14 +330,14 @@ const NotificationsPage = () => {
                                                     </h4>
                                                     {isUnread && (
                                                         <span className="bg-[#e1e8fd] text-[#004ac6] text-[11px] font-black px-2 py-0.5 rounded-full block self-center whitespace-nowrap">
-                                                            جديد
+                                                            {t('notifications.new')}
                                                         </span>
                                                     )}
                                                 </div>
                                                 <span className="text-sm font-medium text-outline shrink-0 order-first sm:order-last" dir="ltr" style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                                                     <span>{new Date(notif.created_at).getFullYear()}/{new Date(notif.created_at).getMonth() + 1}/{new Date(notif.created_at).getDate()}</span>
                                                     <span>-</span>
-                                                    <span>{new Date(notif.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }).replace('AM', 'ص').replace('PM', 'م')}</span>
+                                                    <span>{new Date(notif.created_at).toLocaleTimeString(dir === 'rtl' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </span>
                                             </div>
                                             <p className={`text-base leading-relaxed ${isUnread ? 'text-on-surface-variant font-medium' : 'text-outline font-normal'}`}>
@@ -352,7 +354,7 @@ const NotificationsPage = () => {
                                                         markAsRead(notif.notification_id);
                                                     }} 
                                                     className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" 
-                                                    title="تحديد كمقروء"
+                                                    title={t('notifications.mark_read')}
                                                 >
                                                     <span className="material-symbols-outlined text-xl" data-icon="visibility">visibility</span>
                                                 </button>
@@ -360,7 +362,7 @@ const NotificationsPage = () => {
                                             <button 
                                                 onClick={() => deleteNotification(notif.notification_id)} 
                                                 className="text-on-surface-variant hover:text-error transition-colors p-2 rounded-lg hover:bg-error-container/50" 
-                                                title="حذف"
+                                                title={t('common.delete')}
                                             >
                                                 <span className="material-symbols-outlined text-xl" data-icon="delete">delete</span>
                                             </button>
@@ -374,28 +376,28 @@ const NotificationsPage = () => {
             </div>
 
             {/* Archive Modal */}
-            <Modal isOpen={isArchiveModalOpen} onClose={() => setIsArchiveModalOpen(false)} title="تنظيف وأرشفة الإشعارات">
-                <div className="space-y-4" dir="rtl">
+            <Modal isOpen={isArchiveModalOpen} onClose={() => setIsArchiveModalOpen(false)} title={t('notifications.archive_modal_title')}>
+                <div className="space-y-4" dir={dir}>
                     <div className="bg-warning-container text-on-warning-container p-4 rounded-xl flex items-start gap-3">
                         <span className="material-symbols-outlined shrink-0">warning</span>
                         <div className="text-sm">
-                            <p className="font-bold mb-1">تنبيه!</p>
-                            <p>سيتم مسح الإشعارات القديمة نهائياً ولا يمكن التراجع عن هذه العملية.</p>
+                            <p className="font-bold mb-1">{t('notifications.warning')}</p>
+                            <p>{t('notifications.archive_warning_desc')}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-on-surface mb-2">اختر مدة الإشعارات المراد مسحها</label>
+                        <label className="block text-sm font-medium text-on-surface mb-2">{t('notifications.select_archive_duration')}</label>
                         <select 
                             value={archiveMonths}
                             onChange={(e) => setArchiveMonths(e.target.value)}
                             className="w-full bg-surface-container-highest border border-outline-variant rounded-xl p-3 outline-none"
                         >
-                            <option value="1">الإشعارات الأقدم من شهر واحد</option>
-                            <option value="3">الإشعارات الأقدم من 3 أشهر</option>
-                            <option value="6">الإشعارات الأقدم من 6 أشهر</option>
-                            <option value="12">الإشعارات الأقدم من سنة كاملة</option>
-                            <option value="24">الإشعارات الأقدم من سنتين</option>
+                            <option value="1">{t('notifications.month_1')}</option>
+                            <option value="3">{t('notifications.month_3')}</option>
+                            <option value="6">{t('notifications.month_6')}</option>
+                            <option value="12">{t('notifications.month_12')}</option>
+                            <option value="24">{t('notifications.month_24')}</option>
                         </select>
                     </div>
 
@@ -410,13 +412,13 @@ const NotificationsPage = () => {
                             ) : (
                                 <span className="material-symbols-outlined text-[20px]">auto_delete</span>
                             )}
-                            تنظيف الأرشيف الآن
+                            {t('notifications.archive_btn')}
                         </button>
                         <button 
                             onClick={() => setIsArchiveModalOpen(false)}
                             className="flex-1 bg-surface-container-high text-on-surface py-2.5 rounded-xl font-bold hover:bg-surface-container-highest transition-colors"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                     </div>
                 </div>

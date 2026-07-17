@@ -4,23 +4,23 @@ import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
 import Modal from '../../shared/components/Modal';
 import usePermission from '../../hooks/usePermission';
-import ConfirmDialog from '../../shared/components/ConfirmDialog';
+import useTranslation from '../../i18n/useTranslation';
 
 const RolesPage = () => {
+    const { t, dir } = useTranslation();
     const addToast = useToastStore(state => state.addToast);
     const [roles, setRoles] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingRole, setEditingRole] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [deleteTargetId, setDeleteTargetId] = useState(null);
     const { can } = usePermission();
 
     const [form, setForm] = useState({
         role_name: ''
     });
 
-    const PROTECTED_ROLES = ['SuperAdmin', 'Advertiser', 'ScreenOwner', 'Maintenance', 'Secretary'];
+    const PROTECTED_ROLES = [1, 2, 3, 4, 6, 7]; // SuperAdmin, Advertiser, ScreenOwner, Maintenance, Secretary, Admin
 
     const fetchRoles = async () => {
         setIsLoading(true);
@@ -32,7 +32,7 @@ const RolesPage = () => {
                 setRoles(Array.isArray(res.data) ? res.data : []);
             }
         } catch (error) {
-            addToast('فشل في جلب الصلاحيات والأدوار', 'error');
+            addToast(t('admin.roles_fetch_failed'), 'error');
         } finally {
             setIsLoading(false);
         }
@@ -42,15 +42,12 @@ const RolesPage = () => {
         fetchRoles();
     }, []);
 
-    const openModal = (role = null) => {
+    const openModal = (role) => {
         if (role) {
             setEditingRole(role);
             setForm({ role_name: role.role_name || '' });
-        } else {
-            setEditingRole(null);
-            setForm({ role_name: '' });
+            setIsModalOpen(true);
         }
-        setIsModalOpen(true);
     };
 
     const closeModal = () => {
@@ -61,19 +58,17 @@ const RolesPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!form.role_name.trim()) {
-            addToast('يرجى إدخال اسم الدور', 'warning');
+            addToast(t('admin.role_name_required'), 'warning');
             return;
         }
 
         setIsSubmitting(true);
         try {
             if (editingRole) {
-                const id = editingRole.role_id || editingRole.id;
-                await axiosClient.put(ENDPOINTS.LOOKUPS.ROLE(id), form);
-                addToast('تم تعديل الدور بنجاح', 'success');
-            } else {
-                await axiosClient.post(ENDPOINTS.LOOKUPS.ROLES, form);
-                addToast('تم إضافة الدور بنجاح', 'success');
+                const res = await axiosClient.put(ENDPOINTS.LOOKUPS.ROLE(editingRole.role_id || editingRole.id), form);
+                if (res.data.success || res.status === 200) {
+                    addToast(t('admin.role_updated'), 'success');
+                }
             }
             closeModal();
             fetchRoles();
@@ -83,23 +78,10 @@ const RolesPage = () => {
                 const firstErr = Object.values(errList)[0][0];
                 addToast(firstErr, 'error');
             } else {
-                addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ الدور', 'error');
+                addToast(error.response?.data?.message || t('admin.role_save_error'), 'error');
             }
         } finally {
             setIsSubmitting(false);
-        }
-    };
-
-    const confirmDelete = async () => {
-        if (!deleteTargetId) return;
-        try {
-            await axiosClient.delete(ENDPOINTS.LOOKUPS.ROLE(deleteTargetId));
-            addToast('تم حذف الدور بنجاح', 'success');
-            fetchRoles();
-        } catch (error) {
-            addToast(error.response?.data?.message || 'فشل حذف الدور', 'error');
-        } finally {
-            setDeleteTargetId(null);
         }
     };
 
@@ -108,21 +90,10 @@ const RolesPage = () => {
 
     return (
         <div className="space-y-8 animate-fade-in pb-12" dir="rtl">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-r-4 border-primary pr-6 bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="font-headline-lg text-headline-lg font-semibold text-on-surface mb-2">إدارة الأدوار والصلاحيات</h1>
-                    <p className="text-on-surface-variant font-body-md text-body-md">إضافة وتعديل أدوار المستخدمين في النظام</p>
-                </div>
-                <div>
-                    {can('manage_all') && (
-                        <button
-                            onClick={() => openModal()}
-                            className="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-6 py-3 rounded-lg flex items-center gap-2 shadow-sm transition-transform hover:-translate-y-0.5 active:translate-y-0 duration-200"
-                        >
-                            <span className="material-symbols-outlined">add</span>
-                            إضافة دور جديد
-                        </button>
-                    )}
+                    <h1 className="font-headline-lg text-headline-lg font-semibold text-on-surface mb-2">{t('admin.roles_title')}</h1>
+                    <p className="text-on-surface-variant font-body-md text-body-md">{t('admin.roles_subtitle')}</p>
                 </div>
             </div>
 
@@ -133,26 +104,26 @@ const RolesPage = () => {
                     </div>
                 ) : roles.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-12 text-center my-auto">
-                        <div className="w-16 h-16 bg-surface-container-lowest rounded-full flex items-center justify-center mb-4 border border-outline-variant">
-                            <span className="material-symbols-outlined text-outline text-3xl">warning</span>
+                        <div className="bg-surface-container-lowest p-12 text-center rounded-3xl border border-outline-variant">
+                            <span className="material-symbols-outlined text-[48px] text-on-surface-variant mb-4 opacity-50">security</span>
+                            <h4 className="font-headline-md text-headline-md text-on-surface mb-2">{t('common.no_data')}</h4>
+                            <p className="font-body-md text-body-md text-on-surface-variant">{t('admin.no_roles_added')}</p>
                         </div>
-                        <h4 className="font-headline-md text-headline-md text-on-surface mb-2">لا توجد بيانات</h4>
-                        <p className="font-body-md text-body-md text-on-surface-variant">لا توجد أدوار مضافة حالياً.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-right border-collapse">
                             <thead className="bg-surface-container-low border-b border-outline-variant">
                                 <tr>
-                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap">اسم الدور</th>
-                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-center">النوع</th>
-                                    {can('manage_all') && <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-left">إجراءات</th>}
+                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-start">{t('admin.role_name')}</th>
+                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-center">{t('admin.role_type')}</th>
+                                    {can('manage_all') && <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-left">{t('admin.actions')}</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-outline-variant font-body-md text-body-md">
                                 {roles.map((row, index) => {
                                     const id = row.role_id || row.id || index;
-                                    const isProtected = PROTECTED_ROLES.includes(row.role_name);
+                                    const isProtected = PROTECTED_ROLES.includes(id);
                                     return (
                                         <tr key={id} className="hover:bg-surface-container-lowest transition-colors group">
                                             <td className="py-4 px-6">
@@ -165,32 +136,22 @@ const RolesPage = () => {
                                             </td>
                                             <td className="py-4 px-6 text-center">
                                                 {isProtected ? (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-caption text-caption border border-[#fde68a]">دور أساسي (محمي)</span>
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-caption text-caption border border-[#fde68a]">{t('admin.core_role')}</span>
                                                 ) : (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant font-caption text-caption">دور مخصص</span>
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant font-caption text-caption">{t('admin.custom_role')}</span>
                                                 )}
                                             </td>
                                             {can('manage_all') && (
                                                 <td className="py-4 px-6 text-left">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center justify-end gap-2">
                                                         <button
                                                             type="button"
                                                             onClick={(e) => { e.stopPropagation(); openModal(row); }}
                                                             className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors"
-                                                            title="تعديل"
+                                                            title={t('common.edit')}
                                                         >
                                                             <span className="material-symbols-outlined">edit</span>
                                                         </button>
-                                                        {!isProtected && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={(e) => { e.stopPropagation(); setDeleteTargetId(id); }}
-                                                                className="p-2 text-error hover:bg-error-container rounded-full transition-colors"
-                                                                title="حذف"
-                                                            >
-                                                                <span className="material-symbols-outlined">delete</span>
-                                                            </button>
-                                                        )}
                                                     </div>
                                                 </td>
                                             )}
@@ -205,21 +166,21 @@ const RolesPage = () => {
 
             <Modal
                 isOpen={isModalOpen}
-                onClose={closeModal}
-                title={editingRole ? 'تعديل الدور' : 'إضافة دور جديد'}
-                size="sm"
+                onClose={() => !isSubmitting && setIsModalOpen(false)}
+                title={t('admin.edit_role')}
+                size="md"
             >
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4" dir="rtl">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className={labelClass}>اسم الدور <span className="text-error">*</span></label>
+                        <label className={labelClass}>{t('admin.role_name')} <span className="text-error">*</span></label>
                         <input
                             type="text"
                             required
                             maxLength="50"
                             value={form.role_name}
-                            onChange={(e) => setForm({ role_name: e.target.value })}
+                            onChange={(e) => setForm({ ...form, role_name: e.target.value })}
+                            placeholder={t('admin.role_name_placeholder')}
                             className={inputClass}
-                            placeholder="مثال: مدير مالي"
                         />
                     </div>
 
@@ -229,30 +190,20 @@ const RolesPage = () => {
                             disabled={isSubmitting}
                             className="flex-1 bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 shadow-sm transition-colors disabled:opacity-50"
                         >
-                            {isSubmitting ? 'جاري الحفظ...' : 'تأكيد الحفظ'}
+                            {isSubmitting ? t('common.saving') : t('common.save')}
                         </button>
                         <button
                             type="button"
                             onClick={closeModal}
                             className="flex-1 bg-surface-variant text-on-surface-variant py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest border border-outline-variant transition-colors"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                     </div>
                 </form>
             </Modal>
-
-            <ConfirmDialog
-                isOpen={!!deleteTargetId}
-                onClose={() => setDeleteTargetId(null)}
-                onConfirm={confirmDelete}
-                title="تأكيد حذف الدور"
-                message="هل أنت متأكد من حذف هذا الدور؟ قد يسبب هذا مشاكل إذا كان هناك مستخدمون مرتبطون به."
-                confirmText="نعم، موافق على الحذف"
-            />
         </div>
     );
 };
 
 export default RolesPage;
-

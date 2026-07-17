@@ -3,10 +3,12 @@ import { Clock, Zap, Info, Calendar } from 'lucide-react';
 import Modal from '../../../shared/components/Modal';
 import axiosClient from '../../../core/api/axiosClient';
 import { ENDPOINTS } from '../../../core/api/endpoints';
+import useTranslation from '../../../i18n/useTranslation';
 
 const ScreenAvailabilityModal = ({ isOpen, onClose, screen, selectedDate }) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
+    const { t, dir } = useTranslation();
 
     useEffect(() => {
         if (!isOpen || !screen?.screen_id) return;
@@ -43,23 +45,22 @@ const ScreenAvailabilityModal = ({ isOpen, onClose, screen, selectedDate }) => {
             title={
                 <span className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-[var(--color-dark-turquoise)]" />
-                    خريطة سعات الشاشة الزمنية
+                    {t('ads.screen_time_capacity_map')}
                 </span>
             }
         >
-            <div className="space-y-5" dir="rtl">
+            <div className="space-y-5" dir={dir}>
                 {/* Header Info */}
                 <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                         <h3 className="font-black text-sm text-gray-800">{screen?.screen_name}</h3>
                         <div className="flex items-center gap-1 text-[11px] font-bold text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">
                             <Calendar className="w-3.5 h-3.5 text-[var(--color-dark-turquoise)]" /> 
-                            {selectedDate || 'اليوم'}
+                            {selectedDate || t('ads.today')}
                         </div>
                     </div>
                     <p className="text-[10px] text-gray-500 font-bold leading-relaxed">
-                        اختر أوقات التشغيل بعناية. المربعات توضح حالة الساعات المتاحة للبث. وتعتبر أوقات الذروة 
-                        مضاعفة التكلفة ولكن أعلى مشاهدة.
+                        {t('ads.capacity_map_desc')}
                     </p>
                 </div>
 
@@ -67,17 +68,17 @@ const ScreenAvailabilityModal = ({ isOpen, onClose, screen, selectedDate }) => {
                 {loading ? (
                     <div className="flex flex-col justify-center items-center py-12 gap-3">
                         <div className="w-8 h-8 border-4 border-[var(--color-dark-turquoise)]/20 border-t-[var(--color-dark-turquoise)] rounded-full animate-spin"></div>
-                        <span className="text-xs font-bold text-gray-400">جاري فحص الاتصال والسعات...</span>
+                        <span className="text-xs font-bold text-gray-400">{t('ads.checking_capacities')}</span>
                     </div>
                 ) : (
                     <>
                         {/* Legend */}
                         <div className="flex flex-wrap items-center gap-4 bg-white border border-gray-100 p-3 rounded-xl shadow-sm">
-                            <LegendItem colorClass="bg-emerald-100 border border-emerald-300" text="متاح بشكل كامل" />
-                            <LegendItem colorClass="bg-amber-100 border border-amber-300" text="متاح جزئياً" />
-                            <LegendItem colorClass="bg-rose-100 border border-rose-300" text="ممتلئ تماماً" />
+                            <LegendItem colorClass="bg-emerald-100 border border-emerald-300" text={t('ads.fully_available')} />
+                            <LegendItem colorClass="bg-amber-100 border border-amber-300" text={t('ads.partially_available')} />
+                            <LegendItem colorClass="bg-rose-100 border border-rose-300" text={t('ads.fully_booked')} />
                             <span className="flex items-center gap-1 ml-auto text-[10px] font-bold text-gray-600 bg-gray-50 px-2 py-1 rounded-lg">
-                                <Zap className="w-3 h-3 text-[var(--color-gold)]" /> وقت ذروة مدفوع
+                                <Zap className="w-3 h-3 text-[var(--color-gold)]" /> {t('ads.paid_peak_time')}
                             </span>
                         </div>
 
@@ -98,13 +99,13 @@ const ScreenAvailabilityModal = ({ isOpen, onClose, screen, selectedDate }) => {
                                         className={`p-2 rounded-xl border flex flex-col items-center justify-center relative overflow-hidden transition-colors ${bgClass}`}
                                     >
                                         {slot.is_peak && (
-                                            <div className="absolute top-1 right-1" title="وقت ذروة">
+                                            <div className="absolute top-1 right-1" title={t('ads.peak_time')}>
                                                 <Zap className="w-3 h-3 text-[var(--color-gold)] fill-[var(--color-gold)]" />
                                             </div>
                                         )}
                                         <span className="text-[11px] font-black tracking-wider" dir="ltr">{slot.hour}</span>
                                         <span className="text-[9px] font-extrabold mt-1.5 bg-white/60 px-1.5 py-0.5 rounded-md w-full text-center">
-                                            {slot.is_full ? 'محجوز' : `${Math.floor(slot.available_seconds / 60)} د ق`}
+                                            {slot.is_full ? t('ads.booked') : `${Math.floor(slot.available_seconds / 60)} ${t('common.minutes_short')}`}
                                         </span>
                                     </div>
                                 );

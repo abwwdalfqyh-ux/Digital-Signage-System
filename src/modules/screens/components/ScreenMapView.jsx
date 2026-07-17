@@ -3,6 +3,7 @@ import { Monitor } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import useTranslation from '../../../i18n/useTranslation';
 
 // Fix Leaflet's default icon paths issue with Webpack/Vite (safe initialization)
 if (L.Icon.Default.prototype._getIconUrl) {
@@ -21,11 +22,11 @@ const STATUS_COLORS = {
   default: '#6b7280',
 };
 
-const STATUS_LABELS = {
-  Online: 'متصل',
-  Offline: 'غير متصل',
-  Maintenance: 'صيانة',
-};
+const getStatusLabels = (t) => ({
+  Online: t('screens.status_online'),
+  Offline: t('screens.status_offline'),
+  Maintenance: t('screens.status_maintenance'),
+});
 
 // Yemen bounds
 const YEMEN_CENTER = [15.5527, 48.5164];
@@ -134,6 +135,10 @@ export default function ScreenMapView({
   regions = [],
   streets = [],
 }) {
+  const { t } = useTranslation();
+  
+  const STATUS_LABELS = useMemo(() => getStatusLabels(t), [t]);
+
   const visibleScreens = useMemo(() => {
     if (!screens.length) return [];
     return screens.filter(s => {
@@ -188,14 +193,14 @@ export default function ScreenMapView({
         zoomControl={false}
       >
         <LayersControl position="topright">
-          <LayersControl.BaseLayer name="خريطة القمر الصناعي (واقعية مع أسماء)" checked>
+          <LayersControl.BaseLayer name={t('screens.satellite_map_with_names')} checked>
             <TileLayer
               attribution='&copy; Google Maps'
               url="https://mt1.google.com/vt/lyrs=y&hl=ar&x={x}&y={y}&z={z}"
               maxZoom={20}
             />
           </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="خريطة الشوارع (فاتحة)">
+          <LayersControl.BaseLayer name={t('screens.street_map_light')}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -208,14 +213,14 @@ export default function ScreenMapView({
         <MapUpdater view={mapView} />
 
         {screensWithCoords.map((screen) => {
-          const statusLabel = STATUS_LABELS[screen.status] || screen.status;
-          const color = STATUS_COLORS[screen.status] || STATUS_COLORS.default;
+          const statusLabel = STATUS_LABELS[screen.computed_status] || screen.computed_status;
+          const color = STATUS_COLORS[screen.computed_status] || STATUS_COLORS.default;
           
           return (
             <Marker
               key={screen.screen_id || screen.id}
               position={[parseFloat(screen.latitude), parseFloat(screen.longitude)]}
-              icon={createCustomIcon(screen.status, false)}
+              icon={createCustomIcon(screen.computed_status, false)}
             >
               <Popup className="screen-map-popup" maxWidth={260}>
                 <div style={{ fontFamily: "'Cairo', sans-serif", direction: 'rtl', padding: '4px', textAlign: 'right' }}>
@@ -245,9 +250,9 @@ export default function ScreenMapView({
           <Marker position={mapView.center} icon={FallbackIcon}>
             <Popup>
               <div style={{ direction: 'rtl', fontFamily: 'Cairo,sans-serif', fontSize: '13px', fontWeight: 700, textAlign: 'right' }}>
-                {visibleScreens.length} شاشة في هذه المنطقة
+                {t('screens.screens_in_this_region').replace('{count}', visibleScreens.length)}
                 <br />
-                <span style={{ fontSize: '11px', color: '#6b7280' }}>إحداثيات GPS غير محددة</span>
+                <span style={{ fontSize: '11px', color: '#6b7280' }}>{t('screens.gps_coordinates_undefined')}</span>
               </div>
             </Popup>
           </Marker>

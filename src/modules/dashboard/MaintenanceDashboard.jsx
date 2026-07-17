@@ -5,6 +5,7 @@ import {
     Clock, Wrench, Activity, MapPin, Eye, RotateCcw, Play, Pause,
     ChevronRight, Radio, Download, Zap, PowerOff,
 } from 'lucide-react';
+import useTranslation from '../../i18n/useTranslation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -91,12 +92,12 @@ const MOCK_SCREENS_GEO = [
     { id: 14, name: 'صعدة – المركز',        city: 'صعدة',    lat: 16.9380, lng: 43.7630, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-3*60000).toISOString() },
 ];
 
-const STATUS_CONFIG = {
-    online:       { color: '#16a34a', light: '#dcfce7', label: 'متصلة',         icon: '🟢', pulse: true,  speed: 'slow' },
-    broken:       { color: '#dc2626', light: '#fee2e2', label: 'عطل / خراب',     icon: '🔴', pulse: true,  speed: 'fast' },
-    maintenance:  { color: '#d97706', light: '#fef3c7', label: 'تحت الصيانة',    icon: '🟠', pulse: false, speed: null  },
-    disconnected: { color: '#6b7280', light: '#f3f4f6', label: 'مفصولة',         icon: '⚫', pulse: false, speed: null  },
-};
+const getStatusConfig = (t) => ({
+    online:       { color: '#16a34a', light: '#dcfce7', label: t('maintenance.status_online'),         icon: '🟢', pulse: true,  speed: 'slow' },
+    broken:       { color: '#dc2626', light: '#fee2e2', label: t('maintenance.status_broken'),     icon: '🔴', pulse: true,  speed: 'fast' },
+    maintenance:  { color: '#d97706', light: '#fef3c7', label: t('maintenance.status_maintenance'),    icon: '🟠', pulse: false, speed: null  },
+    disconnected: { color: '#6b7280', light: '#f3f4f6', label: t('maintenance.status_disconnected'),         icon: '⚫', pulse: false, speed: null  },
+});
 
 /* ──────────────────────────────────────────────────────────────
    HELPERS
@@ -112,21 +113,21 @@ const statusDot = (type) => {
     return map[type] ?? S.outline;
 };
 
-const priorityBadge = (p) => {
+const priorityBadge = (p, t) => {
     const map = {
-        critical: { bg: S.offlineLight, color: S.offline,  label: 'حرج' },
-        high:     { bg: S.warningLight, color: S.warning,  label: 'عالي' },
-        medium:   { bg: S.infoLight,    color: S.info,     label: 'متوسط' },
-        low:      { bg: S.surfaceContainerHigh, color: S.outline, label: 'منخفض' },
+        critical: { bg: S.offlineLight, color: S.offline,  label: t('maintenance.priority_critical') },
+        high:     { bg: S.warningLight, color: S.warning,  label: t('maintenance.priority_high') },
+        medium:   { bg: S.infoLight,    color: S.info,     label: t('maintenance.priority_medium') },
+        low:      { bg: S.surfaceContainerHigh, color: S.outline, label: t('maintenance.priority_low') },
     };
     return map[p] ?? map.low;
 };
 
-const statusBadge = (s) => {
+const statusBadge = (s, t) => {
     const map = {
-        open:       { bg: S.offlineLight, color: S.offline,  label: 'مفتوح' },
-        inprogress: { bg: S.warningLight, color: S.warning,  label: 'جارٍ العمل' },
-        resolved:   { bg: S.onlineLight,  color: S.online,   label: 'تم الحل' },
+        open:       { bg: S.offlineLight, color: S.offline,  label: t('maintenance.status_open') },
+        inprogress: { bg: S.warningLight, color: S.warning,  label: t('maintenance.status_inprogress') },
+        resolved:   { bg: S.onlineLight,  color: S.online,   label: t('maintenance.status_resolved') },
     };
     return map[s] ?? map.open;
 };
@@ -287,6 +288,8 @@ const MapFitter = ({ pins }) => {
    YEMEN STATUS MAP  (React-Leaflet — real interactive map)
 ────────────────────────────────────────────────────────────── */
 const YemenStatusMap = ({ screenData }) => {
+    const { t } = useTranslation();
+    const STATUS_CONFIG = getStatusConfig(t);
     const [filterStatus, setFilterStatus] = useState('all');
     const [selectedPin, setSelectedPin] = useState(null);
     const markerRefs = useRef({});
@@ -311,11 +314,11 @@ const YemenStatusMap = ({ screenData }) => {
     };
 
     const filterOpts = [
-        { key: 'all',          label: `الكل (${pins.length})`,                color: S.primaryContainer },
-        { key: 'online',       label: `متصلة (${counts.online})`,             color: STATUS_CONFIG.online.color },
-        { key: 'broken',       label: `عطل (${counts.broken})`,               color: STATUS_CONFIG.broken.color },
-        { key: 'maintenance',  label: `صيانة (${counts.maintenance})`,         color: STATUS_CONFIG.maintenance.color },
-        { key: 'disconnected', label: `مفصولة (${counts.disconnected})`,       color: STATUS_CONFIG.disconnected.color },
+        { key: 'all',          label: t('maintenance.filter_all', { count: pins.length }),                color: S.primaryContainer },
+        { key: 'online',       label: t('maintenance.filter_online', { count: counts.online }),             color: STATUS_CONFIG.online.color },
+        { key: 'broken',       label: t('maintenance.filter_broken', { count: counts.broken }),               color: STATUS_CONFIG.broken.color },
+        { key: 'maintenance',  label: t('maintenance.filter_maintenance', { count: counts.maintenance }),         color: STATUS_CONFIG.maintenance.color },
+        { key: 'disconnected', label: t('maintenance.filter_disconnected', { count: counts.disconnected }),       color: STATUS_CONFIG.disconnected.color },
     ];
 
     return (
@@ -350,8 +353,8 @@ const YemenStatusMap = ({ screenData }) => {
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${S.outlineVariant}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <MapPin style={{ width: 16, height: 16, color: S.primaryContainer }} />
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>خريطة حالة الشاشات — اليمن</span>
-                    <span style={{ fontSize: '11px', color: S.outline, background: S.surfaceContainerLow, padding: '2px 8px', borderRadius: 99 }}>مباشر · تفاعلية</span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>{t('maintenance.map_title')}</span>
+                    <span style={{ fontSize: '11px', color: S.outline, background: S.surfaceContainerLow, padding: '2px 8px', borderRadius: 99 }}>{t('maintenance.map_live_interactive')}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                     {filterOpts.map(f => (
@@ -433,10 +436,10 @@ const YemenStatusMap = ({ screenData }) => {
                                             <div style={{ fontSize: '11px', color: S.onSurfaceVariant, marginBottom: '4px' }}>
                                                 <Clock style={{ width: 11, height: 11, display: 'inline', marginLeft: '4px' }} />
                                                 {minsSince !== null
-                                                    ? minsSince < 1 ? 'آخر اتصال: منذ لحظات'
-                                                    : minsSince < 60 ? `آخر اتصال: منذ ${minsSince} دقيقة`
-                                                    : `آخر اتصال: منذ ${Math.round(minsSince/60)} ساعة`
-                                                    : 'لا يوجد سجل اتصال'
+                                                    ? minsSince < 1 ? t('maintenance.last_seen_moments')
+                                                    : minsSince < 60 ? t('maintenance.last_seen_minutes', { mins: minsSince })
+                                                    : t('maintenance.last_seen_hours', { hours: Math.round(minsSince/60) })
+                                                    : t('maintenance.no_connection_record')
                                                 }
                                             </div>
 
@@ -448,7 +451,7 @@ const YemenStatusMap = ({ screenData }) => {
                                                     borderRadius: '8px', fontSize: '11px',
                                                     color: STATUS_CONFIG.maintenance.color, fontWeight: 600,
                                                 }}>
-                                                    🔧 قيد الصيانة — فُعِّلت بواسطة الفريق التقني
+                                                    {t('maintenance.maintenance_note_active')}
                                                 </div>
                                             )}
                                             {pin.status === 'disconnected' && (
@@ -458,7 +461,7 @@ const YemenStatusMap = ({ screenData }) => {
                                                     borderRadius: '8px', fontSize: '11px',
                                                     color: STATUS_CONFIG.disconnected.color, fontWeight: 600,
                                                 }}>
-                                                    ⚫ مفصولة — لا يوجد اتصال منذ أكثر من 15 دقيقة
+                                                    {t('maintenance.disconnected_note')}
                                                 </div>
                                             )}
                                             {pin.status === 'broken' && (
@@ -468,7 +471,7 @@ const YemenStatusMap = ({ screenData }) => {
                                                     borderRadius: '8px', fontSize: '11px',
                                                     color: STATUS_CONFIG.broken.color, fontWeight: 600,
                                                 }}>
-                                                    🔴 عطل — كانت متصلة وانقطعت فجأة
+                                                    {t('maintenance.broken_note')}
                                                 </div>
                                             )}
                                         </div>
@@ -485,7 +488,7 @@ const YemenStatusMap = ({ screenData }) => {
                     display: 'flex', flexDirection: 'column', gap: '8px',
                     overflowY: 'auto', maxHeight: '380px', background: S.surfaceContainerLowest,
                 }}>
-                    <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: 700, color: S.outline }}>دليل الحالات:</p>
+                    <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: 700, color: S.outline }}>{t('maintenance.status_guide')}</p>
                     {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
                         <div key={key} style={{
                             display: 'flex', alignItems: 'center', gap: '8px',
@@ -508,7 +511,7 @@ const YemenStatusMap = ({ screenData }) => {
 
                     {/* Screen list */}
                     <div style={{ marginTop: '6px', borderTop: `1px solid ${S.outlineVariant}`, paddingTop: '8px' }}>
-                        <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: 700, color: S.outline }}>الشاشات المعروضة:</p>
+                        <p style={{ margin: '0 0 6px', fontSize: '11px', fontWeight: 700, color: S.outline }}>{t('maintenance.displayed_screens')}</p>
                         {filtered.slice(0, 8).map(pin => {
                             const cfg = STATUS_CONFIG[pin.status];
                             return (
@@ -528,7 +531,7 @@ const YemenStatusMap = ({ screenData }) => {
                             );
                         })}
                         {filtered.length > 8 && (
-                            <p style={{ margin: '4px 0 0', fontSize: '10px', color: S.outline }}>+ {filtered.length - 8} شاشة أخرى</p>
+                            <p style={{ margin: '4px 0 0', fontSize: '10px', color: S.outline }}>{t('maintenance.plus_other_screens', { count: filtered.length - 8 })}</p>
                         )}
                     </div>
                 </div>
@@ -541,6 +544,8 @@ const YemenStatusMap = ({ screenData }) => {
    MAIN MAINTENANCE DASHBOARD
 ────────────────────────────────────────────────────────────── */
 const MaintenanceDashboard = () => {
+    const { t } = useTranslation();
+    const STATUS_CONFIG = getStatusConfig(t);
     const navigate = useNavigate();
     const addToast = useToastStore(s => s.addToast);
 
@@ -577,8 +582,8 @@ const MaintenanceDashboard = () => {
             id: t.id,
             mac_address: t.screen?.mac_address,
             type: t.priority === 'urgent' ? 'offline' : (t.priority === 'high' ? 'warning' : 'info'),
-            screen: t.screen?.screen_name || 'شاشة غير محددة',
-            location: t.screen?.street?.region?.governorate?.name || 'غير محدد',
+            screen: t.screen?.screen_name || t('maintenance.unspecified_screen'),
+            location: t.screen?.street?.region?.governorate?.name || t('maintenance.unspecified_location'),
             since: new Date(t.created_at).toLocaleString('ar-EG'),
             status: t.status === 'open' ? 'open' : (t.status === 'resolved' ? 'resolved' : 'inprogress'),
             priority: t.priority,
@@ -588,7 +593,7 @@ const MaintenanceDashboard = () => {
 
     const realActivity = tickets.filter(t => t.admin_reply).map(t => ({
         time: new Date(t.updated_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-        msg: `رد على التذكرة: ${t.subject}`,
+        msg: t('maintenance.ticket_reply', { subject: t.subject }),
         type: 'info'
     }));
 
@@ -599,7 +604,7 @@ const MaintenanceDashboard = () => {
         const channel = echo.private('admin.screens');
         channel.listen('ScreenUpdated', (e) => {
             if (e.screen) {
-                addToast(`تحديث مباشر: حالة الشاشة (${e.screen.screen_name}) تغيّرت`, 'info');
+                addToast(t('maintenance.live_update', { screenName: e.screen.screen_name }), 'info');
             }
         });
 
@@ -611,12 +616,12 @@ const MaintenanceDashboard = () => {
 
     /* Update status to maintenance */
     const handleStartMaintenance = async (screen) => {
-        if (!screen || !screen.screen_id) return addToast('الشاشة غير صالحة', 'error');
+        if (!screen || !screen.screen_id) return addToast(t('maintenance.invalid_screen'), 'error');
         await updateScreenStatus({ id: screen.screen_id, status: 'maintenance' });
     };
 
     const handleResolveTicket = async (ticketId) => {
-        await updateTicket({ id: ticketId, payload: { status: 'resolved', admin_reply: 'تم حل المشكلة' } });
+        await updateTicket({ id: ticketId, payload: { status: 'resolved', admin_reply: t('maintenance.problem_resolved') } });
     };
 
     const handleInProgressTicket = async (ticketId) => {
@@ -637,36 +642,36 @@ const MaintenanceDashboard = () => {
                 command: command
             });
         } catch (error) {
-            addToast('فشل في إرسال الأمر للشاشة', 'error');
+            addToast(t('maintenance.cmd_failed'), 'error');
         }
     };
 
     const handlePing = (mac_address) => {
-        if (!mac_address) return addToast('لا يوجد معرف للشاشة', 'error');
-        addToast('جاري فحص الاتصال بالشاشة...', 'info');
+        if (!mac_address) return addToast(t('maintenance.no_screen_id'), 'error');
+        addToast(t('maintenance.pinging_screen'), 'info');
         sendScreenCommand(mac_address, 'PING');
     };
 
     const handleRebootSingle = (mac_address) => {
-        if (!mac_address) return addToast('لا يوجد معرف للشاشة', 'error');
-        addToast('جاري إعادة تشغيل الشاشة...', 'warning');
+        if (!mac_address) return addToast(t('maintenance.no_screen_id'), 'error');
+        addToast(t('maintenance.rebooting_screen'), 'warning');
         sendScreenCommand(mac_address, 'RESTART_APP');
     };
 
     const handleReboot = () => {
         const brokenScreens = filteredIncidents.filter(i => i.type === 'offline');
         if (brokenScreens.length === 0) {
-            addToast('لا توجد شاشات متعطلة لإعادة تشغيلها', 'info');
+            addToast(t('maintenance.no_broken_screens_to_reboot'), 'info');
             return;
         }
-        addToast(`جاري إرسال أمر إعادة التشغيل لـ ${brokenScreens.length} شاشة...`, 'warning');
+        addToast(t('maintenance.rebooting_multiple_screens', { count: brokenScreens.length }), 'warning');
         brokenScreens.forEach(inc => {
             if (inc.mac_address) {
                 sendScreenCommand(inc.mac_address, 'RESTART_APP');
             }
         });
     };
-    const handleExport = () => addToast('جاري تصدير تقرير الصيانة...', 'info');
+    const handleExport = () => addToast(t('maintenance.exporting_report'), 'info');
 
     /* ── Screen table rows ── */
     const tableScreens = screens.slice(0, 12);
@@ -710,9 +715,9 @@ const MaintenanceDashboard = () => {
                         </div>
                         <div>
                             <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: S.onBackground, lineHeight: 1.1 }}>
-                                مركز عمليات الصيانة
+                                {t('maintenance.page_title')}
                             </h1>
-                            <p style={{ margin: 0, fontSize: '12px', color: S.outline }}>Network Operations Center (NOC)</p>
+                            <p style={{ margin: 0, fontSize: '12px', color: S.outline }}>{t('maintenance.page_desc')}</p>
                         </div>
                     </div>
                 </div>
@@ -724,9 +729,9 @@ const MaintenanceDashboard = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: S.surfaceContainerLowest, border: `1px solid ${S.outlineVariant}`, borderRadius: '10px', padding: '7px 14px' }}>
                         <PulseDot color={isLive ? S.online : S.outline} size={8} />
                         <span style={{ fontSize: '12px', fontWeight: 600, color: isLive ? S.online : S.outline }}>
-                            {isLive ? 'مباشر' : 'موقوف'}
+                            {isLive ? t('maintenance.live') : t('maintenance.paused')}
                         </span>
-                        <span style={{ fontSize: '11px', color: S.outline }}>· آخر تحديث: {refreshTime}</span>
+                        <span style={{ fontSize: '11px', color: S.outline }}>· {t('maintenance.last_update', { time: refreshTime })}</span>
                     </div>
 
                     {/* Toggle live */}
@@ -742,7 +747,7 @@ const MaintenanceDashboard = () => {
                         }}
                     >
                         {isLive ? <Pause style={{ width: 14, height: 14 }} /> : <Play style={{ width: 14, height: 14 }} />}
-                        {isLive ? 'إيقاف التحديث' : 'تشغيل التحديث'}
+                        {isLive ? t('maintenance.stop_update') : t('maintenance.start_update')}
                     </button>
 
                     {/* Manual refresh */}
@@ -757,7 +762,7 @@ const MaintenanceDashboard = () => {
                         }}
                     >
                         <RefreshCw style={{ width: 14, height: 14 }} />
-                        تحديث
+                        {t('maintenance.refresh')}
                     </button>
 
                     {/* Export */}
@@ -773,7 +778,7 @@ const MaintenanceDashboard = () => {
                         }}
                     >
                         <Download style={{ width: 14, height: 14 }} />
-                        تصدير التقرير
+                        {t('maintenance.export_report')}
                     </button>
                 </div>
             </motion.div>
@@ -782,35 +787,35 @@ const MaintenanceDashboard = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', marginBottom: '24px' }}>
                 <MaintKpiCard
                     index={0} icon={CheckCircle2}
-                    label="متصلة — سليمة" value={mockOnline}
-                    sub={`من إجمالي ${mockTotal} شاشة`}
+                    label={t('maintenance.online_healthy')} value={mockOnline}
+                    sub={t('maintenance.out_of_total_screens', { count: mockTotal })}
                     color={STATUS_CONFIG.online.color} bgColor={STATUS_CONFIG.online.light}
-                    badge={{ label: 'تعمل', color: STATUS_CONFIG.online.color, bg: STATUS_CONFIG.online.light }}
+                    badge={{ label: t('maintenance.working'), color: STATUS_CONFIG.online.color, bg: STATUS_CONFIG.online.light }}
                 />
                 <MaintKpiCard
                     index={1} icon={AlertTriangle}
-                    label="عطل / خربانة" value={mockBroken}
-                    sub="انقطعت فجأة — تدخل عاجل"
+                    label={t('maintenance.broken_faulty')} value={mockBroken}
+                    sub={t('maintenance.sudden_disconnect_urgent')}
                     color={STATUS_CONFIG.broken.color} bgColor={STATUS_CONFIG.broken.light}
-                    badge={mockBroken > 0 ? { label: 'عاجل!', color: STATUS_CONFIG.broken.color, bg: STATUS_CONFIG.broken.light } : undefined}
+                    badge={mockBroken > 0 ? { label: t('maintenance.urgent'), color: STATUS_CONFIG.broken.color, bg: STATUS_CONFIG.broken.light } : undefined}
                 />
                 <MaintKpiCard
                     index={2} icon={Wrench}
-                    label="تحت الصيانة" value={mockMaintenance}
-                    sub="فُعِّلت يدوياً من الفريق"
+                    label={t('maintenance.under_maintenance')} value={mockMaintenance}
+                    sub={t('maintenance.manually_activated')}
                     color={STATUS_CONFIG.maintenance.color} bgColor={STATUS_CONFIG.maintenance.light}
                 />
                 <MaintKpiCard
                     index={3} icon={PowerOff}
-                    label="مفصولة" value={mockDisconnected}
-                    sub="لا إشارة > 15 دقيقة"
+                    label={t('maintenance.disconnected')} value={mockDisconnected}
+                    sub={t('maintenance.no_signal_15_min')}
                     color={STATUS_CONFIG.disconnected.color} bgColor={STATUS_CONFIG.disconnected.light}
-                    badge={mockDisconnected > 0 ? { label: 'بلا اتصال', color: STATUS_CONFIG.disconnected.color, bg: STATUS_CONFIG.disconnected.light } : undefined}
+                    badge={mockDisconnected > 0 ? { label: t('maintenance.no_connection'), color: STATUS_CONFIG.disconnected.color, bg: STATUS_CONFIG.disconnected.light } : undefined}
                 />
                 <MaintKpiCard
                     index={4} icon={Activity}
-                    label="نسبة وقت التشغيل" value={`${mockUptime}%`}
-                    sub="خلال آخر 24 ساعة"
+                    label={t('maintenance.uptime_ratio')} value={`${mockUptime}%`}
+                    sub={t('maintenance.last_24_hours')}
                     color={mockUptime >= 90 ? S.online : mockUptime >= 70 ? S.warning : S.offline}
                 />
             </div>
@@ -829,20 +834,20 @@ const MaintenanceDashboard = () => {
             >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
                     <Radio style={{ width: 18, height: 18, color: S.primaryContainer }} />
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: S.onBackground }}>ملخص حالة الشبكة</span>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: S.onBackground }}>{t('maintenance.network_status_summary')}</span>
                 </div>
                 <div style={{ flex: 1, minWidth: '200px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '11px', color: S.outline }}>وقت التشغيل الكلي</span>
+                        <span style={{ fontSize: '11px', color: S.outline }}>{t('maintenance.total_uptime')}</span>
                         <span style={{ fontSize: '11px', fontWeight: 700, color: mockUptime >= 90 ? S.online : S.warning }}>{mockUptime}%</span>
                     </div>
                     <UptimeBar pct={mockUptime} />
                 </div>
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                     {[
-                        { label: '24 ساعة', pct: mockUptime },
-                        { label: '7 أيام',  pct: Math.min(mockUptime + 8, 99) },
-                        { label: '30 يوم',  pct: Math.min(mockUptime + 15, 99) },
+                        { label: t('maintenance.24_hours'), pct: mockUptime },
+                        { label: t('maintenance.7_days'),  pct: Math.min(mockUptime + 8, 99) },
+                        { label: t('maintenance.30_days'),  pct: Math.min(mockUptime + 15, 99) },
                     ].map((item) => (
                         <div key={item.label} style={{ textAlign: 'center' }}>
                             <p style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: item.pct >= 90 ? S.online : S.warning }}>{item.pct}%</p>
@@ -872,20 +877,20 @@ const MaintenanceDashboard = () => {
                     <div style={{ padding: '18px 20px', borderBottom: `1px solid ${S.outlineVariant}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <AlertTriangle style={{ width: 16, height: 16, color: S.warning }} />
-                            <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>تذاكر الصيانة</span>
+                            <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>{t('maintenance.maintenance_tickets')}</span>
                             <span style={{
                                 fontSize: '11px', fontWeight: 700,
                                 background: S.offlineLight, color: S.offline,
                                 padding: '2px 8px', borderRadius: 99,
-                            }}>{openIncidents} مفتوح</span>
+                            }}>{openIncidents} {t('maintenance.open')}</span>
                         </div>
                         {/* Filter tabs */}
                         <div style={{ display: 'flex', gap: '4px' }}>
                             {[
-                                { key: 'all', label: 'الكل' },
-                                { key: 'open', label: 'مفتوح' },
-                                { key: 'inprogress', label: 'جارٍ' },
-                                { key: 'resolved', label: 'محلول' },
+                                { key: 'all', label: t('maintenance.all') },
+                                { key: 'open', label: t('maintenance.open') },
+                                { key: 'inprogress', label: t('maintenance.inprogress') },
+                                { key: 'resolved', label: t('maintenance.resolved') },
                             ].map(f => (
                                 <button
                                     key={f.key}
@@ -934,7 +939,7 @@ const MaintenanceDashboard = () => {
                                             <span style={{ fontSize: '11px', color: S.outline }}>{incident.location}</span>
                                             <span style={{ fontSize: '11px', color: S.outlineVariant }}>·</span>
                                             <Clock style={{ width: 10, height: 10, color: S.outline }} />
-                                            <span style={{ fontSize: '11px', color: S.outline }}>منذ {incident.since}</span>
+                                            <span style={{ fontSize: '11px', color: S.outline }}>{t('maintenance.since', { time: incident.since })}</span>
                                         </div>
                                     </div>
 
@@ -948,7 +953,7 @@ const MaintenanceDashboard = () => {
                                             <button
                                                 onClick={() => handleInProgressTicket(incident.id)}
                                                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.warning, padding: '4px' }}
-                                                title="قيد المعالجة"
+                                                title={t('maintenance.inprogress')}
                                             >
                                                 <AlertTriangle style={{ width: 15, height: 15 }} />
                                             </button>
@@ -957,7 +962,7 @@ const MaintenanceDashboard = () => {
                                             <button
                                                 onClick={() => handleResolveTicket(incident.id)}
                                                 style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.online, padding: '4px' }}
-                                                title="إغلاق التذكرة كـ محلولة"
+                                                title={t('maintenance.close_ticket_resolved')}
                                             >
                                                 <CheckCircle2 style={{ width: 15, height: 15 }} />
                                             </button>
@@ -965,21 +970,21 @@ const MaintenanceDashboard = () => {
                                         <button
                                             onClick={() => handlePing(incident.mac_address)}
                                             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.info, padding: '4px' }}
-                                            title="فحص الاتصال (Ping)"
+                                            title={t('maintenance.ping_connection')}
                                         >
                                             <Radio style={{ width: 15, height: 15 }} />
                                         </button>
                                         <button
                                             onClick={() => handleRebootSingle(incident.mac_address)}
                                             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.warning, padding: '4px' }}
-                                            title="إعادة التشغيل"
+                                            title={t('maintenance.restart')}
                                         >
                                             <RotateCcw style={{ width: 15, height: 15 }} />
                                         </button>
                                         <button
                                             onClick={() => navigate(`/dashboard/screens/${incident.id}`)}
                                             style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: S.primaryContainer, padding: '4px' }}
-                                            title="عرض الشاشة"
+                                            title={t('maintenance.view_screen')}
                                         >
                                             <Eye style={{ width: 15, height: 15 }} />
                                         </button>
@@ -990,7 +995,7 @@ const MaintenanceDashboard = () => {
                         {filteredIncidents.length === 0 && (
                             <div style={{ padding: '40px', textAlign: 'center', color: S.outline, fontSize: '13px' }}>
                                 <CheckCircle2 style={{ width: 28, height: 28, color: S.online, display: 'block', margin: '0 auto 8px' }} />
-                                لا توجد تذاكر في هذه الفئة
+                                {t('maintenance.no_tickets_in_category')}
                             </div>
                         )}
                     </div>
@@ -1008,7 +1013,7 @@ const MaintenanceDashboard = () => {
                             }}
                         >
                             <RotateCcw style={{ width: 13, height: 13 }} />
-                            إعادة تشغيل المتعطلة
+                            {t('maintenance.restart_broken')}
                         </button>
                         <button
                             onClick={() => navigate('/dashboard/screens')}
@@ -1021,7 +1026,7 @@ const MaintenanceDashboard = () => {
                             }}
                         >
                             <Monitor style={{ width: 13, height: 13 }} />
-                            إدارة الشاشات
+                            {t('maintenance.manage_screens')}
                         </button>
                     </div>
                 </motion.div>
@@ -1040,10 +1045,10 @@ const MaintenanceDashboard = () => {
                     <div style={{ padding: '18px 20px', borderBottom: `1px solid ${S.outlineVariant}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
                             <Radio style={{ width: 15, height: 15, color: S.online }} />
-                            <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>سجل الأحداث</span>
+                            <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>{t('maintenance.event_log')}</span>
                         </div>
                         <PulseDot color={S.online} size={7} />
-                        <span style={{ fontSize: '11px', color: S.online, fontWeight: 600 }}>مباشر</span>
+                        <span style={{ fontSize: '11px', color: S.online, fontWeight: 600 }}>{t('maintenance.live')}</span>
                     </div>
 
                     <div style={{ flex: 1, overflowY: 'auto', maxHeight: '360px' }}>
@@ -1068,12 +1073,12 @@ const MaintenanceDashboard = () => {
                                         <span style={{ fontSize: '10px', color: S.outline }}>{act.time}</span>
                                     </div>
                                     <span style={{ fontSize: '10px', padding: '2px 8px', borderRadius: 99, background: bg, color: dotColor, fontWeight: 700, flexShrink: 0 }}>
-                                        {act.type === 'online' ? 'متصل' : act.type === 'offline' ? 'منقطع' : act.type === 'warning' ? 'تحذير' : 'معلومة'}
+                                        {act.type === 'online' ? t('maintenance.status_online') : act.type === 'offline' ? t('maintenance.status_offline') : act.type === 'warning' ? t('maintenance.warning') : t('maintenance.info')}
                                     </span>
                                 </motion.div>
                             );
                         }) : (
-                            <div style={{ textAlign: 'center', color: S.outline, padding: '20px' }}>لا توجد أحداث مؤخراً</div>
+                            <div style={{ textAlign: 'center', color: S.outline, padding: '20px' }}>{t('maintenance.no_recent_events')}</div>
                         )}
                     </div>
 
@@ -1088,7 +1093,7 @@ const MaintenanceDashboard = () => {
                                 fontSize: '12px', fontWeight: 700, cursor: 'pointer',
                             }}
                         >
-                            عرض السجل الكامل
+                            {t('maintenance.view_full_log')}
                             <ChevronRight style={{ width: 13, height: 13 }} />
                         </button>
                     </div>
@@ -1108,7 +1113,7 @@ const MaintenanceDashboard = () => {
                 <div style={{ padding: '18px 22px', borderBottom: `1px solid ${S.outlineVariant}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <Monitor style={{ width: 16, height: 16, color: S.primaryContainer }} />
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>حالة جميع الشاشات</span>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: S.onBackground }}>{t('maintenance.all_screens_status')}</span>
                     </div>
                     <button
                         onClick={() => navigate('/dashboard/screens')}
@@ -1118,7 +1123,7 @@ const MaintenanceDashboard = () => {
                             color: S.primaryContainer, fontSize: '12px', fontWeight: 700,
                         }}
                     >
-                        إدارة الشاشات
+                        {t('maintenance.manage_screens')}
                         <ChevronRight style={{ width: 14, height: 14 }} />
                     </button>
                 </div>
@@ -1129,8 +1134,8 @@ const MaintenanceDashboard = () => {
                     padding: '10px 22px', background: S.surfaceContainerLow,
                     borderBottom: `1px solid ${S.outlineVariant}`,
                 }}>
-                    {['اسم الشاشة', 'الموقع', 'الحالة', 'آخر ظهور', ''].map((h, i) => (
-                        <span key={i} style={{ fontSize: '11px', fontWeight: 700, color: S.outline, textAlign: i > 1 ? 'center' : 'start' }}>{h}</span>
+                    {[{label: t('maintenance.screen_name')}, {label: t('maintenance.location')}, {label: t('maintenance.status')}, {label: t('maintenance.last_seen')}, {label: ''}].map((h, i) => (
+                        <span key={i} style={{ fontSize: '11px', fontWeight: 700, color: S.outline, textAlign: i > 1 ? 'center' : 'start' }}>{h.label}</span>
                     ))}
                 </div>
 
@@ -1146,10 +1151,10 @@ const MaintenanceDashboard = () => {
                     const minsSinceHb = scr.last_heartbeat
                         ? Math.round((Date.now() - new Date(scr.last_heartbeat).getTime()) / 60000)
                         : null;
-                    const lastSeenLabel = minsSinceHb === null ? 'غير معروف'
-                        : minsSinceHb < 1   ? 'الآن'
-                        : minsSinceHb < 60  ? `${minsSinceHb} د`
-                        : `${Math.round(minsSinceHb / 60)} س`;
+                    const lastSeenLabel = minsSinceHb === null ? t('maintenance.unknown')
+                        : minsSinceHb < 1   ? t('maintenance.now')
+                        : minsSinceHb < 60  ? `${minsSinceHb} ${t('maintenance.minutes_short')}`
+                        : `${Math.round(minsSinceHb / 60)} ${t('maintenance.hours_short')}`;
                     return (
                         <motion.div
                             key={scr.id ?? idx}
@@ -1173,7 +1178,7 @@ const MaintenanceDashboard = () => {
                                 }}>
                                     <Monitor style={{ width: 16, height: 16, color: cfg.color }} />
                                 </div>
-                                <span style={{ fontSize: '13px', fontWeight: 600, color: S.onSurface }}>{scr.name || `شاشة #${scr.id}`}</span>
+                                <span style={{ fontSize: '13px', fontWeight: 600, color: S.onSurface }}>{scr.name || t('maintenance.screen_id', { id: scr.id })}</span>
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -1203,7 +1208,7 @@ const MaintenanceDashboard = () => {
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                                 <button
                                     onClick={() => navigate('/dashboard/screens')}
-                                    title="إدارة الشاشة"
+                                    title={t('maintenance.manage_screen')}
                                     style={{
                                         background: S.surfaceContainerLow, border: `1px solid ${S.outlineVariant}`,
                                         borderRadius: '8px', padding: '6px 10px', cursor: 'pointer',
@@ -1212,7 +1217,7 @@ const MaintenanceDashboard = () => {
                                     }}
                                 >
                                     <Eye style={{ width: 12, height: 12 }} />
-                                    عرض
+                                    {t('maintenance.view')}
                                 </button>
                             </div>
                         </motion.div>

@@ -54,12 +54,7 @@ export const ENDPOINTS = {
         UPDATE: (id) => `/duration-discounts/${id}`,
         DELETE: (id) => `/duration-discounts/${id}`
     },
-    FREQUENCY_PACKAGES: {
-        ALL: '/frequency-packages',
-        CREATE: '/frequency-packages',
-        UPDATE: (id) => `/frequency-packages/${id}`,
-        DELETE: (id) => `/frequency-packages/${id}`
-    },
+
     SCREEN_PRICING: {
         ALL: '/screen-pricing-slots',
         UPDATE: (id) => `/screen-pricing-slots/${id}`,

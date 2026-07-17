@@ -31,7 +31,7 @@ const NAV_LABELS = {
     users:              { ar: 'المستخدمون',      en: 'Users' },
     roles:              { ar: 'الصلاحيات',       en: 'Roles' },
     locations:          { ar: 'المواقع',          en: 'Locations' },
-    frequencyPackages:  { ar: 'باقات التكرار',   en: 'Frequency Packages' },
+
     paymentMethods:     { ar: 'طرق الدفع',       en: 'Payment Methods' },
     paymentOps:         { ar: 'عمليات الدفع',    en: 'Payment Operations' },
     sessions:           { ar: 'الجلسات',          en: 'Sessions' },
@@ -51,11 +51,11 @@ const t = (key, lang = 'ar') => NAV_LABELS[key]?.[lang] ?? NAV_LABELS[key]?.ar ?
 
 /**
  * Centralized Navigation Configuration
- * @param {string} roleName
+ * @param {number} roleId
  * @param {string} lang  'ar' | 'en'
  */
-export const getNavItems = (roleName, lang = 'ar') => {
-    switch (roleName) {
+export const getNavItems = (roleId, lang = 'ar') => {
+    switch (roleId) {
         case ROLES.SUPER_ADMIN:
         case ROLES.ADMIN:
             return [
@@ -67,7 +67,7 @@ export const getNavItems = (roleName, lang = 'ar') => {
                 { path: '/dashboard/users', icon: Users, label: t('users', lang) },
                 { path: '/dashboard/roles', icon: Shield, label: t('roles', lang) },
                 { path: '/dashboard/locations', icon: MapPin, label: t('locations', lang) },
-                { path: '/dashboard/frequency-packages', icon: Repeat, label: t('frequencyPackages', lang) },
+
                 { path: '/dashboard/payment-methods', icon: CreditCard, label: t('paymentMethods', lang) },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: t('paymentOps', lang) },
                 { path: '/dashboard/sessions', icon: ShieldAlert, label: t('sessions', lang) },

@@ -13,72 +13,7 @@ export const useDurationDiscounts = () => {
   });
 };
 
-export const useFrequencyPackages = () => {
-  return useQuery({
-    queryKey: ['frequencyPackages'],
-    queryFn: async () => {
-      const res = await axiosClient.get(ENDPOINTS.FREQUENCY_PACKAGES.ALL);
-      return Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
-    },
-  });
-};
 
-export const useCreateFrequencyPackage = () => {
-  const queryClient = useQueryClient();
-  const addToast = useToastStore(state => state.addToast);
-
-  return useMutation({
-    mutationFn: async (payload) => {
-      const res = await axiosClient.post(ENDPOINTS.FREQUENCY_PACKAGES.CREATE, payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['frequencyPackages'] });
-      addToast('تمت إضافة الباقة بنجاح', 'success');
-    },
-    onError: (err) => {
-      addToast(err.response?.data?.message || 'تعذر إضافة الباقة', 'error');
-    }
-  });
-};
-
-export const useUpdateFrequencyPackage = () => {
-  const queryClient = useQueryClient();
-  const addToast = useToastStore(state => state.addToast);
-
-  return useMutation({
-    mutationFn: async ({ id, payload }) => {
-      const res = await axiosClient.put(ENDPOINTS.FREQUENCY_PACKAGES.UPDATE(id), payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['frequencyPackages'] });
-      addToast('تم تحديث الباقة بنجاح', 'success');
-    },
-    onError: (err) => {
-      addToast(err.response?.data?.message || 'تعذر تحديث الباقة', 'error');
-    }
-  });
-};
-
-export const useDeleteFrequencyPackage = () => {
-  const queryClient = useQueryClient();
-  const addToast = useToastStore(state => state.addToast);
-
-  return useMutation({
-    mutationFn: async (id) => {
-      const res = await axiosClient.delete(ENDPOINTS.FREQUENCY_PACKAGES.DELETE(id));
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['frequencyPackages'] });
-      addToast('تم حذف الباقة بنجاح', 'success');
-    },
-    onError: () => {
-      addToast('تعذر حذف الباقة', 'error');
-    }
-  });
-};
 
 export const useCreateDurationDiscount = () => {
   const queryClient = useQueryClient();

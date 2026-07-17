@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
+import useTranslation from '../../i18n/useTranslation';
 
 const AdminProfilePage = () => {
+    const { t, dir } = useTranslation();
     const navigate = useNavigate();
     const { user, logout } = useAuthStore();
     const [logoutHover, setLogoutHover] = useState(false);
 
     const handleLogout = async () => {
-        if (window.confirm('هل أنت متأكد أنك تريد الخروج من التطبيق؟')) {
+        if (window.confirm(t('admin.confirm_logout'))) {
             try {
                 await axiosClient.post(ENDPOINTS.AUTH.LOGOUT);
             } catch (e) {
@@ -22,13 +24,13 @@ const AdminProfilePage = () => {
         }
     };
 
-    const fullName = user?.full_name || 'أوس';
+    const fullName = user?.full_name || t('admin.default_name_aws');
     const email    = user?.email            || 'and@gmail.com';
     const phone    = user?.phone            || '7701244071';
     const roleName = user?.role?.role_name  || 'SuperAdmin';
     const joinDate = user?.created_at
-        ? new Date(user.created_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' })
-        : 'يناير 2024';
+        ? new Date(user.created_at).toLocaleDateString(dir === 'rtl' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long' })
+        : t('admin.default_join_date');
 
     /* ── Settings rows data ── */
     const settingsRows = [
@@ -37,8 +39,8 @@ const AdminProfilePage = () => {
             icon: 'manage_accounts',
             iconColor: 'text-primary',
             iconBg: 'bg-primary/10',
-            label: 'تعديل البيانات الشخصية',
-            description: 'تحديث الاسم والصورة والبيانات الأساسية',
+            label: t('admin.edit_personal_data'),
+            description: t('admin.edit_personal_data_desc'),
             badge: null,
             action: () => navigate('/dashboard/settings'),
             destructive: false,
@@ -48,8 +50,8 @@ const AdminProfilePage = () => {
             icon: 'lock_reset',
             iconColor: 'text-secondary',
             iconBg: 'bg-secondary/10',
-            label: 'تغيير كلمة المرور',
-            description: 'تعديل كلمة المرور لحماية حسابك',
+            label: t('admin.change_password'),
+            description: t('admin.change_password_desc'),
             badge: null,
             action: () => navigate('/dashboard/settings'),
             destructive: false,
@@ -59,8 +61,8 @@ const AdminProfilePage = () => {
             icon: 'logout',
             iconColor: 'text-error',
             iconBg: 'bg-error/10',
-            label: 'تسجيل الخروج',
-            description: 'إنهاء الجلسة الحالية وتسجيل الخروج من النظام',
+            label: t('admin.logout'),
+            description: t('admin.logout_desc'),
             badge: null,
             action: handleLogout,
             destructive: true,
@@ -76,13 +78,13 @@ const AdminProfilePage = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 py-2 mb-1">
                 <div className="flex flex-col">
                     <h1 className="text-xl font-bold text-on-surface mb-0.5 flex items-center gap-2">
-                        الملف الشخصي
+                        {t('admin.profile_title')}
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                             <span className="material-symbols-outlined text-base">account_circle</span>
                         </div>
                     </h1>
                     <p className="text-on-surface-variant text-sm">
-                        إدارة معلومات حسابك الشخصي وإعدادات الأمان.
+                        {t('admin.profile_subtitle')}
                     </p>
                 </div>
             </div>
@@ -125,7 +127,7 @@ const AdminProfilePage = () => {
                 {/* Email */}
                 <div className="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
                     <div>
-                        <p className="text-xs text-on-surface-variant mb-1.5">البريد الإلكتروني</p>
+                        <p className="text-xs text-on-surface-variant mb-1.5">{t('admin.email_address')}</p>
                         <p className="text-sm font-semibold text-on-surface break-all">{email}</p>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
@@ -136,7 +138,7 @@ const AdminProfilePage = () => {
                 {/* Phone */}
                 <div className="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
                     <div>
-                        <p className="text-xs text-on-surface-variant mb-1.5">رقم الهاتف</p>
+                        <p className="text-xs text-on-surface-variant mb-1.5">{t('admin.phone_number')}</p>
                         <p className="text-sm font-semibold text-on-surface" style={{ direction: 'ltr', textAlign: 'right' }}>{phone}</p>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-secondary/10 flex items-center justify-center text-secondary flex-shrink-0">
@@ -147,7 +149,7 @@ const AdminProfilePage = () => {
                 {/* Join date */}
                 <div className="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
                     <div>
-                        <p className="text-xs text-on-surface-variant mb-1.5">تاريخ الانضمام</p>
+                        <p className="text-xs text-on-surface-variant mb-1.5">{t('admin.join_date')}</p>
                         <p className="text-sm font-semibold text-on-surface">{joinDate}</p>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
@@ -167,7 +169,7 @@ const AdminProfilePage = () => {
                 <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface">
                     <h3 className="text-base font-semibold text-on-surface flex items-center gap-2">
                         <span className="material-symbols-outlined text-lg text-primary">settings</span>
-                        إعدادات الحساب
+                        {t('admin.account_settings')}
                     </h3>
                 </div>
 
@@ -177,13 +179,13 @@ const AdminProfilePage = () => {
                         <thead className="bg-surface-container-low border-b border-outline-variant">
                             <tr>
                                 <th className="py-3 px-5 text-xs text-on-surface-variant font-medium whitespace-nowrap">
-                                    الإجراء
+                                    {t('admin.action')}
                                 </th>
                                 <th className="py-3 px-5 text-xs text-on-surface-variant font-medium whitespace-nowrap hidden md:table-cell">
-                                    الوصف
+                                    {t('admin.description')}
                                 </th>
                                 <th className="py-3 px-5 text-xs text-on-surface-variant font-medium whitespace-nowrap text-left">
-                                    تنفيذ
+                                    {t('admin.execute')}
                                 </th>
                             </tr>
                         </thead>

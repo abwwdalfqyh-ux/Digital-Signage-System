@@ -1,11 +1,15 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import useTranslation from '../../i18n/useTranslation'; // 
 /**
  * Confirmation Dialog Component
  * Used for destructive actions (delete, revoke, etc.)
  */
-const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'تأكيد', cancelText = 'إلغاء', variant = 'danger' }) => {
+const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText, cancelText, variant = 'danger' }) => {
+    const { t, dir } = useTranslation();
+    const finalConfirmText = confirmText || t('common.confirm');
+    const finalCancelText = cancelText || t('common.cancel');
     const variantStyles = {
         danger: 'bg-error hover:bg-error/90 text-on-error shadow-[0_4px_12px_rgba(186,26,26,0.3)]',
         warning: 'bg-[#eab308] hover:bg-[#ca8a04] text-white shadow-sm',
@@ -27,7 +31,7 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6" dir="rtl">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6" dir={dir}>
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -55,13 +59,13 @@ const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, confirmText
                                 onClick={onClose}
                                 className="flex-1 bg-background hover:bg-surface-container-low text-on-surface border border-outline-variant font-label-lg text-label-lg py-3.5 px-4 rounded-xl transition-all"
                             >
-                                {cancelText}
+                                {finalCancelText}
                             </button>
                             <button
                                 onClick={onConfirm}
                                 className={`flex-1 font-label-lg text-label-lg py-3.5 px-4 rounded-xl transition-all focus:outline-none focus:ring-4 focus:ring-error/20 ${variantStyles[variant]}`}
                             >
-                                {confirmText}
+                                {finalConfirmText}
                             </button>
                         </div>
                     </motion.div>

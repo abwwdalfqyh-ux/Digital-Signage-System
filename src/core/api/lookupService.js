@@ -30,11 +30,7 @@ export const lookupService = {
         const res = await axiosClient.get('/lookups/roles');
         return res.data;
     },
-    // New endpoint for frequency packages directly connected to scheduling/pricing
-    getFrequencyPackages: async () => {
-        const res = await axiosClient.get('/frequency-packages');
-        return res.data?.data || [];
-    },
+
     getUsersByRole: async (roleName) => {
         const res = await axiosClient.get(`/lookups/users-by-role/${roleName}`);
         return res.data;

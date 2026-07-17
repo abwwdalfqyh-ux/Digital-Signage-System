@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useTranslation from '../../../i18n/useTranslation';
 
 const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
+    const { t } = useTranslation();
     return (
         <div className="bg-surface-container-lowest border border-error/20 rounded-2xl shadow-sm overflow-hidden mt-6 relative">
             {/* Warning Top Accent Gradient */}
@@ -14,12 +16,12 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                         <span className="material-symbols-outlined text-[24px]">gpp_maybe</span>
                     </div>
                     <div>
-                        <h3 className="font-title-lg text-title-lg font-black text-on-surface tracking-tight">سجل التهديدات والأجهزة المحظورة</h3>
-                        <p className="text-sm text-on-surface-variant mt-1 font-medium">الأجهزة وعناوين الـ IP الممنوعة من الوصول للنظام لأسباب أمنية.</p>
+                        <h3 className="font-title-lg text-title-lg font-black text-on-surface tracking-tight">{t('sessions.threat_log')}</h3>
+                        <p className="text-sm text-on-surface-variant mt-1 font-medium">{t('sessions.threat_log_desc')}</p>
                     </div>
                 </div>
                 <div className="bg-white border border-outline-variant rounded-xl px-5 py-2.5 flex items-center gap-3 shadow-sm">
-                    <span className="text-xs font-black text-on-surface-variant uppercase tracking-widest">إجمالي المحظورين</span>
+                    <span className="text-xs font-black text-on-surface-variant uppercase tracking-widest">{t('sessions.total_blocked')}</span>
                     <span className="font-black text-error text-2xl leading-none">{blockedItems.length}</span>
                 </div>
             </div>
@@ -29,11 +31,11 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                 <table className="w-full text-right border-collapse">
                     <thead>
                         <tr className="bg-surface-container-low/40 text-on-surface-variant font-label-md text-label-md border-b border-outline-variant/60">
-                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">الكيان المحظور (الجهاز)</th>
-                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap text-center">بصمة الاتصال (IP)</th>
-                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">سجل الحظر (التاريخ)</th>
-                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">سبب المنع التلقائي / اليدوي</th>
-                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap text-left">إجراءات الأمان</th>
+                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">{t('sessions.blocked_entity')}</th>
+                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap text-center">{t('sessions.ip_fingerprint')}</th>
+                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">{t('sessions.block_date')}</th>
+                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap">{t('sessions.block_reason_col')}</th>
+                            <th className="py-4 px-6 font-bold uppercase tracking-widest text-[11px] whitespace-nowrap text-left">{t('sessions.security_actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="font-body-md text-body-md text-on-surface divide-y divide-outline-variant/40">
@@ -45,9 +47,9 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                                             <div className="absolute inset-0 rounded-full bg-emerald-400/20 animate-ping" style={{ animationDuration: '3s' }} />
                                             <span className="material-symbols-outlined text-emerald-500 text-5xl relative z-10" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
                                         </div>
-                                        <h4 className="font-extrabold text-xl text-on-surface mb-2">النظام آمن ومستقر 100%</h4>
+                                        <h4 className="font-extrabold text-xl text-on-surface mb-2">{t('sessions.system_secure')}</h4>
                                         <p className="text-sm text-on-surface-variant leading-relaxed">
-                                            لا توجد أي أجهزة أو عناوين IP محظورة حالياً. لا يوجد أي نشاط مريب مسجل في خوادم النظام.
+                                            {t('sessions.no_blocked')}
                                         </p>
                                     </div>
                                 </td>
@@ -71,8 +73,8 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                                                     <span className="material-symbols-outlined text-[22px]">devices</span>
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-sm text-on-surface">{item.device_name || 'شبكة/جهاز غير معرّف'}</p>
-                                                    <p className="text-[11px] font-bold text-on-surface-variant mt-0.5 opacity-70">غير موثوق (Untrusted)</p>
+                                                    <p className="font-bold text-sm text-on-surface">{item.device_name || t('sessions.unknown_network')}</p>
+                                                    <p className="text-[11px] font-bold text-on-surface-variant mt-0.5 opacity-70">{t('sessions.untrusted')}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -93,7 +95,7 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                                                     {new Date(item.blocked_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                                 </span>
                                                 <span className="text-[11px] text-error font-medium mt-1">
-                                                    تم الحظر حديثاً
+                                                    {t('sessions.recently_blocked')}
                                                 </span>
                                             </div>
                                         </td>
@@ -102,7 +104,7 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                                         <td className="py-5 px-6">
                                             <span className="inline-flex items-center gap-1.5 bg-[#FFF7ED] text-[#C2410C] px-3 py-1.5 rounded-full text-xs font-bold border border-[#FED7AA] shadow-sm">
                                                 <span className="material-symbols-outlined text-[15px]">warning</span>
-                                                {item.reason || 'حظر يدوي احترازي'}
+                                                {item.reason || t('sessions.manual_block')}
                                             </span>
                                         </td>
 
@@ -113,7 +115,7 @@ const BlocklistTable = ({ blockedItems = [], onUnblock }) => {
                                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-emerald-50 hover:text-emerald-700 text-on-surface-variant text-sm font-bold transition-all border border-outline-variant/80 hover:border-emerald-300 shadow-sm hover:shadow group-hover:bg-white"
                                             >
                                                 <span className="material-symbols-outlined text-[18px]">lock_open</span>
-                                                استعادة وفك الحظر
+                                                {t('sessions.unblock_restore')}
                                             </button>
                                         </td>
                                     </motion.tr>

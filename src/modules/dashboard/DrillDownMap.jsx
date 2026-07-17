@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─────────────────────────────────────────────────────────────
    FIX: Leaflet icon 404 in Vite
@@ -156,6 +157,7 @@ const MapController = ({ target }) => {
    STATUS SUMMARY MINI-ROW
 ───────────────────────────────────────────────────────────── */
 const StatusRow = ({ screens }) => {
+    const { t } = useTranslation();
     const counts = { online: 0, broken: 0, maintenance: 0, disconnected: 0 };
     screens.forEach(s => { const st = deriveStatus(s); counts[st] = (counts[st] || 0) + 1; });
     return (
@@ -168,7 +170,7 @@ const StatusRow = ({ screens }) => {
                     fontSize: '11px', fontWeight: 700,
                 }}>
                     <span style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.color }} />
-                    {cfg.label}: {counts[key]}
+                    {t('dashboard.status_' + key)}: {counts[key]}
                 </span>
             ))}
         </div>
@@ -202,11 +204,12 @@ const Breadcrumb = ({ crumbs, onNavigate }) => (
    SCREEN INFO CARD (shown in right panel)
 ───────────────────────────────────────────────────────────── */
 const ScreenCard = ({ screen }) => {
+    const { t } = useTranslation();
     const st = deriveStatus(screen);
     const cfg = STATUS[st];
     const hb = screen.last_heartbeat ? new Date(screen.last_heartbeat) : null;
     const mins = hb ? Math.round((Date.now() - hb.getTime()) / 60000) : null;
-    const lastSeen = mins === null ? 'غير معروف' : mins < 1 ? 'الآن' : mins < 60 ? `${mins} د` : `${Math.round(mins / 60)} س`;
+    const lastSeen = mins === null ? t('dashboard.last_seen_unknown') : mins < 1 ? t('dashboard.last_seen_now') : mins < 60 ? t('dashboard.last_seen_mins', { mins }) : t('dashboard.last_seen_hours', { hours: Math.round(mins / 60) });
 
     return (
         <div style={{
@@ -226,7 +229,7 @@ const ScreenCard = ({ screen }) => {
                         fontSize: '10px', fontWeight: 700, color: cfg.color,
                     }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: cfg.color }} />
-                        {cfg.label}
+                        {t('dashboard.status_' + st)}
                     </span>
                     <span style={{ fontSize: '9px', color: T.muted }}>• {lastSeen}</span>
                 </div>
@@ -235,7 +238,7 @@ const ScreenCard = ({ screen }) => {
             {/* Navigation Button for Technicians (Native) */}
             <button 
                 onClick={() => window.startAppTracking && window.startAppTracking(screen)}
-                title="تتبع مسار الوصول للشاشة داخل النظام"
+                title={t('dashboard.track_route_title')}
                 style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     width: 32, height: 32, borderRadius: '8px', flexShrink: 0, cursor: 'pointer',
@@ -255,6 +258,7 @@ const ScreenCard = ({ screen }) => {
    MAIN COMPONENT: DrillDownMap
 ═══════════════════════════════════════════════════════════════ */
 const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
+    const { t } = useTranslation();
     /* Levels: 'country' | 'gov' | 'region' | 'street' */
     const [level, setLevel] = useState('country');
     const [govs, setGovs] = useState([]);
@@ -341,7 +345,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
 
     const startTracking = useCallback((scr) => {
         if (!navigator.geolocation) {
-            alert('متصفحك لا يدعم تحديد الموقع (GPS)!');
+            alert(t('dashboard.gps_not_supported'));
             return;
         }
         setTrackingState({ loading: true, screenId: scr.id });
@@ -376,15 +380,15 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                     const lngBounds = [Math.min(userLng, scr.lng), Math.max(userLng, scr.lng)];
                     setMapTarget({ bounds: [[latBounds[0], lngBounds[0]], [latBounds[1], lngBounds[1]]] });
                 } else {
-                    alert('لم يتم العثور على مسار طريق متاح.');
+                    alert(t('dashboard.no_route_found'));
                 }
             } catch (err) {
-                alert('عذراً، حدث خطأ أثناء رسم المسار.');
+                alert(t('dashboard.route_error'));
             } finally {
                 setTrackingState({ loading: false, screenId: null });
             }
         }, (err) => {
-            alert('يرجى تفعيل صلاحية الوصول للموقع (GPS) في المتصفح لرسم المسار داخل النظام.');
+            alert(t('dashboard.gps_permission_needed'));
             setTrackingState({ loading: false, screenId: null });
         }, { enableHighAccuracy: true });
     }, []);
@@ -426,7 +430,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
     };
 
     /* ── BREADCRUMB NAVIGATION ── */
-    const crumbs = [{ label: 'اليمن' }];
+    const crumbs = [{ label: t('dashboard.yemen') }];
     if (selectedGov)    crumbs.push({ label: selectedGov.name });
     if (selectedRegion) crumbs.push({ label: selectedRegion.name });
     if (selectedStreet) crumbs.push({ label: selectedStreet.name });
@@ -442,7 +446,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
     currentScreens.forEach(s => { const st = deriveStatus(s); countsByStatus[st]++; });
 
     /* Right-panel list: at country level show govs, else show screens */
-    const panelTitle = level === 'country' ? 'المحافظات' : level === 'gov' ? 'المناطق' : level === 'region' ? 'الشوارع' : 'الشاشات';
+    const panelTitle = level === 'country' ? t('dashboard.governorates') : level === 'gov' ? t('dashboard.areas') : level === 'region' ? t('dashboard.streets') : t('dashboard.screens_level');
     const panelItems = level === 'country' ? govs
         : level === 'gov' ? regions
         : level === 'region' ? streets
@@ -483,9 +487,9 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
             <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <MapPin style={{ width: 16, height: 16, color: T.primary }} />
-                    <span style={{ fontSize: '14px', fontWeight: 800, color: T.text }}>خريطة الشاشات التفاعلية — حفر تدريجي</span>
+                    <span style={{ fontSize: '14px', fontWeight: 800, color: T.text }}>{t('dashboard.interactive_map_title')}</span>
                     <span style={{ fontSize: '10px', color: T.muted, background: T.surface, padding: '2px 8px', borderRadius: 99 }}>
-                        {level === 'country' ? 'اضغط محافظة للدخول' : level === 'gov' ? 'اضغط منطقة للمزيد' : level === 'region' ? 'اضغط شارع للتفاصيل' : 'مستوى الشاشات'}
+                        {level === 'country' ? t('dashboard.click_gov_to_enter') : level === 'gov' ? t('dashboard.click_area_for_more') : level === 'region' ? t('dashboard.click_street_for_details') : t('dashboard.screens_level')}
                     </span>
                 </div>
 
@@ -499,7 +503,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                             fontSize: '11px', fontWeight: 700,
                         }}>
                             <span style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.color }} />
-                            {cfg.label}: {countsByStatus[key]}
+                            {t('dashboard.status_' + key)}: {countsByStatus[key]}
                         </span>
                     ))}
                 </div>
@@ -513,12 +517,12 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <Navigation style={{ width: 16, height: 16, animation: 'pulse 1.5s infinite' }} />
                                 <div>
-                                    <p style={{ margin: 0, fontSize: '12px', fontWeight: 700 }}>مسار مباشر إلى: {routeState.targetScr?.name}</p>
-                                    <p style={{ margin: '2px 0 0', fontSize: '10px', opacity: 0.9 }}>المسافة: {routeState.distance} كم | الوقت المقدر: {routeState.duration} دقيقة</p>
+                                    <p style={{ margin: 0, fontSize: '12px', fontWeight: 700 }}>{t('dashboard.direct_route_to', { name: routeState.targetScr?.name })}</p>
+                                    <p style={{ margin: '2px 0 0', fontSize: '10px', opacity: 0.9 }}>{t('dashboard.distance_time', { dist: routeState.distance, dur: routeState.duration })}</p>
                                 </div>
                             </div>
                             <button onClick={cancelTracking} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', padding: '6px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <X style={{ width: 14, height: 14 }} /> إلغاء التتبع
+                                <X style={{ width: 14, height: 14 }} /> {t('dashboard.exit_route')}
                             </button>
                         </div>
                     </motion.div>
@@ -579,7 +583,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                                                         color: STATUS[deriveStatus(scr)]?.color,
                                                     }}>
                                                         <span style={{ width: 7, height: 7, borderRadius: '50%', background: STATUS[deriveStatus(scr)]?.color }} />
-                                                        {STATUS[deriveStatus(scr)]?.label}
+                                                        {t('dashboard.status_' + deriveStatus(scr))}
                                                     </span>
                                                 </div>
                                             </div>

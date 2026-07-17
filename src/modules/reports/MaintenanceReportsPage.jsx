@@ -4,8 +4,10 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
 import useAuthStore from '../../store/useAuthStore';
+import useTranslation from '../../i18n/useTranslation';
 
 const MaintenanceReportsPage = () => {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const [screens, setScreens] = useState([]);
     const [loadingScreens, setLoadingScreens] = useState(true);
@@ -35,7 +37,7 @@ const MaintenanceReportsPage = () => {
             }
         } catch (error) {
             console.error("Error fetching screens", error);
-            addToast('فشل في جلب قائمة الشاشات', 'error');
+            addToast(t('reports.fetch_screens_failed'), 'error');
         } finally {
             setLoadingScreens(false);
         }
@@ -48,7 +50,7 @@ const MaintenanceReportsPage = () => {
 
     const generateReport = async () => {
         if (!filters.screen_id || !filters.start_date || !filters.end_date) {
-            addToast('يرجى تعبئة جميع الفلاتر المطلوبة', 'warning');
+            addToast(t('reports.fill_required_filters'), 'warning');
             return;
         }
 
@@ -56,10 +58,10 @@ const MaintenanceReportsPage = () => {
         try {
             const res = await axiosClient.get('/reports/maintenance', { params: filters });
             setReportData(res.data);
-            addToast('تم استخراج تقرير الصيانة بنجاح', 'success');
+            addToast(t('reports.maintenance_report_generated_success'), 'success');
         } catch (error) {
             console.error("Error generating report", error);
-            addToast('حدث خطأ أثناء استخراج التقرير', 'error');
+            addToast(t('reports.report_generate_failed'), 'error');
             setReportData(null);
         } finally {
             setLoadingReport(false);
@@ -77,9 +79,9 @@ const MaintenanceReportsPage = () => {
                 <div>
                     <h1 className="text-3xl font-bold text-on-background flex items-center gap-3">
                         <Activity className="w-8 h-8 text-primary" />
-                        تقرير الصيانة الفني
+                        {t('reports.maintenance_report_header')}
                     </h1>
-                    <p className="text-on-surface-variant mt-2 text-sm">استخرج تقارير فنية حول حالة الشاشات وأوقات الانقطاع</p>
+                    <p className="text-on-surface-variant mt-2 text-sm">{t('reports.maintenance_report_desc')}</p>
                 </div>
             </div>
 
@@ -88,7 +90,7 @@ const MaintenanceReportsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                     
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">اختر الشاشة</label>
+                        <label className="text-sm font-semibold text-on-surface block">{t('reports.select_screen')}</label>
                         <select 
                             name="screen_id" 
                             value={filters.screen_id} 
@@ -96,7 +98,7 @@ const MaintenanceReportsPage = () => {
                             className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                             disabled={loadingScreens}
                         >
-                            <option value="">-- يرجى اختيار شاشة --</option>
+                            <option value="">{t('reports.please_select_screen')}</option>
                             {screens.map(screen => (
                                 <option key={screen.screen_id} value={screen.screen_id}>
                                     {screen.screen_name} {screen.mac_address ? `(${screen.mac_address})` : ''}
@@ -106,7 +108,7 @@ const MaintenanceReportsPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">من تاريخ</label>
+                        <label className="text-sm font-semibold text-on-surface block">{t('reports.from_date')}</label>
                         <div className="relative">
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
                             <input 
@@ -120,7 +122,7 @@ const MaintenanceReportsPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">إلى تاريخ</label>
+                        <label className="text-sm font-semibold text-on-surface block">{t('reports.to_date')}</label>
                         <div className="relative">
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
                             <input 
@@ -144,7 +146,7 @@ const MaintenanceReportsPage = () => {
                             ) : (
                                 <>
                                     <Search className="w-5 h-5" />
-                                    استخراج
+                                    {t('reports.extract_btn')}
                                 </>
                             )}
                         </button>
@@ -153,7 +155,7 @@ const MaintenanceReportsPage = () => {
                             onClick={handlePrint}
                             disabled={!reportData}
                             className="px-5 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary font-medium rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                            title="طباعة التقرير (PDF)"
+                            title={t('reports.print_report_pdf')}
                         >
                             <Printer className="w-5 h-5" />
                         </button>
@@ -192,36 +194,36 @@ const MaintenanceReportsPage = () => {
                         <div className="flex-1 flex items-center justify-start px-12 bg-[#1c5b8e]">
                             <div className="text-center">
                                 <img src="/Main_app_logo.png" alt="SabaPost Logo" className="h-16 object-contain mb-2 brightness-0 invert mx-auto" />
-                                <p className="font-bold text-lg">سبأ بوست - SabaPost</p>
-                                <p className="text-sm opacity-80">نظام إدارة الإعلانات الرقمية</p>
+                                <p className="font-bold text-lg">{t('reports.sabapost_name')}</p>
+                                <p className="text-sm opacity-80">{t('reports.sabapost_tagline')}</p>
                             </div>
                         </div>
                         
                         <div className="w-48 bg-[#102a43]" style={{ clipPath: 'polygon(0 0, 100% 0, 75% 100%, 25% 100%)' }}></div>
 
                         <div className="flex-1 flex items-center justify-end px-12 bg-[#1c5b8e]">
-                            <h1 className="text-5xl font-black tracking-tight" style={{ color: '#ffffff' }}>تقرير فني للصيانة</h1>
+                            <h1 className="text-5xl font-black tracking-tight" style={{ color: '#ffffff' }}>{t('reports.technical_maintenance_report')}</h1>
                         </div>
                     </div>
 
                     {/* Metadata Section */}
                     <div className="grid grid-cols-2 gap-8 py-10 px-16 bg-white">
                         <div className="flex-1 text-right space-y-3">
-                            <div className="flex justify-start gap-3"><span className="font-bold text-gray-900 w-32">السيد/ة:</span> <span className="text-gray-700">{reportData.screen.owner ? (reportData.screen.owner.full_name || reportData.screen.owner.username) : 'غير مدرج'}</span></div>
-                            <div className="flex justify-start gap-3"><span className="font-bold text-gray-900 w-32">رقم الجوال:</span> <span className="text-gray-700">{reportData.screen.owner?.phone || 'غير مدرج'}</span></div>
+                            <div className="flex justify-start gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.mr_mrs')}</span> <span className="text-gray-700">{reportData.screen.owner ? (reportData.screen.owner.full_name || reportData.screen.owner.username) : t('reports.not_listed')}</span></div>
+                            <div className="flex justify-start gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.mobile_number')}</span> <span className="text-gray-700">{reportData.screen.owner?.phone || t('reports.not_listed')}</span></div>
                         </div>
 
                         <div className="flex-1 text-left space-y-3">
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.screen_id} - {reportData.screen.screen_name}</span> <span className="font-bold text-gray-900">:رقم الشاشة</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.street ? `${reportData.screen.street.street_name} - ${reportData.screen.street.region?.region_name}` : 'غير محدد'}</span> <span className="font-bold text-gray-900">:موقع الشاشة</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{new Date().toLocaleDateString('ar-SA')}</span> <span className="font-bold text-gray-900">:تاريخ الإصدار</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700" dir="ltr">{filters.start_date} <span className="mx-1">/</span> {filters.end_date}</span> <span className="font-bold text-gray-900">:الفترة</span></div>
+                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.screen_id} - {reportData.screen.screen_name}</span> <span className="font-bold text-gray-900">{t('reports.screen_number')}</span></div>
+                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.street ? `${reportData.screen.street.street_name} - ${reportData.screen.street.region?.region_name}` : t('reports.unspecified')}</span> <span className="font-bold text-gray-900">{t('reports.screen_location')}</span></div>
+                            <div className="flex justify-end gap-3"><span className="text-gray-700">{new Date().toLocaleDateString('ar-SA')}</span> <span className="font-bold text-gray-900">{t('reports.issue_date')}</span></div>
+                            <div className="flex justify-end gap-3"><span className="text-gray-700" dir="ltr">{filters.start_date} <span className="mx-1">/</span> {filters.end_date}</span> <span className="font-bold text-gray-900">{t('reports.period')}</span></div>
                         </div>
                     </div>
 
                     {/* Technical Stats */}
                     <div className="px-16 flex-1 mb-10">
-                        <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">الملخص الفني وحالة الشاشة</h2>
+                        <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">{t('reports.technical_summary')}</h2>
                         
                         <div className="grid grid-cols-2 gap-6">
                             {/* Status Card */}
@@ -231,9 +233,9 @@ const MaintenanceReportsPage = () => {
                                         {reportData.summary.status === 'Online' ? <Wifi className="w-8 h-8" /> : <WifiOff className="w-8 h-8" />}
                                     </div>
                                     <div>
-                                        <p className="text-gray-600 font-medium">حالة الاتصال الحالية</p>
+                                        <p className="text-gray-600 font-medium">{t('reports.current_connection_status')}</p>
                                         <h3 className={`text-2xl font-bold ${reportData.summary.status === 'Online' ? 'text-green-700' : 'text-red-700'}`}>
-                                            {reportData.summary.status === 'Online' ? 'متصلة (Online)' : 'غير متصلة (Offline)'}
+                                            {reportData.summary.status === 'Online' ? t('reports.status_online') : t('reports.status_offline')}
                                         </h3>
                                     </div>
                                 </div>
@@ -246,9 +248,9 @@ const MaintenanceReportsPage = () => {
                                         <Clock className="w-8 h-8" />
                                     </div>
                                     <div>
-                                        <p className="text-gray-600 font-medium">ساعات الانقطاع الحالية</p>
+                                        <p className="text-gray-600 font-medium">{t('reports.current_offline_hours')}</p>
                                         <h3 className="text-2xl font-bold text-orange-700">
-                                            {reportData.summary.offline_hours} ساعة
+                                            {reportData.summary.offline_hours} {t('reports.hour')}
                                         </h3>
                                     </div>
                                 </div>
@@ -258,29 +260,29 @@ const MaintenanceReportsPage = () => {
                         <div className="grid grid-cols-2 gap-6 mt-6">
                             {/* Ads count */}
                             <div className="p-6 rounded-2xl border bg-blue-50 border-blue-200">
-                                <p className="text-gray-600 font-medium mb-1">إجمالي الحملات الفعالة</p>
+                                <p className="text-gray-600 font-medium mb-1">{t('reports.total_active_campaigns')}</p>
                                 <h3 className="text-3xl font-bold text-blue-700">{reportData.summary.total_ads}</h3>
-                                <p className="text-xs text-gray-500 mt-2">خلال الفترة المحددة</p>
+                                <p className="text-xs text-gray-500 mt-2">{t('reports.during_selected_period')}</p>
                             </div>
                             
                             {/* Total Plays */}
                             <div className="p-6 rounded-2xl border bg-indigo-50 border-indigo-200">
-                                <p className="text-gray-600 font-medium mb-1">إجمالي مرات العرض (Playbacks)</p>
+                                <p className="text-gray-600 font-medium mb-1">{t('reports.total_playbacks')}</p>
                                 <h3 className="text-3xl font-bold text-indigo-700">{reportData.summary.total_plays}</h3>
-                                <p className="text-xs text-gray-500 mt-2">مؤشر على عمل مشغل الوسائط</p>
+                                <p className="text-xs text-gray-500 mt-2">{t('reports.media_player_indicator')}</p>
                             </div>
                         </div>
 
                         <div className="mt-8 bg-gray-50 p-6 rounded-2xl border border-gray-200">
-                            <h3 className="font-bold text-gray-800 mb-4">سجل الاتصال الأخير</h3>
+                            <h3 className="font-bold text-gray-800 mb-4">{t('reports.last_connection_log')}</h3>
                             <div className="space-y-3">
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-600">آخر اتصال بالخادم (Ping):</span>
-                                    <span className="font-medium text-gray-900" dir="ltr">{reportData.summary.last_ping || 'غير متاح'}</span>
+                                    <span className="text-gray-600">{t('reports.last_ping')}</span>
+                                    <span className="font-medium text-gray-900" dir="ltr">{reportData.summary.last_ping || t('reports.not_available')}</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-2">
-                                    <span className="text-gray-600">تاريخ آخر انقطاع:</span>
-                                    <span className="font-medium text-gray-900" dir="ltr">{reportData.summary.offline_since || 'لا يوجد انقطاع مسجل'}</span>
+                                    <span className="text-gray-600">{t('reports.last_offline_date')}</span>
+                                    <span className="font-medium text-gray-900" dir="ltr">{reportData.summary.offline_since || t('reports.no_offline_recorded')}</span>
                                 </div>
                             </div>
                         </div>
@@ -288,14 +290,14 @@ const MaintenanceReportsPage = () => {
                         {/* Conditions and Info */}
                         <div className="mt-16 grid grid-cols-2 gap-8 items-end w-full">
                             <div className="text-right">
-                                <h4 className="font-bold text-gray-900 text-lg mb-2">معلومات إضافية:</h4>
+                                <h4 className="font-bold text-gray-900 text-lg mb-2">{t('reports.additional_info')}</h4>
                                 <p className="text-gray-600 text-sm leading-relaxed">
-                                    هذا التقرير مخصص لفريق الصيانة والدعم الفني لمراقبة أداء الشاشات ولا يحتوي على أي بيانات مالية. التقرير مصدر آلياً.
+                                    {t('reports.maintenance_report_disclaimer')}
                                 </p>
                             </div>
                             <div className="flex flex-col items-center justify-end px-12">
-                                <h4 className="font-bold text-gray-900 text-lg mb-10 border-b border-gray-300 pb-2 min-w-[250px] text-center">{user?.full_name || user?.username || 'فريق الصيانة'}</h4>
-                                <p className="text-gray-500 text-sm w-full text-center">التوقيع</p>
+                                <h4 className="font-bold text-gray-900 text-lg mb-10 border-b border-gray-300 pb-2 min-w-[250px] text-center">{user?.full_name || user?.username || t('reports.maintenance_team')}</h4>
+                                <p className="text-gray-500 text-sm w-full text-center">{t('reports.signature')}</p>
                             </div>
                         </div>
                     </div>
@@ -320,8 +322,8 @@ const MaintenanceReportsPage = () => {
                     <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center shadow-sm mb-6">
                         <Activity className="w-10 h-10 text-primary/40" />
                     </div>
-                    <h3 className="text-xl font-bold text-on-background mb-2">التقارير الفنية جاهزة للاستخراج</h3>
-                    <p className="text-on-surface-variant max-w-md">قم بتحديد الشاشة والفترة الزمنية ثم اضغط على زر "استخراج" لعرض تقرير الصيانة الفني وطباعته.</p>
+                    <h3 className="text-xl font-bold text-on-background mb-2">{t('reports.technical_reports_ready')}</h3>
+                    <p className="text-on-surface-variant max-w-md">{t('reports.technical_reports_instructions')}</p>
                 </div>
             )}
         </div>

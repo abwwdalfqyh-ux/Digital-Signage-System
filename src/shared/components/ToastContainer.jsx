@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertTriangle, Info, AlertCircle } from 'lucide-react';
 import useToastStore from '../../store/useToastStore';
+import useTranslation from '../../i18n/useTranslation';
 
 const iconMap = {
     success: CheckCircle,
@@ -19,12 +20,13 @@ const colorMap = {
 
 const ToastContainer = () => {
     const { toasts, removeToast } = useToastStore();
+    const { t, dir } = useTranslation();
 
     return (
         <div
             className="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 w-full pointer-events-none"
             style={{ maxWidth: '520px', padding: '0 16px' }}
-            dir="rtl"
+            dir={dir}
         >
             <AnimatePresence>
                 {toasts.map((toast) => {
@@ -55,7 +57,7 @@ const ToastContainer = () => {
                                 <button
                                     onClick={() => removeToast(toast.id)}
                                     className="text-white/40 hover:text-white/80 transition-colors shrink-0 mt-0.5"
-                                    aria-label="إغلاق"
+                                    aria-label={t('common.close')}
                                 >
                                     <X className="w-4 h-4" />
                                 </button>

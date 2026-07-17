@@ -1,43 +1,45 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, FileText } from 'lucide-react';
+import useTranslation from '../../i18n/useTranslation';
 
 const LegalModal = ({ isOpen, onClose, type }) => {
+    const { t, dir } = useTranslation();
     const isPrivacy = type === 'privacy';
-    const title = isPrivacy ? 'سياسة الخصوصية' : 'شروط الاستخدام';
+    const title = isPrivacy ? t('auth.privacy_policy') : t('auth.terms_of_use');
     const Icon = isPrivacy ? ShieldCheck : FileText;
 
     const privacyContent = (
         <div className="space-y-4 text-sm text-[#4b5563] leading-relaxed font-medium">
-            <p>في شبكة سبأ بوست، نولي أهمية قصوى لحماية خصوصيتك وبياناتك الشخصية. توضح سياسة الخصوصية هذه كيفية جمع واستخدام وحماية معلوماتك عند استخدامك لمنصتنا.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">1. المعلومات التي نجمعها</h4>
-            <p>نقوم بجمع المعلومات التي تقدمها لنا مباشرة عند التسجيل، مثل الاسم، البريد الإلكتروني، ورقم الهاتف. بالإضافة إلى معلومات حول كيفية استخدامك للنظام.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">2. استخدام المعلومات</h4>
-            <p>نستخدم معلوماتك لتقديم وتحسين خدماتنا، ومعالجة المدفوعات للإعلانات، وتوفير دعم فني متخصص، وللتواصل معك بشأن التحديثات المهمة.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">3. أمان البيانات</h4>
-            <p>نحن نستخدم إجراءات أمنية متقدمة وتشفير عالي المستوى لحماية معلوماتك من الوصول غير المصرح به أو التعديل أو الإفصاح.</p>
-            <p className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">آخر تحديث: يوليو 2026</p>
+            <p>{t('auth.privacy_policy_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.privacy_sec1_title')}</h4>
+            <p>{t('auth.privacy_sec1_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.privacy_sec2_title')}</h4>
+            <p>{t('auth.privacy_sec2_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.privacy_sec3_title')}</h4>
+            <p>{t('auth.privacy_sec3_desc')}</p>
+            <p className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">{t('auth.last_updated_july_2026')}</p>
         </div>
     );
 
     const termsContent = (
         <div className="space-y-4 text-sm text-[#4b5563] leading-relaxed font-medium">
-            <p>مرحباً بك في منصة سبأ بوست. باستخدامك لمنصتنا، فإنك توافق على الالتزام بشروط الاستخدام التالية. يرجى قراءتها بعناية.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">1. شروط استخدام النظام</h4>
-            <p>يُمنع استخدام النظام لأي أغراض غير قانونية أو رفع محتوى إعلاني يخالف الآداب العامة أو القوانين المعمول بها. تحتفظ الإدارة بالحق في رفض أي إعلان دون إبداء الأسباب.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">2. عمليات الدفع والاسترداد</h4>
-            <p>جميع المبالغ المدفوعة للحملات الإعلانية المعتمدة غير قابلة للاسترداد. في حال تم رفض الإعلان من قبل الإدارة قبل عرضه، سيتم إعادة المبلغ لرصيدك في المنصة.</p>
-            <h4 className="text-[#111827] font-bold mt-4 text-base">3. إخلاء المسؤولية</h4>
-            <p>المنصة غير مسؤولة عن أي أضرار غير مباشرة أو خسائر في الأرباح ناتجة عن استخدام أو عدم القدرة على استخدام خدماتنا.</p>
-            <p className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">آخر تحديث: يوليو 2026</p>
+            <p>{t('auth.terms_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.terms_sec1_title')}</h4>
+            <p>{t('auth.terms_sec1_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.terms_sec2_title')}</h4>
+            <p>{t('auth.terms_sec2_desc')}</p>
+            <h4 className="text-[#111827] font-bold mt-4 text-base">{t('auth.terms_sec3_title')}</h4>
+            <p>{t('auth.terms_sec3_desc')}</p>
+            <p className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400 text-center">{t('auth.last_updated_july_2026')}</p>
         </div>
     );
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" dir="rtl">
-                    {/* الخلفية المظلمة */}
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" dir={dir}>
+                    {/* Dark Background */}
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -46,7 +48,7 @@ const LegalModal = ({ isOpen, onClose, type }) => {
                         className="absolute inset-0 bg-[#111827]/40 backdrop-blur-sm"
                     />
 
-                    {/* نافذة المحتوى */}
+                    {/* Modal Content */}
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -81,7 +83,7 @@ const LegalModal = ({ isOpen, onClose, type }) => {
                                 onClick={onClose}
                                 className="w-full py-3 bg-[#14506b] hover:bg-[#0f3c50] text-white rounded-xl font-bold text-sm shadow-md shadow-[#14506b]/20 transition-all hover:-translate-y-0.5"
                             >
-                                قرأت ذلك وموافق
+                                {t('auth.i_read_and_agree')}
                             </button>
                         </div>
                     </motion.div>

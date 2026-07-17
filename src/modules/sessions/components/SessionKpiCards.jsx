@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import useTranslation from '../../../i18n/useTranslation';
 
 /* ─── Animation Variants (matches project style) ─── */
 const containerVariants = {
@@ -59,6 +60,7 @@ const guessDeviceType = (deviceName = '') => {
    Exported Component
    ═══════════════════════════════ */
 const SessionKpiCards = ({ sessions = [], loading = false }) => {
+    const { t } = useTranslation();
     const otherSessions = sessions.filter(s => !s.is_current);
     const deviceTypes   = [...new Set(sessions.map(s => guessDeviceType(s.device_name)))].length;
 
@@ -83,25 +85,25 @@ const SessionKpiCards = ({ sessions = [], loading = false }) => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md"
         >
             <KpiCard
-                title="إجمالي الجلسات"
+                title={t('sessions.total_sessions')}
                 value={sessions.length}
                 icon="devices"
                 colorClass="bg-primary-container/10 text-primary"
             />
             <KpiCard
-                title="جلسات أخرى"
+                title={t('sessions.other_sessions_kpi')}
                 value={otherSessions.length}
                 icon="multiple_stop"
                 colorClass="bg-secondary-container/20 text-secondary"
             />
             <KpiCard
-                title="أنواع الأجهزة"
+                title={t('sessions.device_types')}
                 value={deviceTypes}
                 icon="laptop_mac"
                 colorClass="bg-surface-variant text-on-surface-variant"
             />
             <KpiCard
-                title="مستوى الأمان"
+                title={t('sessions.security_level')}
                 value={`${secScore}%`}
                 isProgress={true}
                 secScore={secScore}

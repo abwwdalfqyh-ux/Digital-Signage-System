@@ -11,6 +11,7 @@ import echo from '../../core/api/echo';
 import useToastStore from '../../store/useToastStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { SETTINGS_QUERY_KEY } from '../../hooks/api/useSettings';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Stitch colour tokens — light ─── */
 const LIGHT = {
@@ -47,39 +48,16 @@ const DARK = {
 const SIDEBAR_FULL = 250;
 const SIDEBAR_MINI = 68;
 
-/* Labels map — ar / en */
-const T = {
-    ar: {
-        brandSub: 'لوحة تحكم سبأ',
-        logout: 'تسجيل الخروج',
-        expandSidebar: 'توسيع القائمة',
-        collapseSidebar: 'تصغير القائمة',
-        darkMode: 'الوضع الليلي',
-        lightMode: 'الوضع النهاري',
-        switchLang: 'English',
-        notifications: 'الإشعارات',
-        profile: 'الملف الشخصي',
-    },
-    en: {
-        brandSub: 'Saba Control Panel',
-        logout: 'Logout',
-        expandSidebar: 'Expand sidebar',
-        collapseSidebar: 'Collapse sidebar',
-        darkMode: 'Dark mode',
-        lightMode: 'Light mode',
-        switchLang: 'عربي',
-        notifications: 'Notifications',
-        profile: 'Profile',
-    },
-};
+/* Labels map — now powered by useTranslation hook */
 
 /* ──────────────────────────────────────────── */
 const DashboardLayout = () => {
     const { user, logout, impersonatedRole, setImpersonatedRole } = useAuthStore();
     const addToast = useToastStore(s => s.addToast);
     const queryClient = useQueryClient();
-    const { roleName } = usePermission();
+    const { roleId, roleName } = usePermission();
     const { theme, toggleTheme, language, setLanguage } = useUIStore();
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -93,20 +71,22 @@ const DashboardLayout = () => {
     const [isLauncherOpen, setIsLauncherOpen] = useState(false);
     const launcherRef = useRef(null);
     const [isAddingShortcut, setIsAddingShortcut] = useState(false);
-    const navItems = getNavItems(roleName, language);
+    
+    // Pass roleId to getNavItems instead of roleName
+    const navItems = getNavItems(roleId, language);
     const launchableItems = navItems.filter(i => i.path !== '/dashboard');
 
     const [savedPaths, setSavedPaths] = useState(() => {
         try {
-            const val = localStorage.getItem(`qa_${roleName}`);
+            const val = localStorage.getItem(`qa_${roleId}`);
             if (val) return JSON.parse(val);
         } catch(e) {}
         return launchableItems.slice(0, maxItems).map(i => i.path);
     });
 
     useEffect(() => {
-        localStorage.setItem(`qa_${roleName}`, JSON.stringify(savedPaths));
-    }, [savedPaths, roleName]);
+        localStorage.setItem(`qa_${roleId}`, JSON.stringify(savedPaths));
+    }, [savedPaths, roleId]);
 
     /* Close launchers on outside click */
     useEffect(() => {
@@ -131,12 +111,14 @@ const DashboardLayout = () => {
         const userChannel = echo.private(`user.${user.user_id}`);
         userChannel.listen('NotificationSent', (e) => {
             setUnreadCount(prev => prev + 1);
-            let title = 'إشعار جديد';
+            let title = t('common.new notification');
             try {
                 const parsed = JSON.parse(e.notification.title);
-                if (parsed.key === 'notif_title_payout_requested') title = 'طلب سحب جديد';
-                else if (parsed.key === 'notif_title_payout_approved') title = 'تم اعتماد السحب';
-                else if (parsed.key === 'notif_title_payout_rejected') title = 'تم رفض السحب';
+                if (parsed.key) {
+                    if (parsed.key === 'notif title payout requested') title = t('notifications.payout_requested');
+                    else if (parsed.key === 'notif title payout approved') title = t('notifications.payout_approved');
+                    else if (parsed.key === 'notif title payout rejected') title = t('notifications.payout_rejected');
+                }
             } catch (err) {}
             
             addToast(`🔔 ${title}`, 'info');
@@ -157,7 +139,7 @@ const DashboardLayout = () => {
             echo.leave(`user.${user.user_id}`);
             echo.leave('system.settings');
         };
-    }, [user, addToast, queryClient]);
+    }, [user, addToast, queryClient, t]);
 
     /* Fetch unread notifications count */
     useEffect(() => {
@@ -182,14 +164,23 @@ const DashboardLayout = () => {
         };
     }, []);
 
-    const trueRole = user?.role?.role_name || null;
-    const canImpersonate = trueRole === 'SuperAdmin' || trueRole === 'Admin';
+    const canImpersonate = roleId === 1 || roleId === 7; // SuperAdmin or Admin
 
     /* Derived */
     const isDark = theme === 'dark';
     const isRTL = language === 'ar';
     const S = isDark ? DARK : LIGHT;
-    const lbl = T[language] ?? T.ar;
+    const lbl = {
+        brandSub: t('layout.brand_sub'),
+        logout: t('layout.logout'),
+        expandSidebar: t('layout.expand_sidebar'),
+        collapseSidebar: t('layout.collapse_sidebar'),
+        darkMode: t('layout.dark_mode'),
+        lightMode: t('layout.light_mode'),
+        switchLang: t('layout.switch_lang'),
+        notifications: t('layout.notifications'),
+        profile: t('layout.profile'),
+    };
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -676,7 +667,7 @@ const DashboardLayout = () => {
                         <div ref={launcherRef} style={{ position: 'relative' }}>
                             <IconBtn 
                                 onClick={() => { setIsLauncherOpen(!isLauncherOpen); setIsAddingShortcut(false); }} 
-                                title={isRTL ? 'الوصول السريع' : 'App Launcher'}
+                                title={t('common.quick_access')}
                             >
                                 <Grid style={{
                                     width: 17, height: 17,
@@ -694,14 +685,14 @@ const DashboardLayout = () => {
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                                         <span style={{ fontSize: '13px', fontWeight: 700, color: S.onSurface, fontFamily: "'IBM Plex Sans Arabic'" }}>
-                                            {isRTL ? 'الوصول السريع' : 'Quick Access'}
+                                            {t('common.quick_access')}
                                         </span>
                                         {activeLaunchItems.length < maxItems && (
                                             <button
                                                 onClick={() => setIsAddingShortcut(!isAddingShortcut)}
                                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: S.primaryContainer, fontSize: '12px', fontWeight: 600, padding: 0 }}
                                             >
-                                                {isRTL ? '+ إضافة' : '+ Add'}
+                                                + {t('common.add')}
                                             </button>
                                         )}
                                     </div>
@@ -745,7 +736,7 @@ const DashboardLayout = () => {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                             {availableLaunchItems.length === 0 && (
                                                 <div style={{ fontSize: '12px', color: S.outline, textAlign: 'center' }}>
-                                                    {isRTL ? 'جميع الواجهات مضافة' : 'All interfaces added'}
+                                                    {t('common.all interfaces added')}
                                                 </div>
                                             )}
                                             {availableLaunchItems.map(item => (
@@ -771,7 +762,7 @@ const DashboardLayout = () => {
                             <div ref={roleMenuRef} style={{ position: 'relative' }}>
                                 <IconBtn
                                     onClick={() => { setIsRoleMenuOpen(p => !p); }}
-                                    title={isRTL ? 'تبديل الصلاحية (معاينة)' : 'Switch Role (Preview)'}
+                                    title={t('common.switch role preview')}
                                 >
                                     <Users style={{
                                         width: 17, height: 17,
@@ -801,16 +792,16 @@ const DashboardLayout = () => {
                                             textAlign: 'center'
                                         }}>
                                             <span style={{ fontSize: '13px', fontWeight: 800, color: S.primary, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                                {isRTL ? 'معاينة النظام بصفة' : 'Preview System As:'}
+                                                {t('common.preview_system_as')}
                                             </span>
                                         </div>
                                         <div style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                             {[
-                                                { id: null, label: isRTL ? 'مدير عام (رجوع)' : 'Admin (Reset)' },
-                                                { id: 'Advertiser', label: isRTL ? 'المعلن' : 'Advertiser' },
-                                                { id: 'ScreenOwner', label: isRTL ? 'مالك الشاشات' : 'Screen Owner' },
-                                                { id: 'Secretary', label: isRTL ? 'السكرتير' : 'Secretary' },
-                                                { id: 'Maintenance', label: isRTL ? 'فريق الصيانة' : 'Maintenance' }
+                                                { id: null, label: t('common.role admin reset') },
+                                                { id: 2, label: t('common.role advertiser') },
+                                                { id: 3, label: t('common.role screen owner') },
+                                                { id: 6, label: t('common.role secretary') },
+                                                { id: 4, label: t('common.role maintenance') }
                                             ].map(r => (
                                                 <button
                                                     key={r.id || 'admin'}
@@ -873,7 +864,7 @@ const DashboardLayout = () => {
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     lineHeight: 1.2,
                                 }}>
-                                    {user?.full_name || (isRTL ? 'مدير النظام' : 'System Admin')}
+                                    {user?.full_name || t('common.system admin')}
                                 </p>
                                 <p style={{
                                     margin: 0, fontSize: '10px', color: S.onSurfaceVariant,

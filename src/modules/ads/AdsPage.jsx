@@ -13,6 +13,7 @@ import ReviewAdModal from './components/ReviewAdModal';
 import AdInvoiceModal from './components/AdInvoiceModal';
 import { useAds, useUpdateAdStatus, useDeleteAd } from '../../hooks/api/useAds';
 import { useQueryClient } from '@tanstack/react-query';
+import useTranslation from '../../i18n/useTranslation';
 
 const AdsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -42,6 +43,7 @@ const AdsPage = () => {
     const navigate = useNavigate();
     const addToast = useToastStore(state => state.addToast);
     const queryClient = useQueryClient();
+    const { t, dir } = useTranslation();
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -58,7 +60,7 @@ const AdsPage = () => {
         const endDate = new Date(end);
         const diffTime = Math.abs(endDate - startDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        return `${diffDays} أيام`;
+        return `${diffDays} ${t('common.days')}`;
     };
 
     const formatTime = (timeStr) => {
@@ -66,7 +68,7 @@ const AdsPage = () => {
         const parts = timeStr.split(':');
         if (parts.length >= 2) {
             const h = parseInt(parts[0]);
-            const ampm = h >= 12 ? 'م' : 'ص';
+            const ampm = h >= 12 ? t('ads.pm') : t('ads.am');
             const h12 = h % 12 || 12;
             return `${h12}:${parts[1]} ${ampm}`;
         }
@@ -100,12 +102,12 @@ const AdsPage = () => {
     };
 
     const statusTabs = [
-        { key: 'all', label: 'كافة الحملات' },
-        { key: 'Active', label: 'تبث حالياً (نشط)' },
-        { key: 'Pending', label: 'تنتظر الموافقة' },
-        { key: 'waiting_payment', label: 'معلقة مالياً' },
-        { key: 'Paused', label: 'تمت المقاطعة' },
-        { key: 'Rejected', label: 'مرفوضة رقابياً' },
+        { key: 'all', label: t('ads.tab_all_campaigns') },
+        { key: 'Active', label: t('ads.tab_active') },
+        { key: 'Pending', label: t('ads.tab_pending_approval') },
+        { key: 'waiting_payment', label: t('ads.tab_waiting_payment') },
+        { key: 'Paused', label: t('ads.tab_paused') },
+        { key: 'Rejected', label: t('ads.tab_rejected') },
     ];
 
     const stats = globalStats;
@@ -116,7 +118,7 @@ const AdsPage = () => {
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D1FAE5] text-[#059669] border border-[#A7F3D0] text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#059669]"></span>
-                        نشط
+                        {t('ads.status_active')}
                     </span>
                 );
             case 'Pending':
@@ -124,21 +126,21 @@ const AdsPage = () => {
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span>
-                        {status === 'Pending' ? 'تنتظر الاعتماد' : 'بانتظار الدفع'}
+                        {status === 'Pending' ? t('ads.status_pending') : t('ads.status_waiting_payment')}
                     </span>
                 );
             case 'Paused':
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dce2f7] text-[#434655] border border-[#c3c6d7] text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#737686]"></span>
-                        معلق
+                        {t('ads.status_paused')}
                     </span>
                 );
             case 'Rejected':
                 return (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffdad6] text-[#ba1a1a] border border-[#ba1a1a]/20 text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
-                        مرفوض
+                        {t('ads.status_rejected')}
                     </span>
                 );
             default:
@@ -152,31 +154,31 @@ const AdsPage = () => {
     };
 
     return (
-        <div className="flex-1 overflow-y-auto" dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <div className="flex-1 overflow-y-auto" dir={dir} style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             {/* Page Header */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
                         <Megaphone className="text-[#004ac6] w-8 h-8 md:w-[36px] md:h-[36px]" />
                         <h1 className="text-2xl md:text-3xl font-semibold text-[#141b2b] flex items-center gap-3">
-                            المركز الإعلاني المباشر
+                            {t('ads.live_ad_center')}
                             <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-medium border border-emerald-100">
                                 <span className="relative flex h-2 w-2">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
-                                مباشر
+                                {t('ads.live')}
                             </div>
                         </h1>
                     </div>
-                    <p className="text-base text-[#434655]">مراقبة ومراجعة وتوجيه جميع الحملات الإعلانية النشطة والمتوقفة ضمن الشبكة.</p>
+                    <p className="text-base text-[#434655]">{t('ads.live_ad_desc')}</p>
                 </div>
                 {can('create_campaigns') && (
                     <div className="flex items-center gap-[12px]">
                         <button
                             onClick={handleRefresh}
                             disabled={isRefreshing}
-                            title="تحديث البيانات"
+                            title={t('common.refresh')}
                             className="w-[48px] h-[48px] flex items-center justify-center rounded-lg bg-white text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm"
                         >
                             <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
@@ -184,7 +186,7 @@ const AdsPage = () => {
                         <button onClick={() => navigate('/dashboard/ads/create')}
                             className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
                             <Plus className="w-5 h-5" />
-                            إطلاق حملة جديدة
+                            {t('ads.start_new_campaign')}
                         </button>
                     </div>
                 )}
@@ -197,7 +199,7 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#f1f3ff] flex items-center justify-center mb-4">
                         <Layers className="text-[#004ac6] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">إجمالي المعاملات</p>
+                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.total_transactions')}</p>
                     <h3 className="text-5xl font-bold text-[#141b2b]">{stats.total}</h3>
                 </div>
 
@@ -206,7 +208,7 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
                         <Activity className="text-[#0284C7] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">يتم بثها حالياً</p>
+                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.currently_broadcasting')}</p>
                     <h3 className="text-5xl font-bold text-[#141b2b]">{stats.active}</h3>
                 </div>
 
@@ -215,7 +217,7 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center mb-4">
                         <Clock className="text-[#D97706] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">تنتظر الاعتماد</p>
+                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.pending_approval_short')}</p>
                     <h3 className="text-5xl font-bold text-[#141b2b]">{stats.pending}</h3>
                 </div>
 
@@ -224,7 +226,7 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#ffdad6] flex items-center justify-center mb-4">
                         <Ban className="text-[#ba1a1a] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">إعلانات مرفوضة</p>
+                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.rejected_ads')}</p>
                     <h3 className="text-5xl font-bold text-[#141b2b]">{stats.rejected}</h3>
                 </div>
 
@@ -233,7 +235,7 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#dce2f7] flex items-center justify-center mb-4">
                         <PauseCircle className="text-[#434655] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">حملات متوقفة</p>
+                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.paused_campaigns')}</p>
                     <h3 className="text-5xl font-bold text-[#141b2b]">{stats.paused}</h3>
                 </div>
             </div>
@@ -252,7 +254,7 @@ const AdsPage = () => {
                 <div className="relative w-full lg:w-80">
                     <input 
                         type="text" 
-                        placeholder="ابحث عن إعلان..." 
+                        placeholder={t('dashboard.search_ads')} 
                         value={searchTerm}
                         onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                         className="w-full pr-10 pl-4 py-2 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:border-[#004ac6] focus:ring-1 focus:ring-[#004ac6] transition-colors"
@@ -271,16 +273,16 @@ const AdsPage = () => {
                     <table className="w-full text-right font-sans">
                         <thead>
                             <tr className="bg-surface-container-low border-b border-border-color">
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">العنوان</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">المعلن</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">الحالة</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">التكلفة</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">الشاشة المستهدفة</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">المدة</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">الحجم</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">من</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">إلى</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">إجراءات</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.ad_title')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.advertiser')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.publish_status')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.total_cost')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.target_screen')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.duration')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.size')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.from')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.to')}</th>
+                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-outline-variant/30">
@@ -291,8 +293,8 @@ const AdsPage = () => {
                                             <div className="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-5 border border-outline-variant">
                                                 <Megaphone className="w-8 h-8 text-outline" />
                                             </div>
-                                            <h4 className="font-title-lg text-title-lg text-on-background font-bold mb-2">لا توجد حملات مسجلة هنا</h4>
-                                            <p className="font-body-md text-body-md text-on-surface-variant">حاول تغيير الفلاتر الحالية للبحث، أو ابدأ بإطلاق حملتك الإعلانية.</p>
+                                            <h4 className="font-title-lg text-title-lg text-on-background font-bold mb-2">{t('ads.no_ads')}</h4>
+                                            <p className="font-body-md text-body-md text-on-surface-variant">{t('dashboard.try_changing_filters')}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -303,7 +305,7 @@ const AdsPage = () => {
                                             <span className="font-label-lg text-label-lg text-on-background font-bold whitespace-nowrap">{row.title}</span>
                                         </td>
                                         <td className="py-2 px-3">
-                                            <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{row.advertiser?.full_name || 'غير محدد'}</span>
+                                            <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{row.advertiser?.full_name || t('common.unspecified')}</span>
                                         </td>
                                         <td className="py-2 px-3 text-center">
                                             {renderStatusBadge(row.status)}
@@ -344,20 +346,20 @@ const AdsPage = () => {
                                             <div className="flex items-center justify-center gap-1.5 flex-nowrap w-max mx-auto">
                                                 {/* عرض التفاصيل (Eye) */}
                                                 <button onClick={(e) => { e.stopPropagation(); setDetailsModal({ open: true, ad: row }) }}
-                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary-container hover:border-primary transition-all bg-surface shadow-sm group/btn" title="استعراض التفاصيل">
+                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary-container hover:border-primary transition-all bg-surface shadow-sm group/btn" title={t('ads.view_details')}>
                                                     <Eye className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                 </button>
 
                                                 {/* فاتورة (Invoice) */}
                                                 <button onClick={(e) => { e.stopPropagation(); setInvoiceModal({ open: true, ad: row }) }}
-                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-blue-700 hover:bg-blue-100 hover:border-blue-500 transition-all bg-surface shadow-sm group/btn" title="عرض الفاتورة">
+                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-blue-700 hover:bg-blue-100 hover:border-blue-500 transition-all bg-surface shadow-sm group/btn" title={t('ads.view_invoice')}>
                                                     <Layers className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                 </button>
 
                                                 {/* أوامر الرقابة (المراجعة المركزية بدلاً من القبول/الرفض المباشر) */}
                                                 {can('approve_ads') && row.status === 'Pending' && (
                                                     <button onClick={(e) => { e.stopPropagation(); setReviewModal({ open: true, ad: row }) }}
-                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-primary/30 flex items-center justify-center text-primary hover:text-white hover:bg-primary transition-all bg-primary/10 shadow-sm group/btn" title="مراجعة واعتماد">
+                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-primary/30 flex items-center justify-center text-primary hover:text-white hover:bg-primary transition-all bg-primary/10 shadow-sm group/btn" title={t('ads.review_and_approve')}>
                                                         <PlayCircle className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                     </button>
                                                 )}
@@ -365,7 +367,7 @@ const AdsPage = () => {
                                                 {/* تفعيل مباشر للمدير إذا كان بانتظار الدفع (تخطي الدفع) */}
                                                 {can('approve_ads') && row.status === 'waiting_payment' && (
                                                     <button onClick={(e) => { e.stopPropagation(); setApproveModal({ open: true, ad: row, action: 'Active' }) }}
-                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500 transition-all bg-surface shadow-sm group/btn" title="تفعيل فوري (تخطي الدفع)">
+                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-emerald-700 hover:bg-emerald-100 hover:border-emerald-500 transition-all bg-surface shadow-sm group/btn" title={t('ads.activate_now_skip_payment')}>
                                                         <PlayCircle className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                     </button>
                                                 )}
@@ -373,14 +375,14 @@ const AdsPage = () => {
                                                 {/* أوامر الإيقاف والاستئناف */}
                                                 {(can('approve_ads') || can('manage_all')) && row.status === 'Active' && (
                                                     <button onClick={(e) => { e.stopPropagation(); setApproveModal({ open: true, ad: row, action: 'Paused' }) }}
-                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-amber-700 hover:bg-amber-100 hover:border-amber-500 transition-all bg-surface shadow-sm group/btn" title="إيقاف مؤقت">
+                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-amber-700 hover:bg-amber-100 hover:border-amber-500 transition-all bg-surface shadow-sm group/btn" title={t('ads.pause')}>
                                                         <PauseCircle className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                     </button>
                                                 )}
 
                                                 {(can('approve_ads') || can('manage_all')) && row.status === 'Paused' && (
                                                     <button onClick={(e) => { e.stopPropagation(); setApproveModal({ open: true, ad: row, action: 'Active' }) }}
-                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary-container hover:border-primary transition-all bg-surface shadow-sm group/btn" title="استئناف">
+                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary-container hover:border-primary transition-all bg-surface shadow-sm group/btn" title={t('ads.resume')}>
                                                         <PlayCircle className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                     </button>
                                                 )}
@@ -388,14 +390,14 @@ const AdsPage = () => {
                                                 {/* الدفع (Stripe) */}
                                                 {(isAdvertiser || isAdmin) && row.status === 'waiting_payment' && (
                                                     <button onClick={(e) => { e.stopPropagation(); setStripeModal({ open: true, ad: row }) }}
-                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-border-color flex items-center justify-center text-[#8B5CF6] hover:bg-[#8B5CF6]/10 hover:border-[#8B5CF6] transition-all bg-surface shadow-sm group/btn" title="سداد (Stripe)">
+                                                        className="w-9 h-9 flex-shrink-0 rounded-xl border border-border-color flex items-center justify-center text-[#8B5CF6] hover:bg-[#8B5CF6]/10 hover:border-[#8B5CF6] transition-all bg-surface shadow-sm group/btn" title={t('ads.pay_with_stripe')}>
                                                         <CreditCard className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                     </button>
                                                 )}
 
                                                 {/* الحذف النهائي */}
                                                 <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.ad_id) }}
-                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error-container hover:border-error transition-all bg-surface shadow-sm group/btn" title="حذف">
+                                                    className="w-9 h-9 flex-shrink-0 rounded-xl border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error-container hover:border-error transition-all bg-surface shadow-sm group/btn" title={t('common.delete')}>
                                                     <Trash2 className="w-[18px] h-[18px] transition-transform group-hover/btn:scale-110" />
                                                 </button>
                                             </div>
@@ -411,7 +413,7 @@ const AdsPage = () => {
                 {pagination && pagination.last_page > 1 && (
                     <div className="flex items-center justify-between px-6 py-4 border-t border-outline-variant bg-surface-container-lowest">
                         <span className="text-sm text-on-surface-variant font-body-md">
-                            صفحة {pagination.current_page} من {pagination.last_page} ({pagination.total} إعلان)
+                            {t('common.page')} {pagination.current_page} {t('common.of')} {pagination.last_page} ({pagination.total} {t('ads.ads_count')})
                         </span>
                         <div className="flex items-center gap-2">
                             <button
@@ -419,14 +421,14 @@ const AdsPage = () => {
                                 disabled={pagination.current_page === 1}
                                 className="px-4 py-2 text-sm font-label-md text-primary bg-primary-container/20 rounded-lg hover:bg-primary-container/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                السابق
+                                {t('common.previous')}
                             </button>
                             <button
                                 onClick={() => setCurrentPage(p => Math.min(pagination.last_page, p + 1))}
                                 disabled={pagination.current_page === pagination.last_page}
                                 className="px-4 py-2 text-sm font-label-md text-primary bg-primary-container/20 rounded-lg hover:bg-primary-container/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                التالي
+                                {t('common.next')}
                             </button>
                         </div>
                     </div>
@@ -435,53 +437,53 @@ const AdsPage = () => {
 
             {/* Approve/Reject Modal */}
             <Modal isOpen={approveModal.open} onClose={() => { setApproveModal({ open: false, ad: null, action: '' }); setRejectReason(''); }}
-                title={approveModal.action === 'Active' ? 'الموافقة وتفعيل الحملة فوراً' : approveModal.action === 'waiting_payment' ? 'اعتماد المحتوى وطلب الدفع' : approveModal.action === 'Paused' ? 'إيقاف البث مؤقتاً' : 'قرارات الرقابة (رفض الإعلان)'}>
-                <div className="space-y-6 font-sans" dir="rtl">
+                title={approveModal.action === 'Active' ? t('ads.modal_approve_activate') : approveModal.action === 'waiting_payment' ? t('ads.modal_approve_request_payment') : approveModal.action === 'Paused' ? t('ads.modal_pause_ad') : t('ads.modal_reject_ad')}>
+                <div className="space-y-6 font-sans" dir={dir}>
                     <div className={`p-5 rounded-2xl border flex gap-4 ${approveModal.action === 'Active' || approveModal.action === 'waiting_payment' ? 'bg-emerald-50 border-emerald-200' : approveModal.action === 'Paused' ? 'bg-amber-50 border-amber-200' : 'bg-error-container border-error/20'}`}>
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${approveModal.action === 'Active' || approveModal.action === 'waiting_payment' ? 'bg-emerald-100 text-emerald-600' : approveModal.action === 'Paused' ? 'bg-amber-100 text-amber-600' : 'bg-error text-white'}`}>
                             {approveModal.action === 'Active' || approveModal.action === 'waiting_payment' ? <CheckCircle className="w-5 h-5" /> : approveModal.action === 'Paused' ? <PauseCircle className="w-5 h-5" /> : <Ban className="w-5 h-5" />}
                         </div>
                         <div>
                             <span className={`block font-label-lg text-label-lg mb-1 ${approveModal.action === 'Active' || approveModal.action === 'waiting_payment' ? 'text-emerald-700' : approveModal.action === 'Paused' ? 'text-amber-700' : 'text-error'}`}>
-                                إقرار نهائي للإجراء
+                                {t('ads.final_action_conf')}
                             </span>
                             <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
                                 {approveModal.action === 'waiting_payment'
-                                    ? `أنت على وشك الموافقة على محتوى الحملة "${approveModal.ad?.title}". سيتم إرسال إشعار للمعلن لكي يقوم بعملية الدفع.`
+                                    ? t('ads.waiting_payment_desc', { title: approveModal.ad?.title })
                                     : approveModal.action === 'Active'
-                                        ? `أنت على وشك اعتماد الحملة "${approveModal.ad?.title}" وبدء البث الفوري لها على الشاشات (تخطي الدفع).`
+                                        ? t('ads.active_desc', { title: approveModal.ad?.title })
                                         : approveModal.action === 'Paused'
-                                            ? `هل أنت متأكد من إيقاف البث مؤقتاً للحملة "${approveModal.ad?.title}"؟ لن يتم عرضها على الشاشات حتى استئنافها.`
-                                            : `سيتم إرجاع حملة "${approveModal.ad?.title}" للمعلن نظراً لوجود تجاوزات. يرجى توضيحها أدناه بوضوح.`}
+                                            ? t('ads.pause_desc', { title: approveModal.ad?.title })
+                                            : t('ads.reject_desc', { title: approveModal.ad?.title })}
                             </p>
                         </div>
                     </div>
 
                     {approveModal.action === 'Rejected' && (
                         <div className="space-y-2">
-                            <label className="font-label-md text-label-md text-on-surface block px-1">سبب تعليق وإيقاف الحملة رقابياً <span className="text-error">*</span></label>
-                            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="مثال: التصميم يخالف الشروط والأحكام الخاصة بالمحتوى..."
+                            <label className="font-label-md text-label-md text-on-surface block px-1">{t('ads.reject_reason')} <span className="text-error">*</span></label>
+                            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder={t('ads.reject_placeholder')}
                                 className="w-full bg-surface border border-outline-variant rounded-xl py-3.5 px-4 font-body-md text-body-md text-on-background placeholder-outline focus:outline-none focus:ring-1 focus:ring-error focus:border-error transition-all min-h-[120px] resize-none" required />
                         </div>
                     )}
 
                     <button onClick={handleStatusChange}
                         className={`w-full font-label-lg text-label-lg py-4 rounded-xl transition-all shadow-sm ${approveModal.action === 'Active' || approveModal.action === 'waiting_payment' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : approveModal.action === 'Paused' ? 'bg-amber-600 hover:bg-amber-700 text-white' : 'bg-error hover:bg-error/90 text-on-error'}`}>
-                        {approveModal.action === 'waiting_payment' ? 'اعتماد المحتوى وطلب الدفع' : approveModal.action === 'Active' ? 'اعتماد العرض الآن' : approveModal.action === 'Paused' ? 'تأكيد الإيقاف' : 'إصدار قرار الرفض'}
+                        {approveModal.action === 'waiting_payment' ? t('ads.approve_and_request_payment') : approveModal.action === 'Active' ? t('ads.approve_now') : approveModal.action === 'Paused' ? t('ads.confirm_pause') : t('ads.issue_rejection')}
                     </button>
                 </div>
             </Modal>
 
             {/* View Details Modal */}
-            <Modal isOpen={detailsModal.open} onClose={() => setDetailsModal({ open: false, ad: null })} title="البطاقة التعريفية للحملة">
+            <Modal isOpen={detailsModal.open} onClose={() => setDetailsModal({ open: false, ad: null })} title={t('ads.campaign_identity_card')}>
                 {detailsModal.ad && (
-                    <div className="space-y-6 font-sans bg-surface" dir="rtl">
+                    <div className="space-y-6 font-sans bg-surface" dir={dir}>
                         <div className="flex items-start justify-between bg-surface-container-lowest border border-outline-variant p-5 rounded-2xl shadow-sm">
                             <div className="space-y-1.5 flex-1 pr-2">
                                 <h2 className="font-title-lg text-title-lg text-on-background font-bold">{detailsModal.ad.title}</h2>
                                 <div className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
                                     <User className="w-4 h-4" />
-                                    <span>{detailsModal.ad.advertiser?.full_name || 'غير معروف'}</span>
+                                    <span>{detailsModal.ad.advertiser?.full_name || t('common.unspecified')}</span>
                                 </div>
                             </div>
                             {renderStatusBadge(detailsModal.ad.status)}
@@ -491,7 +493,7 @@ const AdsPage = () => {
                             <div className="bg-error-container p-4 rounded-2xl border border-error/20 flex gap-3 shadow-inner">
                                 <Ban className="w-5 h-5 text-error shrink-0 mt-0.5" />
                                 <div>
-                                    <span className="block font-label-sm text-label-sm text-error uppercase tracking-wider mb-1">رسالة الإدارة الرقابية</span>
+                                    <span className="block font-label-sm text-label-sm text-error uppercase tracking-wider mb-1">{t('ads.rejection_message')}</span>
                                     <p className="font-body-sm text-body-sm text-on-error-container leading-relaxed">{detailsModal.ad.rejection_reason}</p>
                                 </div>
                             </div>
@@ -499,21 +501,15 @@ const AdsPage = () => {
 
                         <div className="grid grid-cols-2 gap-4 bg-surface-container-low p-5 rounded-2xl border border-outline-variant">
                             <div className="space-y-1.5">
-                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">الميزانية المرصودة</span>
+                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">{t('ads.allocated_budget')}</span>
                                 <span className="font-title-md text-title-md text-primary font-black flex items-center gap-1">
                                     <DollarSign className="w-5 h-5" />
                                     {detailsModal.ad.total_cost || 0}
                                 </span>
                             </div>
+
                             <div className="space-y-1 mt-2">
-                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">معدل البث</span>
-                                <span className="font-body-md text-body-md text-on-background flex items-center gap-1.5 border border-outline-variant/50 bg-surface rounded p-1.5">
-                                    <Activity className="w-4 h-4 text-primary" />
-                                    كل {detailsModal.ad.daily_frequency || '—'} دقيقة
-                                </span>
-                            </div>
-                            <div className="space-y-1 mt-2">
-                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">طول الشريط / المقطع</span>
+                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">{t('ads.media_length')}</span>
                                 <span className="font-body-md text-body-md text-on-background flex items-center gap-1.5 border border-outline-variant/50 bg-surface rounded p-1.5" dir="ltr">
                                     <Clock className="w-4 h-4 text-primary" />
                                     {detailsModal.ad.duration ? `${detailsModal.ad.duration}s` : '—'}
@@ -526,7 +522,7 @@ const AdsPage = () => {
                                         <div className="w-6 h-6 rounded-md bg-secondary/10 text-secondary flex items-center justify-center">
                                             <Calendar className="w-3.5 h-3.5" />
                                         </div>
-                                        تاريخ الانطلاق
+                                        {t('ads.start_date')}
                                     </span>
                                     <span className="font-body-lg text-body-lg text-on-background font-bold block pl-8" dir="ltr">
                                         {detailsModal.ad.start_date || '—'} <span className="text-sm font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.start_time)}</span>
@@ -537,7 +533,7 @@ const AdsPage = () => {
                                         <div className="w-6 h-6 rounded-md bg-error/10 text-error flex items-center justify-center">
                                             <Calendar className="w-3.5 h-3.5" />
                                         </div>
-                                        تاريخ التوقف
+                                        {t('ads.end_date')}
                                     </span>
                                     <span className="font-body-lg text-body-lg text-on-background font-bold block pl-8" dir="ltr">
                                         {detailsModal.ad.end_date || '—'} <span className="text-sm font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.end_time)}</span>
@@ -548,14 +544,14 @@ const AdsPage = () => {
 
                         <button onClick={() => setDetailsModal({ open: false, ad: null })}
                             className="w-full mt-4 bg-surface border border-outline text-on-surface hover:bg-surface-container hover:text-primary font-label-lg text-label-lg py-3.5 rounded-xl shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary">
-                            إغلاق البطاقة
+                            {t('common.close_card')}
                         </button>
                     </div>
                 )}
             </Modal>
 
             <ConfirmDialog isOpen={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={handleDelete}
-                title="حذف الحملة الإعلانية" message="هل أنت متأكد من رغبتك في حذف هذا الإعلان من سجلات النظام نهائياً؟" confirmText="نعم، موافق على الإتلاف" />
+                title={t('ads.delete_campaign')} message={t('ads.delete_campaign_msg')} confirmText={t('common.yes_confirm_deletion')} />
 
             {/* Pagination Controls */}
             {pagination.last_page > 1 && (
@@ -565,11 +561,11 @@ const AdsPage = () => {
                         disabled={currentPage === 1}
                         className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        السابق
+                        {t('common.previous')}
                     </button>
                     
                     <span className="text-sm text-gray-600 px-4">
-                        صفحة {currentPage} من {pagination.last_page}
+                        {t('common.page')} {currentPage} {t('common.of')} {pagination.last_page}
                     </span>
 
                     <button
@@ -577,7 +573,7 @@ const AdsPage = () => {
                         disabled={currentPage === pagination.last_page}
                         className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        التالي
+                        {t('common.next')}
                     </button>
                 </div>
             )}

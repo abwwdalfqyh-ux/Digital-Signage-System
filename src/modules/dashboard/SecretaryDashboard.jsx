@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Stitch colour tokens ─── */
 const S = {
@@ -72,6 +73,7 @@ const SecretaryDashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const addToast = useToastStore(state => state.addToast);
+    const { t, dir } = useTranslation();
     const navigate = useNavigate();
 
     const fetchData = async (silent = false) => {
@@ -80,7 +82,7 @@ const SecretaryDashboard = () => {
             const res = await axiosClient.get('/dashboard/secretary-overview');
             setData(res.data.data || res.data);
         } catch (e) {
-            if (!silent) addToast('حدث خطأ أثناء جلب إحصائيات السكرتير', 'error');
+            if (!silent) addToast(t('common.error'), 'error');
             console.error(e);
         } finally {
             if (!silent) setLoading(false);
@@ -104,7 +106,7 @@ const SecretaryDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-surface p-4 sm:p-6 lg:p-8 font-sans" dir="rtl">
+        <div className="min-h-screen bg-surface p-4 sm:p-6 lg:p-8 font-sans" dir={dir}>
             <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8">
                 
                 {/* Header */}
@@ -115,7 +117,7 @@ const SecretaryDashboard = () => {
                             animate={{ opacity: 1, x: 0 }}
                             className="font-display-md text-on-surface mb-2"
                         >
-                            نظرة عامة (العمليات)
+                            {t('dashboard.overview')}
                         </motion.h1>
                         <motion.p
                             initial={{ opacity: 0 }}
@@ -124,7 +126,7 @@ const SecretaryDashboard = () => {
                             className="font-body-md text-on-surface-variant flex items-center gap-2"
                         >
                             <ShieldCheck size={18} className="text-primary" />
-                            مرحباً بك في لوحة تحكم السكرتير.
+                            {t('dashboard.welcome_secretary')}
                         </motion.p>
                     </div>
 
@@ -137,14 +139,14 @@ const SecretaryDashboard = () => {
                         className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-on-surface-variant font-label-md transition-colors bg-white hover:bg-surface-container hover:text-primary border border-outline-variant shadow-sm w-full sm:w-auto"
                     >
                         <RefreshCw size={18} />
-                        <span>تحديث</span>
+                        <span>{t('common.refresh')}</span>
                     </motion.button>
                 </div>
 
                 {/* KPI Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                     <KpiCard
-                        label="إعلانات بانتظار الاعتماد"
+                        label={t('dashboard.pending_ads')}
                         value={data?.pending_ads_count || 0}
                         iconBg="#fff3e0"
                         iconColor="#ea580c"
@@ -154,7 +156,7 @@ const SecretaryDashboard = () => {
                         onClick={() => navigate('/dashboard/ads')}
                     />
                     <KpiCard
-                        label="إيصالات بانتظار الاعتماد"
+                        label={t('dashboard.pending_receipts')}
                         value={data?.pending_payments_count || 0}
                         iconBg="#e0f2fe"
                         iconColor="#0284c7"
@@ -164,7 +166,7 @@ const SecretaryDashboard = () => {
                         onClick={() => navigate('/dashboard/payment-ops')}
                     />
                     <KpiCard
-                        label="شاشات منقطعة/خارج الخدمة"
+                        label={t('dashboard.offline_screens_count')}
                         value={data?.offline_screens_count || 0}
                         iconBg="#fee2e2"
                         iconColor="#dc2626"
@@ -174,7 +176,7 @@ const SecretaryDashboard = () => {
                         onClick={() => navigate('/dashboard/screens')}
                     />
                     <KpiCard
-                        label="إجمالي الإعلانات"
+                        label={t('dashboard.total_ads')}
                         value={data?.total_ads || 0}
                         iconBg="#e0e7ff"
                         iconColor="#4f46e5"
@@ -196,15 +198,15 @@ const SecretaryDashboard = () => {
                         <div className="w-10 h-10 rounded-xl bg-primary-container/10 flex items-center justify-center text-primary">
                             <Users size={20} />
                         </div>
-                        <h2 className="font-title-lg text-on-surface">نظام الدعم الفني والتذاكر</h2>
+                        <h2 className="font-title-lg text-on-surface">{t('dashboard.support_system')}</h2>
                     </div>
                     <div className="flex flex-col items-center justify-center py-12 px-4 text-center border-2 border-dashed border-outline-variant/30 rounded-2xl bg-surface-container-lowest">
                         <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-4">
                             <AlertCircle className="text-on-surface-variant w-8 h-8 opacity-50" />
                         </div>
-                        <h3 className="font-title-md text-on-surface mb-2">النظام قيد التطوير</h3>
+                        <h3 className="font-title-md text-on-surface mb-2">{t('dashboard.system_under_dev')}</h3>
                         <p className="font-body-md text-on-surface-variant max-w-md">
-                            واجهة التذاكر والدعم الفني سيتم توفيرها قريباً لتتمكن من استقبال استفسارات المعلنين وملاك الشاشات بشكل مباشر.
+                            {t('dashboard.ticket_system_soon')}
                         </p>
                     </div>
                 </motion.div>

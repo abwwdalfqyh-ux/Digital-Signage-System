@@ -1,6 +1,10 @@
 import React from 'react';
 
-const DataTable = ({ columns, data, loading, onRowClick, emptyMessage = 'لا توجد بيانات لعرضها' }) => {
+import useTranslation from '../../i18n/useTranslation'; // 
+
+const DataTable = ({ columns, data, loading, onRowClick, emptyMessage }) => {
+    const { t } = useTranslation();
+    const finalEmptyMessage = emptyMessage || t('common.no_data_to_display');
     if (loading) {
         return (
             <div className="flex justify-center p-8">
@@ -12,7 +16,7 @@ const DataTable = ({ columns, data, loading, onRowClick, emptyMessage = 'لا ت
     if (!data || data.length === 0) {
         return (
             <div className="text-center p-8 text-gray-500 font-bold bg-white rounded-lg border-[2.5px] border-[var(--color-dark-turquoise)]">
-                {emptyMessage}
+                {finalEmptyMessage}
             </div>
         );
     }

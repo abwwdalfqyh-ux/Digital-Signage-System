@@ -6,8 +6,10 @@ import useToastStore from '../../store/useToastStore';
 import Modal from '../../shared/components/Modal';
 import ConfirmDialog from '../../shared/components/ConfirmDialog';
 import usePermission from '../../hooks/usePermission';
+import useTranslation from '../../i18n/useTranslation';
 
 const PaymentMethodsPage = () => {
+    const { t, dir } = useTranslation();
     const addToast = useToastStore(state => state.addToast);
     const [methods, setMethods] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -26,10 +28,10 @@ const PaymentMethodsPage = () => {
     const handleTestConnections = () => {
         setIsActionMenuOpen(false);
         setIsTestingConnections(true);
-        addToast('جاري فحص الاتصال وتأكيد جاهزية البوابات الفعالة...', 'info');
+        addToast(t('admin.testing_gateways'), 'info');
         setTimeout(() => {
             setIsTestingConnections(false);
-            addToast('نجاح الاختبار: جميع بوابات الدفع الفعالة تستجيب بشكل صحيح', 'success');
+            addToast(t('admin.testing_gateways_success'), 'success');
         }, 1500);
     };
 
@@ -38,7 +40,7 @@ const PaymentMethodsPage = () => {
         setIsSyncing(true);
         await fetchMethods();
         setIsSyncing(false);
-        addToast('تمت إعادة المزامنة الكلية للبيانات بنجاح', 'success');
+        addToast(t('admin.sync_success'), 'success');
     };
 
     const handleExportData = () => {
@@ -60,7 +62,7 @@ const PaymentMethodsPage = () => {
         a.download = `Secure_Payment_Config_${new Date().getTime()}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        addToast('تم تصدير ملف التهيئة المشفر بنجاح', 'success');
+        addToast(t('admin.export_success'), 'success');
     };
 
     const [form, setForm] = useState({
@@ -86,7 +88,7 @@ const PaymentMethodsPage = () => {
                 setMethods(Array.isArray(res.data) ? res.data : Object.values(res.data || {}));
             }
         } catch (error) {
-            addToast('فشل في جلب وسائل الدفع', 'error');
+            addToast(t('admin.fetch_payment_methods_failed'), 'error');
         } finally {
             setIsLoading(false);
         }
@@ -122,8 +124,8 @@ const PaymentMethodsPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.name || !form.account_details) {
-            addToast('يرجى تعبئة الحقول الأساسية', 'warning');
+        if (!form.name.trim() || !form.account_details.trim()) {
+            addToast(t('admin.fill_basic_fields'), 'warning');
             return;
         }
 
@@ -134,13 +136,20 @@ const PaymentMethodsPage = () => {
                 is_active: form.is_active ? 'true' : 'false'
             };
 
+            let res;
             if (editingMethod) {
                 const id = editingMethod.method_id || editingMethod.id;
-                await axiosClient.put(ENDPOINTS.PAYMENT.METHOD(id), payload);
-                addToast('تم تعديل وسيلة الدفع بنجاح', 'success');
+                res = await axiosClient.put(ENDPOINTS.PAYMENT.METHOD(id), payload);
             } else {
-                await axiosClient.post(ENDPOINTS.PAYMENT.METHODS, payload);
-                addToast('تم إضافة وسيلة الدفع بنجاح', 'success');
+                res = await axiosClient.post(ENDPOINTS.PAYMENT.METHODS, payload);
+            }
+            
+            if (res.data.success || res.status === 200 || res.status === 201) {
+                if (editingMethod) {
+                    addToast(t('admin.payment_method_updated'), 'success');
+                } else {
+                    addToast(t('admin.payment_method_added'), 'success');
+                }
             }
             closeModal();
             fetchMethods();
@@ -150,7 +159,7 @@ const PaymentMethodsPage = () => {
                 const firstErr = Object.values(errList)[0][0];
                 addToast(firstErr, 'error');
             } else {
-                addToast(error.response?.data?.message || 'حدث خطأ أثناء حفظ وسيلة الدفع', 'error');
+                addToast(error.response?.data?.message || t('admin.payment_method_save_error'), 'error');
             }
         } finally {
             setIsSubmitting(false);
@@ -161,10 +170,10 @@ const PaymentMethodsPage = () => {
         const { id } = deleteDialog;
         try {
             await axiosClient.delete(ENDPOINTS.PAYMENT.METHOD(id));
-            addToast('تم حذف وسيلة الدفع بنجاح', 'success');
+            addToast(t('admin.payment_method_deleted'), 'success');
             fetchMethods();
         } catch (error) {
-            addToast(error.response?.data?.message || 'فشل حذف وسيلة الدفع', 'error');
+            addToast(error.response?.data?.message || t('admin.payment_method_save_error'), 'error');
         } finally {
             setDeleteDialog({ open: false, id: null });
         }
@@ -182,15 +191,12 @@ const PaymentMethodsPage = () => {
     return (
         <div className="space-y-6 pb-12" dir="rtl">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 mb-2">
-                <div className="flex flex-col">
-                    <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-1 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                            <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
-                        </div>
-                        بوابات الدفع الإلكتروني
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-r-4 border-primary bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant relative overflow-hidden">
+                <div className="relative z-10">
+                    <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-2 flex items-center gap-3">
+                        {t('admin.payment_gateways_title')}
                     </h1>
-                    <p className="text-on-surface-variant font-body-md text-body-md">إدارة قنوات التحصيل المالي وربط واجهات الدفع العالمية بشكل آمن.</p>
+                    <p className="text-on-surface-variant font-body-md text-body-md">{t('admin.payment_gateways_subtitle')}</p>
                 </div>
                 {can('manage_all') && (
                     <button
@@ -198,49 +204,41 @@ const PaymentMethodsPage = () => {
                         className="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow-sm transition-all whitespace-nowrap"
                     >
                         <span className="material-symbols-outlined text-xl">add</span>
-                        تكوين بوابة جديدة
+                        {t('admin.add_new_gateway')}
                     </button>
                 )}
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <div className="bg-surface border border-outline-variant rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
-                    <div>
-                        <p className="font-label-md text-label-md text-on-surface-variant mb-4">إجمالي القنوات</p>
-                        <p className="font-display-lg text-headline-lg text-on-surface font-extrabold">{totalMethods}</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors">
+                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.total_channels')}</p>
+                    <p className="font-display-lg text-headline-lg text-on-surface font-extrabold">{totalMethods}</p>
+                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                         <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
                     </div>
                 </div>
 
-                <div className="bg-surface border border-outline-variant rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
-                    <div>
-                        <p className="font-label-md text-label-md text-on-surface-variant mb-4">القنوات النشطة</p>
-                        <p className="font-display-lg text-headline-lg text-[#16a34a] font-extrabold">{activeMethods}</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-full bg-[#16a34a]/10 flex items-center justify-center text-[#16a34a]">
+                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-success/30 transition-colors">
+                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.active_channels')}</p>
+                    <p className="font-display-lg text-headline-lg text-[#16a34a] font-extrabold">{activeMethods}</p>
+                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-[#16a34a]/10 flex items-center justify-center text-[#16a34a]">
                         <span className="material-symbols-outlined text-2xl">check_circle</span>
                     </div>
                 </div>
 
-                <div className="bg-surface border border-outline-variant rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
-                    <div>
-                        <p className="font-label-md text-label-md text-on-surface-variant mb-4">موقوفة للصيانة</p>
-                        <p className="font-display-lg text-headline-lg text-error font-extrabold">{inactiveMethods}</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error">
+                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-warning/30 transition-colors">
+                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.maintenance_channels')}</p>
+                    <p className="font-display-lg text-headline-lg text-error font-extrabold">{inactiveMethods}</p>
+                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error">
                         <span className="material-symbols-outlined text-2xl">cancel</span>
                     </div>
                 </div>
 
-                <div className="bg-surface border border-outline-variant rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
-                    <div>
-                        <p className="font-label-md text-label-md text-on-surface-variant mb-4">بوابات آلية (API)</p>
-                        <p className="font-display-lg text-headline-lg text-[#4f46e5] font-extrabold">{stripeIntegrations}</p>
-                    </div>
-                    <div className="w-12 h-12 rounded-full bg-[#4f46e5]/10 flex items-center justify-center text-[#4f46e5]">
+                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-secondary/30 transition-colors">
+                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.api_gateways')}</p>
+                    <p className="font-display-lg text-headline-lg text-[#4f46e5] font-extrabold">{stripeIntegrations}</p>
+                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-[#4f46e5]/10 flex items-center justify-center text-[#4f46e5]">
                         <span className="material-symbols-outlined text-2xl">shield</span>
                     </div>
                 </div>
@@ -258,7 +256,7 @@ const PaymentMethodsPage = () => {
                         <button 
                             onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}
                             className={`w-10 h-10 rounded-full transition-colors flex items-center justify-center ${isActionMenuOpen ? 'bg-surface-variant text-on-surface' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50'}`}
-                            title="خيارات متقدمة"
+                            title={t('admin.advanced_options')}
                         >
                             <span className={`material-symbols-outlined ${isSyncing ? 'animate-spin text-primary' : ''}`}>
                                 {isSyncing ? 'refresh' : 'more_vert'}
@@ -276,28 +274,28 @@ const PaymentMethodsPage = () => {
                                         transition={{ duration: 0.15 }}
                                         className="absolute left-0 top-12 min-w-[260px] bg-white rounded-xl border border-outline-variant shadow-lg z-20 py-2 overflow-hidden flex flex-col"
                                     >
-                                        <p className="px-4 py-2 font-label-sm text-xs text-on-surface-variant mb-1 uppercase tracking-wider">عمليات النظام والأمان</p>
+                                        <p className="px-4 py-2 font-label-sm text-xs text-on-surface-variant mb-1 uppercase tracking-wider">{t('admin.system_security_ops')}</p>
                                         
                                         <button onClick={handleTestConnections} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-lowest text-on-surface text-sm font-medium transition-colors text-right w-full">
                                             <span className="material-symbols-outlined text-primary text-[20px]">speed</span>
-                                            اختبار الاتصال الآلي
+                                            {t('admin.auto_test_connection')}
                                         </button>
                                         
                                         <button onClick={() => { setIsActionMenuOpen(false); setIsAuditModalOpen(true); }} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-lowest text-on-surface text-sm font-medium transition-colors text-right w-full">
                                             <span className="material-symbols-outlined text-error text-[20px]">history</span>
-                                            سجل التدقيق الأمني
+                                            {t('admin.security_audit_log')}
                                         </button>
                                         
                                         <button onClick={handleExportData} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-lowest text-on-surface text-sm font-medium transition-colors text-right w-full">
                                             <span className="material-symbols-outlined text-[#16a34a] text-[20px]">download</span>
-                                            تصدير قائمة التهيئة المشفّرة
+                                            {t('admin.export_encrypted_config')}
                                         </button>
                                         
                                         <div className="my-1 border-t border-outline-variant/60"></div>
                                         
                                         <button onClick={handleForceSync} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-lowest text-on-surface text-sm font-medium transition-colors text-right w-full">
                                             <span className="material-symbols-outlined text-on-surface-variant text-[20px]">sync</span>
-                                            فرض إعادة المزامنة
+                                            {t('admin.force_resync')}
                                         </button>
                                     </motion.div>
                                 </>
@@ -315,18 +313,18 @@ const PaymentMethodsPage = () => {
                         <div className="w-16 h-16 bg-surface-container-lowest rounded-full flex items-center justify-center mb-4 border border-outline-variant">
                             <span className="material-symbols-outlined text-outline text-3xl">info</span>
                         </div>
-                        <h4 className="font-headline-md text-headline-md text-on-surface mb-2">لا توجد بوابات تحصيل مسجلة</h4>
-                        <p className="font-body-md text-body-md text-on-surface-variant">قم بإنشاء بوابة جديدة من الزر أعلاه.</p>
+                        <h4 className="font-headline-md text-headline-md text-on-surface mb-2">{t('admin.no_gateways')}</h4>
+                        <p className="font-body-md text-body-md text-on-surface-variant">{t('admin.create_gateway_prompt')}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-right border-collapse">
                             <thead className="bg-surface-container-low border-b border-outline-variant">
                                 <tr>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">الاسم الوصفي</th>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">التفاصيل / التوجيهات</th>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-center">الحالة التشغيلية</th>
-                                    {can('manage_all') && <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-left">إجراءات</th>}
+                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">{t('admin.descriptive_name')}</th>
+                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">{t('admin.details_directions')}</th>
+                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-center">{t('admin.operational_status')}</th>
+                                    {can('manage_all') && <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-left">{t('common.actions')}</th>}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-outline-variant font-body-md text-body-md text-on-surface">
@@ -352,12 +350,12 @@ const PaymentMethodsPage = () => {
                                                 {isActive ? (
                                                     <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] font-bold text-xs tracking-wide">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                                                        نشط ومفعل
+                                                        {t('admin.active_and_enabled')}
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-[#fef2f2] text-[#991b1b] border border-[#fecaca] font-bold text-xs tracking-wide">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]"></span>
-                                                        معطل مؤقتاً
+                                                        {t('admin.temporarily_disabled')}
                                                     </span>
                                                 )}
                                             </td>
@@ -369,11 +367,11 @@ const PaymentMethodsPage = () => {
                                                                 type="button" 
                                                                 onClick={(e) => { 
                                                                     e.stopPropagation(); 
-                                                                    addToast(`جاري فحص اتصال بوابة (${method.name})...`, 'info');
-                                                                    setTimeout(() => addToast('البوابة متصلة وتستجيب بشكل سليم.', 'success'), 1200);
+                                                                    addToast(`${t('admin.testing_gateway_connection')} (${method.name})...`, 'info');
+                                                                    setTimeout(() => addToast(t('admin.gateway_connected'), 'success'), 1200);
                                                                 }} 
                                                                 className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-[#4f46e5]/10 hover:text-[#4f46e5] transition-colors" 
-                                                                title="فحص الاتصال الفردي المباشر"
+                                                                title={t('admin.test_direct_connection')}
                                                             >
                                                                 <span className="material-symbols-outlined text-[18px]">speed</span>
                                                             </button>
@@ -382,7 +380,7 @@ const PaymentMethodsPage = () => {
                                                             type="button" 
                                                             onClick={(e) => { e.stopPropagation(); openModal(method); }} 
                                                             className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors" 
-                                                            title="تعديل"
+                                                            title={t('common.edit')}
                                                         >
                                                             <span className="material-symbols-outlined text-[18px]">edit</span>
                                                         </button>
@@ -390,7 +388,7 @@ const PaymentMethodsPage = () => {
                                                             type="button" 
                                                             onClick={(e) => { e.stopPropagation(); setDeleteDialog({ open: true, id }); }} 
                                                             className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-error/10 hover:text-error transition-colors" 
-                                                            title="حذف"
+                                                            title={t('common.delete')}
                                                         >
                                                             <span className="material-symbols-outlined text-[18px]">delete</span>
                                                         </button>
@@ -410,13 +408,13 @@ const PaymentMethodsPage = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}
-                title={editingMethod ? 'تحديث إعدادات البوابة' : 'تكوين بوابة تحصيل جديدة'}
+                title={editingMethod ? t('admin.update_gateway_settings') : t('admin.configure_new_gateway')}
                 size="md"
             >
                 <form onSubmit={handleSubmit} className="space-y-4 mt-4" dir="rtl">
                     <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm space-y-4">
                         <div>
-                            <label className={labelClass}>تسمية القناة (يظهر للجمهور) <span className="text-error">*</span></label>
+                            <label className={labelClass}>{t('admin.channel_name')} <span className="text-error">*</span></label>
                             <input
                                 type="text"
                                 required
@@ -424,26 +422,26 @@ const PaymentMethodsPage = () => {
                                 value={form.name}
                                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                                 className={inputClass}
-                                placeholder="مثال: الحوالات البنكية المباشرة، Stripe"
+                                placeholder={t('admin.channel_name_placeholder')}
                                 autoFocus
                             />
                         </div>
                         <div>
-                            <label className={labelClass}>إرشادات الدفع (تظهر في الفاتورة) <span className="text-error">*</span></label>
+                            <label className={labelClass}>{t('admin.payment_instructions')} <span className="text-error">*</span></label>
                             <textarea
                                 required
                                 value={form.account_details}
                                 onChange={(e) => setForm({ ...form, account_details: e.target.value })}
                                 className={`${inputClass} resize-none h-24 leading-relaxed`}
-                                placeholder="اكتب تعليمات الإيداع أو أرقام الحسابات المرتبطة هنا..."
+                                placeholder={t('admin.payment_instructions_placeholder')}
                             ></textarea>
                         </div>
                         
                         {/* Status Toggle */}
                         <div className="flex items-center justify-between pt-4 border-t border-outline-variant">
                             <div>
-                                <p className="font-label-md text-label-md text-on-surface">حالة التشغيل</p>
-                                <p className="font-caption text-caption text-on-surface-variant mt-0.5">تفعيل ظهور هذه القناة أثناء عملية الشحن</p>
+                                <p className="font-label-md text-label-md text-on-surface">{t('admin.operational_status')}</p>
+                                <p className="font-caption text-caption text-on-surface-variant mt-0.5">{t('admin.operational_status_hint')}</p>
                             </div>
                             <label className="relative flex items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only peer" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />

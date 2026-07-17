@@ -24,30 +24,31 @@ import { useScreens } from '../../hooks/api/useScreens';
 import echo from '../../core/api/echo';
 import useAuthStore from '../../store/useAuthStore';
 import { useQueryClient } from '@tanstack/react-query';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Status Configs ─────────────────────────────────────────── */
-const STATUS_MAP = {
-    open:        { label: 'مفتوحة',       color: '#3b82f6', bg: 'rgba(59,130,246,0.1)',  Icon: Clock },
-    in_progress: { label: 'قيد المعالجة', color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  Icon: RefreshCw },
-    resolved:    { label: 'محلولة',        color: '#10b981', bg: 'rgba(16,185,129,0.1)',  Icon: CheckCircle },
-    closed:      { label: 'مغلقة',         color: '#6b7280', bg: 'rgba(107,114,128,0.1)', Icon: XCircle },
-};
+const getStatusMap = (t) => ({
+    open:        { label: t('support.status_open'),       color: '#3b82f6', bg: 'rgba(59,130,246,0.1)',  Icon: Clock },
+    in_progress: { label: t('support.status_in_progress'), color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  Icon: RefreshCw },
+    resolved:    { label: t('support.status_resolved'),    color: '#10b981', bg: 'rgba(16,185,129,0.1)',  Icon: CheckCircle },
+    closed:      { label: t('support.status_closed'),      color: '#6b7280', bg: 'rgba(107,114,128,0.1)', Icon: XCircle },
+});
 
 /* ─── Priority Configs ───────────────────────────────────────── */
-const PRIORITY_MAP = {
-    low:    { label: 'منخفضة', color: '#6b7280' },
-    medium: { label: 'متوسطة', color: '#f59e0b' },
-    high:   { label: 'عالية',  color: '#ef4444' },
-    urgent: { label: 'عاجلة',  color: '#dc2626' },
-};
+const getPriorityMap = (t) => ({
+    low:    { label: t('support.priority_low'), color: '#6b7280' },
+    medium: { label: t('support.priority_medium'), color: '#f59e0b' },
+    high:   { label: t('support.priority_high'),  color: '#ef4444' },
+    urgent: { label: t('support.priority_urgent'),  color: '#dc2626' },
+});
 
 /* ─── Category Configs ───────────────────────────────────────── */
-const CATEGORIES = [
-    { value: 'screen_offline',    label: 'شاشة غير متصلة',        Icon: Wifi },
-    { value: 'display_issue',     label: 'مشكلة في العرض',         Icon: Monitor },
-    { value: 'technical_fault',   label: 'عطل تقني',               Icon: Zap },
-    { value: 'billing_query',     label: 'استفسار مالي',            Icon: AlertCircle },
-    { value: 'other',             label: 'أخرى',                   Icon: HelpCircle },
+const getCategories = (t) => [
+    { value: 'screen_offline',    label: t('support.category_screen_offline'),        Icon: Wifi },
+    { value: 'display_issue',     label: t('support.category_display_issue'),         Icon: Monitor },
+    { value: 'technical_fault',   label: t('support.category_technical_fault'),       Icon: Zap },
+    { value: 'billing_query',     label: t('support.category_billing_query'),         Icon: AlertCircle },
+    { value: 'other',             label: t('support.category_other'),                 Icon: HelpCircle },
 ];
 
 /* ─── Skeleton Loader ────────────────────────────────────────── */
@@ -62,10 +63,10 @@ const SkeletonCard = () => (
     </div>
 );
 
-/* ─── Ticket Card ────────────────────────────────────────────── */
 const TicketCard = ({ ticket, onClick }) => {
-    const status  = STATUS_MAP[ticket.status]   || STATUS_MAP.open;
-    const priority = PRIORITY_MAP[ticket.priority] || PRIORITY_MAP.medium;
+    const { t } = useTranslation();
+    const status  = getStatusMap(t)[ticket.status]   || getStatusMap(t).open;
+    const priority = getPriorityMap(t)[ticket.priority] || getPriorityMap(t).medium;
     const StatusIcon = status.Icon;
 
     return (
@@ -95,11 +96,11 @@ const TicketCard = ({ ticket, onClick }) => {
 
             <div className="flex items-center justify-between">
                 <span className="text-xs font-bold" style={{ color: priority.color }}>
-                    ● أولوية {priority.label}
+                    ● {t('support.priority_label_prefix')} {priority.label}
                 </span>
                 {ticket.category && (
                     <span className="text-xs text-[#434655] bg-[#f1f3ff] px-2 py-0.5 rounded-full">
-                        {CATEGORIES.find(c => c.value === ticket.category)?.label || ticket.category}
+                        {getCategories(t).find(c => c.value === ticket.category)?.label || ticket.category}
                     </span>
                 )}
             </div>
@@ -107,8 +108,8 @@ const TicketCard = ({ ticket, onClick }) => {
     );
 };
 
-/* ─── New Ticket Modal ───────────────────────────────────────── */
 const NewTicketModal = ({ onClose, onSuccess }) => {
+    const { t } = useTranslation();
     const [form, setForm] = useState({
         subject: '',
         category: 'screen_offline',
@@ -126,7 +127,7 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!form.subject.trim() || !form.description.trim()) {
-            setError('يرجى ملء جميع الحقول المطلوبة.');
+            setError(t('support.fill_required_fields'));
             return;
         }
         setError('');
@@ -134,7 +135,7 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
             await createTicket(form);
             onSuccess();
         } catch (err) {
-            setError(err.response?.data?.message || 'حدث خطأ أثناء إرسال التذكرة. حاول مرة أخرى.');
+            setError(err.response?.data?.message || t('support.submit_error'));
         }
     };
 
@@ -161,8 +162,8 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                             <Plus className="w-4 h-4 text-[#004ac6]" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-black text-[#141b2b]">تذكرة دعم جديدة</h2>
-                            <p className="text-xs text-[#737686]">أخبرنا بمشكلتك وسنتواصل معك</p>
+                            <h2 className="text-sm font-black text-[#141b2b]">{t('support.new_ticket')}</h2>
+                            <p className="text-xs text-[#737686]">{t('support.tell_us_problem')}</p>
                         </div>
                     </div>
                     <button
@@ -178,7 +179,7 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                     {/* Screen Selection */}
                     <div>
                         <label className="block text-xs font-bold text-[#434655] mb-1.5">
-                            الشاشة المتعلقة بالمشكلة (اختياري)
+                            {t('support.related_screen')}
                         </label>
                         <div className="relative">
                             <select
@@ -186,10 +187,10 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                                 onChange={e => handleChange('screen_id', e.target.value)}
                                 className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
                             >
-                                <option value="" style={{ background: '#ffffff' }}>-- مشكلة عامة / غير محددة --</option>
+                                <option value="" style={{ background: '#ffffff' }}>-- {t('support.general_issue')} --</option>
                                 {screens.map(s => (
                                     <option key={s.screen_id} value={s.screen_id} style={{ background: '#ffffff' }}>
-                                        {s.screen_name} (رقم: {s.screen_id})
+                                        {s.screen_name} ({t('support.screen_number')}: {s.screen_id})
                                     </option>
                                 ))}
                             </select>
@@ -200,11 +201,11 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                     {/* Subject */}
                     <div>
                         <label className="block text-xs font-bold text-[#434655] mb-1.5">
-                            عنوان المشكلة <span className="text-red-400">*</span>
+                            {t('support.issue_title')} <span className="text-red-400">*</span>
                         </label>
                         <input
                             type="text"
-                            placeholder="مثال: شاشة الرياض لا تتصل بالإنترنت"
+                            placeholder={t('support.issue_title_placeholder')}
                             value={form.subject}
                             onChange={e => handleChange('subject', e.target.value)}
                             maxLength={120}
@@ -215,14 +216,14 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                     {/* Category + Priority */}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs font-bold text-[#434655] mb-1.5">نوع المشكلة</label>
+                            <label className="block text-xs font-bold text-[#434655] mb-1.5">{t('support.issue_type')}</label>
                             <div className="relative">
                                 <select
                                     value={form.category}
                                     onChange={e => handleChange('category', e.target.value)}
                                     className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
                                 >
-                                    {CATEGORIES.map(c => (
+                                    {getCategories(t).map(c => (
                                         <option key={c.value} value={c.value} style={{ background: '#ffffff' }}>
                                             {c.label}
                                         </option>
@@ -232,14 +233,14 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-[#434655] mb-1.5">الأولوية</label>
+                            <label className="block text-xs font-bold text-[#434655] mb-1.5">{t('support.priority')}</label>
                             <div className="relative">
                                 <select
                                     value={form.priority}
                                     onChange={e => handleChange('priority', e.target.value)}
                                     className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
                                 >
-                                    {Object.entries(PRIORITY_MAP).map(([val, cfg]) => (
+                                    {Object.entries(getPriorityMap(t)).map(([val, cfg]) => (
                                         <option key={val} value={val} style={{ background: '#ffffff' }}>
                                             {cfg.label}
                                         </option>
@@ -253,10 +254,10 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                     {/* Description */}
                     <div>
                         <label className="block text-xs font-bold text-[#434655] mb-1.5">
-                            وصف المشكلة <span className="text-red-400">*</span>
+                            {t('support.issue_description')} <span className="text-red-400">*</span>
                         </label>
                         <textarea
-                            placeholder="اشرح المشكلة بالتفصيل: متى بدأت؟ ما الشاشة المتأثرة؟ ما الخطوات التي جربتها؟"
+                            placeholder={t('support.issue_description_placeholder')}
                             value={form.description}
                             onChange={e => handleChange('description', e.target.value)}
                             rows={4}
@@ -287,14 +288,14 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                             ) : (
                                 <Send className="w-4 h-4" />
                             )}
-                            {loading ? 'جاري الإرسال...' : 'إرسال التذكرة'}
+                            {loading ? t('support.submitting') : t('support.submit_ticket')}
                         </button>
                         <button
                             type="button"
                             onClick={onClose}
                             className="px-5 py-2.5 bg-[#f1f3ff] hover:bg-[#e9edff] rounded-xl text-sm font-bold text-[#434655] transition-colors"
                         >
-                            إلغاء
+                            {t('common.cancel')}
                         </button>
                     </div>
                 </form>
@@ -303,10 +304,10 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
     );
 };
 
-/* ─── Ticket Detail Drawer ───────────────────────────────────── */
 const TicketDetailDrawer = ({ ticket, onClose }) => {
-    const status   = STATUS_MAP[ticket.status]    || STATUS_MAP.open;
-    const priority = PRIORITY_MAP[ticket.priority] || PRIORITY_MAP.medium;
+    const { t } = useTranslation();
+    const status   = getStatusMap(t)[ticket.status]    || getStatusMap(t).open;
+    const priority = getPriorityMap(t)[ticket.priority] || getPriorityMap(t).medium;
     const StatusIcon = status.Icon;
 
     return (
@@ -350,24 +351,24 @@ const TicketDetailDrawer = ({ ticket, onClose }) => {
                             {status.label}
                         </span>
                         <span className="text-xs font-bold" style={{ color: priority.color }}>
-                            ● أولوية {priority.label}
+                            ● {t('support.priority_label_prefix')} {priority.label}
                         </span>
                         {ticket.category && (
                             <span className="text-xs text-[#434655] bg-[#f1f3ff] px-2 py-1 rounded-full">
-                                {CATEGORIES.find(c => c.value === ticket.category)?.label || ticket.category}
+                                {getCategories(t).find(c => c.value === ticket.category)?.label || ticket.category}
                             </span>
                         )}
                         {ticket.screen && (
                             <span className="text-xs text-[#004ac6] bg-[#e9edff] px-2 py-1 rounded-full flex items-center gap-1">
                                 <Monitor className="w-3 h-3" />
-                                {ticket.screen.screen_name} (رقم: {ticket.screen.screen_id})
+                                {ticket.screen.screen_name} ({t('support.screen_number')}: {ticket.screen.screen_id})
                             </span>
                         )}
                     </div>
 
                     {/* Description */}
                     <div className="bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl p-4">
-                        <p className="text-xs font-bold text-[#737686] mb-2">وصف المشكلة</p>
+                        <p className="text-xs font-bold text-[#737686] mb-2">{t('support.issue_description')}</p>
                         <p className="text-sm text-[#141b2b] leading-relaxed">{ticket.description}</p>
                     </div>
 
@@ -376,7 +377,7 @@ const TicketDetailDrawer = ({ ticket, onClose }) => {
                         <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-2xl p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <MessageSquare className="w-3.5 h-3.5 text-[#004ac6]" />
-                                <p className="text-xs font-bold text-[#004ac6]">رد فريق الدعم</p>
+                                <p className="text-xs font-bold text-[#004ac6]">{t('support.support_reply')}</p>
                             </div>
                             <p className="text-sm text-[#141b2b] leading-relaxed">{ticket.admin_reply}</p>
                         </div>
@@ -384,15 +385,15 @@ const TicketDetailDrawer = ({ ticket, onClose }) => {
 
                     {/* Timeline */}
                     <div>
-                        <p className="text-xs font-bold text-[#737686] mb-3">المعلومات</p>
+                        <p className="text-xs font-bold text-[#737686] mb-3">{t('support.info')}</p>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs">
-                                <span className="text-[#434655]">تاريخ الإنشاء</span>
+                                <span className="text-[#434655]">{t('support.created_at')}</span>
                                 <span className="text-[#434655]">{ticket.created_at_human || ticket.created_at}</span>
                             </div>
                             {ticket.updated_at && ticket.updated_at !== ticket.created_at && (
                                 <div className="flex justify-between text-xs">
-                                    <span className="text-[#434655]">آخر تحديث</span>
+                                    <span className="text-[#434655]">{t('support.last_updated')}</span>
                                     <span className="text-[#434655]">{ticket.updated_at_human || ticket.updated_at}</span>
                                 </div>
                             )}
@@ -405,7 +406,7 @@ const TicketDetailDrawer = ({ ticket, onClose }) => {
                         onClick={onClose}
                         className="w-full py-2.5 bg-[#f1f3ff] hover:bg-[#e9edff] rounded-xl text-sm font-bold text-[#434655] transition-colors"
                     >
-                        إغلاق
+                        {t('common.close')}
                     </button>
                 </div>
             </motion.div>
@@ -426,8 +427,8 @@ const StatCard = ({ label, value, color, delay = 0 }) => (
     </motion.div>
 );
 
-/* ─── Main Page ──────────────────────────────────────────────── */
 const SupportPage = () => {
+    const { t } = useTranslation();
     const { data: tickets = [], isLoading: loading } = useSupportTickets();
     const [showNewModal, setShowNewModal] = useState(false);
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -466,12 +467,12 @@ const SupportPage = () => {
     };
 
     /* Filter Tabs */
-    const FILTERS = [
-        { key: 'all',        label: 'الكل' },
-        { key: 'open',       label: 'مفتوحة' },
-        { key: 'in_progress', label: 'قيد المعالجة' },
-        { key: 'resolved',   label: 'محلولة' },
-        { key: 'closed',     label: 'مغلقة' },
+    const getFilters = (t) => [
+        { key: 'all',        label: t('common.all') },
+        { key: 'open',       label: t('support.status_open') },
+        { key: 'in_progress', label: t('support.status_in_progress') },
+        { key: 'resolved',   label: t('support.status_resolved') },
+        { key: 'closed',     label: t('support.status_closed') },
     ];
 
     const filtered = activeFilter === 'all'
@@ -493,10 +494,10 @@ const SupportPage = () => {
                 <div>
                     <h1 className="text-2xl font-black text-[#141b2b] tracking-tight flex items-center gap-3">
                         <HeadphonesIcon className="w-7 h-7 text-[#004ac6]" />
-                        الدعم والصيانة
+                        {t('support.support_and_maintenance')}
                     </h1>
                     <p className="text-sm text-[#737686] font-bold mt-1">
-                        تتبع تذاكر الدعم الفني لشاشاتك
+                        {t('support.track_support_tickets')}
                     </p>
                 </div>
                 <motion.button
@@ -506,21 +507,21 @@ const SupportPage = () => {
                     className="flex items-center gap-2 px-5 py-2.5 bg-[#004ac6] hover:bg-[#2563eb] rounded-xl text-sm font-black text-white transition-colors shadow-lg shadow-[#004ac6]/20"
                 >
                     <Plus className="w-4 h-4" />
-                    تذكرة جديدة
+                    {t('support.new_ticket_btn')}
                 </motion.button>
             </div>
 
             {/* ── Stats ── */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <StatCard label="إجمالي التذاكر"  value={stats.total}      color="#ffffff"  delay={0}    />
-                <StatCard label="مفتوحة"           value={stats.open}       color="#3b82f6"  delay={0.05} />
-                <StatCard label="قيد المعالجة"    value={stats.inProgress}  color="#f59e0b"  delay={0.1}  />
-                <StatCard label="تم الحل"          value={stats.resolved}    color="#10b981"  delay={0.15} />
+                <StatCard label={t('support.total_tickets')}  value={stats.total}      color="#ffffff"  delay={0}    />
+                <StatCard label={t('support.status_open')}           value={stats.open}       color="#3b82f6"  delay={0.05} />
+                <StatCard label={t('support.status_in_progress')}    value={stats.inProgress}  color="#f59e0b"  delay={0.1}  />
+                <StatCard label={t('support.resolved')}          value={stats.resolved}    color="#10b981"  delay={0.15} />
             </div>
 
             {/* ── Filter Tabs ── */}
             <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {FILTERS.map(f => (
+                {getFilters(t).map(f => (
                     <button
                         key={f.key}
                         onClick={() => setActiveFilter(f.key)}
@@ -554,11 +555,11 @@ const SupportPage = () => {
                     <div className="w-16 h-16 rounded-3xl bg-[#f1f3ff] flex items-center justify-center mb-4">
                         <HeadphonesIcon className="w-8 h-8 text-[#434655]" />
                     </div>
-                    <p className="text-base font-black text-[#737686]">لا توجد تذاكر</p>
+                    <p className="text-base font-black text-[#737686]">{t('support.no_tickets')}</p>
                     <p className="text-xs text-[#434655] mt-1">
                         {activeFilter === 'all'
-                            ? 'لم تقم بفتح أي تذكرة دعم بعد.'
-                            : `لا توجد تذاكر بحالة "${FILTERS.find(f => f.key === activeFilter)?.label}".`}
+                            ? t('support.no_tickets_opened_yet')
+                            : `${t('support.no_tickets_in_status')} "${getFilters(t).find(f => f.key === activeFilter)?.label}".`}
                     </p>
                     {activeFilter === 'all' && (
                         <button
@@ -566,7 +567,7 @@ const SupportPage = () => {
                             className="mt-4 flex items-center gap-2 px-4 py-2 bg-[#004ac6]/20 hover:bg-[#004ac6]/30 border border-indigo-500/30 rounded-xl text-sm font-bold text-[#004ac6] transition-colors"
                         >
                             <Plus className="w-4 h-4" />
-                            افتح أول تذكرة
+                            {t('support.open_first_ticket')}
                         </button>
                     )}
                 </motion.div>

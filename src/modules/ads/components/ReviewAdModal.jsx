@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Clock, HardDrive, FileType, Info, CheckCircle, Ban } from 'lucide-react';
+import useTranslation from '../../../i18n/useTranslation';
 
 const ReviewAdModal = ({ 
     isOpen, 
@@ -11,6 +12,7 @@ const ReviewAdModal = ({
     onRejectSubmit 
 }) => {
     const [rejectReason, setRejectReason] = useState('');
+    const { t, dir } = useTranslation();
 
     if (!isOpen || !ad) return null;
 
@@ -40,7 +42,7 @@ const ReviewAdModal = ({
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                     className="relative w-full max-w-3xl bg-surface-container-lowest rounded-[24px] shadow-2xl overflow-hidden font-sans border border-outline-variant/30 flex flex-col max-h-[90vh]"
-                    dir="rtl"
+                    dir={dir}
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/40 bg-surface-bright/50">
@@ -53,7 +55,7 @@ const ReviewAdModal = ({
                             </button>
                         </div>
                         <h2 className="text-xl font-bold text-on-surface flex-1 text-center pr-8">
-                            مراجعة واعتماد محتوى الحملة الإعلانية
+                            {t('ads.review_approve_campaign')}
                         </h2>
                     </div>
 
@@ -64,13 +66,13 @@ const ReviewAdModal = ({
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-outline-variant/30">
                             <div className="flex items-center gap-6 flex-wrap">
                                 <div>
-                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">عنوان الحملة</span>
+                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">{t('ads.campaign_title')}</span>
                                     <span className="text-lg font-bold text-on-surface">{ad.title}</span>
                                 </div>
                                 <div className="w-[1px] h-8 bg-outline-variant/50 hidden sm:block"></div>
                                 <div>
-                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">المعلن</span>
-                                    <span className="text-lg font-bold text-on-surface">{ad.advertiser?.full_name || 'غير معروف'}</span>
+                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">{t('ads.advertiser')}</span>
+                                    <span className="text-lg font-bold text-on-surface">{ad.advertiser?.full_name || t('common.unspecified')}</span>
                                 </div>
                             </div>
                             
@@ -78,16 +80,16 @@ const ReviewAdModal = ({
                                 {/* Status Badge */}
                                 <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-sm font-bold shadow-sm">
                                     <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse"></span>
-                                    بانتظار الاعتماد
+                                    {t('ads.status_pending')}
                                 </span>
 
                                 {/* Details Button */}
                                 <button 
                                     onClick={onOpenDetails}
-                                    className="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant px-4 py-1.5 rounded-full text-sm font-bold text-primary transition-colors shadow-sm"
+                                    className="flex items center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant px-4 py-1.5 rounded-full text-sm font-bold text-primary transition-colors shadow-sm"
                                 >
                                     <Info className="w-4 h-4" />
-                                    البطاقة التعريفية
+                                    {t('ads.identity card')}
                                 </button>
                             </div>
                         </div>
@@ -111,7 +113,7 @@ const ReviewAdModal = ({
                             ) : (
                                 <div className="text-outline-variant flex flex-col items-center">
                                     <Play className="w-12 h-12 mb-2 opacity-50" />
-                                    <p>لا يوجد ملف ميديا</p>
+                                    <p>{t('ads.no_media_file')}</p>
                                 </div>
                             )}
 
@@ -119,7 +121,7 @@ const ReviewAdModal = ({
                             <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg border border-white/10 pointer-events-none transition-opacity opacity-100 group-hover:opacity-0">
                                 <span className="text-white text-xs font-bold flex items-center gap-2 tracking-wide">
                                     <Play className="w-3 h-3 text-primary-container" />
-                                    مشاهدة مسبقة
+                                    {t('ads.preview')}
                                 </span>
                             </div>
                         </div>
@@ -128,17 +130,17 @@ const ReviewAdModal = ({
                         <div className="flex items-center justify-center gap-6 mt-4 mb-8 text-sm text-on-surface-variant font-medium">
                             <div className="flex items-center gap-1.5">
                                 <FileType className="w-4 h-4 text-primary opacity-80" />
-                                <span>التنسيق: {isVideo ? 'فيديو' : 'صورة'}</span>
+                                <span>{t('ads.format')}: {isVideo ? t('ads.video') : t('ads.image')}</span>
                             </div>
                             <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                             <div className="flex items-center gap-1.5" dir="ltr">
                                 <Clock className="w-4 h-4 text-primary opacity-80" />
-                                <span>المدة: {ad.duration ? `${ad.duration}s` : '—'}</span>
+                                <span>{t('ads.duration')}: {ad.duration ? `${ad.duration}s` : '—'}</span>
                             </div>
                             <div className="w-1 h-1 rounded-full bg-outline-variant"></div>
                             <div className="flex items-center gap-1.5" dir="ltr">
                                 <HardDrive className="w-4 h-4 text-primary opacity-80" />
-                                <span>الحجم: {ad.file_size ? `${ad.file_size}MB` : '—'}</span>
+                                <span>{t('ads.size')}: {ad.file_size ? `${ad.file_size}MB` : '—'}</span>
                             </div>
                         </div>
 
@@ -146,12 +148,12 @@ const ReviewAdModal = ({
                         <div className="space-y-2 bg-error-container/30 p-5 rounded-2xl border border-error/20">
                             <label className="text-sm font-bold text-error block px-1 flex items-center gap-2">
                                 <Ban className="w-4 h-4" />
-                                سبب الرفض (إلزامي في حال الرفض)
+                                {t('ads.reject_reason')} ({t('ads.mandatory_if_rejected')})
                             </label>
                             <textarea 
                                 value={rejectReason}
                                 onChange={(e) => setRejectReason(e.target.value)}
-                                placeholder="اكتب سبب الرفض هنا ليتم توضيحه للمعلن (مثال: محتوى مخالف)..."
+                                placeholder={t('ads.reject_placeholder')}
                                 className="w-full bg-surface-container-lowest border border-error/30 rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-error focus:border-error transition-all resize-none shadow-inner min-h-[80px]"
                             />
                         </div>
@@ -170,14 +172,14 @@ const ReviewAdModal = ({
                             }`}
                         >
                             <Ban className="w-5 h-5" />
-                            رفض الإعلان
+                            {t('ads.reject_ad')}
                         </button>
                         <button 
                             onClick={onApproveClick}
                             className="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-sm flex items-center justify-center gap-2"
                         >
                             <CheckCircle className="w-5 h-5" />
-                            اعتماد الإعلان وطلب الدفع
+                            {t('ads.approve_and_request_payment')}
                         </button>
                     </div>
 

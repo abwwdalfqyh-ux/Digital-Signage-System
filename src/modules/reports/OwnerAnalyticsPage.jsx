@@ -9,6 +9,7 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
 import useAuthStore from '../../store/useAuthStore';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Design tokens ─── */
 const S = {
@@ -40,6 +41,7 @@ const KpiCard = ({
     togglable = false, // ← NEW: enable eye toggle
 }) => {
     const [hidden, setHidden] = useState(false);
+    const { t } = useTranslation();
 
     return (
         <motion.div
@@ -79,7 +81,7 @@ const KpiCard = ({
                 {togglable ? (
                     <button
                         onClick={() => setHidden(h => !h)}
-                        title={hidden ? 'إظهار القيمة' : 'إخفاء القيمة'}
+                        title={hidden ? t('analytics.show_value') : t('analytics.hide_value')}
                         style={{
                             width: 40, height: 40, borderRadius: '50%',
                             background: hidden ? S.surfaceContainerHigh : (iconBg || S.surfaceContainer),
@@ -170,7 +172,7 @@ const KpiCard = ({
                 )}
                 {hidden && (
                     <p className="text-[11px] font-bold mt-2" style={{ color: S.outline }}>
-                        اضغط الأيقونة للإظهار
+                        {t('analytics.click_to_show')}
                     </p>
                 )}
             </div>
@@ -181,6 +183,7 @@ const KpiCard = ({
 
 /* ─── Fill Rate Gauge (SVG Arc) ─── */
 const FillRateGauge = ({ value = 0 }) => {
+    const { t } = useTranslation();
     const pct = Math.min(100, Math.max(0, value));
     const cx = 110, cy = 110, R = 85, strokeW = 18;
     const circumference = Math.PI * R; // half circle
@@ -220,7 +223,7 @@ const FillRateGauge = ({ value = 0 }) => {
                     {pct.toFixed(1)}%
                 </text>
                 <text x={cx} y={cy + 12} textAnchor="middle" fontSize="12" fontWeight="600" fill={S.outline}>
-                    معدل الإشغال
+                    {t('analytics.fill_rate_lbl')}
                 </text>
                 {/* Labels */}
                 <text x={cx - R + 4} y={cy + 22} fontSize="10" fill={S.outline}>0%</text>
@@ -235,7 +238,7 @@ const FillRateGauge = ({ value = 0 }) => {
                 color: pct >= 75 ? S.success : pct >= 40 ? S.warning : S.error,
                 fontSize: 12, fontWeight: 700,
             }}>
-                {pct >= 75 ? '🟢 ممتاز — إشغال عالٍ' : pct >= 40 ? '🟡 متوسط — يمكن التحسين' : '🔴 منخفض — يحتاج اهتمام'}
+                {pct >= 75 ? t('analytics.excellent_fill') : pct >= 40 ? t('analytics.average_fill') : t('analytics.low_fill')}
             </div>
         </div>
     );
@@ -319,6 +322,7 @@ const ImpressionsBarChart = ({ data = [] }) => {
 
 /* ─── Screen Row (table) ─── */
 const ScreenRow = ({ screen, index }) => {
+    const { t } = useTranslation();
     const fillPct = screen.fill_rate || 0;
     const fillColor = fillPct >= 75 ? S.success : fillPct >= 40 ? S.warning : S.error;
     return (
@@ -331,7 +335,7 @@ const ScreenRow = ({ screen, index }) => {
         >
             <td className="py-3 px-4 text-[13px] font-bold" style={{ color: S.onBackground }}>{screen.screen_name}</td>
             <td className="py-3 px-4 text-[12px]" style={{ color: S.onSurfaceVariant }}>
-                {screen.location || 'غير محدد'}
+                {screen.location || t('analytics.unspecified')}
             </td>
             <td className="py-3 px-4 text-center">
                 <div className="flex items-center gap-2 justify-center">
@@ -368,7 +372,7 @@ const ScreenRow = ({ screen, index }) => {
                         background: screen.status === 'online' ? S.success : S.error,
                         display: 'inline-block',
                     }} />
-                    {screen.status === 'online' ? 'متصلة' : 'مقطوعة'}
+                    {screen.status === 'online' ? t('analytics.online') : t('analytics.offline')}
                 </span>
             </td>
         </motion.tr>
@@ -379,6 +383,7 @@ const ScreenRow = ({ screen, index }) => {
    MAIN PAGE COMPONENT
 ══════════════════════════════════════════════════ */
 const OwnerAnalyticsPage = () => {
+    const { t } = useTranslation();
     const { user } = useAuthStore();
     const addToast = useToastStore(s => s.addToast);
     const printRef = useRef(null);
@@ -426,13 +431,13 @@ const OwnerAnalyticsPage = () => {
                         offlineCount: (summary.total_screens || 0) - (summary.online_screens || 0),
                         totalScreens: summary.total_screens || 0,
                         dailyData: [
-                            { label: 'الأحد', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'الإثنين', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'الثلاثاء', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'الأربعاء', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'الخميس', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'الجمعة', impressions: Math.round((summary.total_impressions || 0) / 7) },
-                            { label: 'السبت', impressions: Math.round((summary.total_impressions || 0) / 7) }
+                            { label: t('analytics.sunday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.monday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.tuesday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.wednesday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.thursday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.friday'), impressions: Math.round((summary.total_impressions || 0) / 7) },
+                            { label: t('analytics.saturday'), impressions: Math.round((summary.total_impressions || 0) / 7) }
                         ],
                     });
                 } else {
@@ -440,7 +445,7 @@ const OwnerAnalyticsPage = () => {
                 }
             } catch (e) {
                 console.error(e);
-                addToast('حدث خطأ أثناء جلب البيانات', 'error');
+                addToast(t('analytics.fetch_error'), 'error');
             } finally {
                 setLoading(false);
             }
@@ -454,7 +459,7 @@ const OwnerAnalyticsPage = () => {
         const totalRevenue = sc.reduce((s, x) => s + parseFloat(x.revenue || 0), 0);
         const onlineCount = sc.filter(x => x.status === 'online').length;
 
-        const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const WEEK_DAYS = [t('analytics.sunday'), t('analytics.monday'), t('analytics.tuesday'), t('analytics.wednesday'), t('analytics.thursday'), t('analytics.friday'), t('analytics.saturday')];
         const dailyData = WEEK_DAYS.map(label => ({
             label,
             impressions: Math.round(200 + Math.random() * (totalImpressions / 3)),
@@ -491,14 +496,14 @@ const OwnerAnalyticsPage = () => {
     /* ─── Export Excel (CSV) ─── */
     const handleExportExcel = () => {
         setIsExportMenuOpen(false);
-        const headers = ['اسم الشاشة', 'الموقع', 'معدل الإشغال (%)', 'مرات الظهور', 'الإيراد ($)', 'الحالة'];
+        const headers = [t('analytics.screen_name_col'), t('analytics.location_col'), t('analytics.fill_rate_col'), t('analytics.impressions_col'), t('analytics.revenue_col'), t('analytics.status_col')];
         const rows = displayedScreens.map(s => [
             s.screen_name,
             s.location,
             s.fill_rate.toFixed(1),
             s.impressions,
             parseFloat(s.revenue).toFixed(2),
-            s.status === 'online' ? 'متصلة' : 'مقطوعة',
+            s.status === 'online' ? t('analytics.online') : t('analytics.offline'),
         ]);
 
         const csvContent = [headers, ...rows]
@@ -514,14 +519,14 @@ const OwnerAnalyticsPage = () => {
         link.download = `analytics_owner_${dateStr}.csv`;
         link.click();
         URL.revokeObjectURL(url);
-        addToast('تم تحميل ملف Excel بنجاح', 'success');
+        addToast(t('analytics.excel_download_success'), 'success');
     };
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-32 gap-4">
                 <RefreshCw className="w-10 h-10 animate-spin" style={{ color: S.primaryContainer }} />
-                <p className="text-[14px] font-bold" style={{ color: S.onSurfaceVariant }}>جاري تحميل التحليلات...</p>
+                <p className="text-[14px] font-bold" style={{ color: S.onSurfaceVariant }}>{t('analytics.loading_analytics')}</p>
             </div>
         );
     }
@@ -546,10 +551,10 @@ const OwnerAnalyticsPage = () => {
                 className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
                 <div>
                     <h1 className="text-3xl font-black m-0 mb-1 tracking-tight" style={{ color: S.onBackground }}>
-                        التحليلات والأداء
+                        {t('analytics.page_title')}
                     </h1>
                     <p className="text-sm font-medium m-0" style={{ color: S.onSurfaceVariant }}>
-                        تقارير الإشغال، مرات الظهور، والأداء المالي لشاشاتك
+                        {t('analytics.page_desc')}
                     </p>
                 </div>
 
@@ -567,7 +572,7 @@ const OwnerAnalyticsPage = () => {
                                 color: S.onSurface, minWidth: 180,
                             }}
                         >
-                            <option value="all">جميع الشاشات</option>
+                            <option value="all">{t('analytics.all_screens')}</option>
                             {screens.map(s => (
                                 <option key={s.screen_id} value={s.screen_id}>{s.screen_name}</option>
                             ))}
@@ -598,7 +603,7 @@ const OwnerAnalyticsPage = () => {
                             }}
                         >
                             <Download className="w-4 h-4" />
-                            تصدير التقرير
+                            {t('analytics.export_report')}
                             <ChevronDown className={`w-4 h-4 transition-transform ${isExportMenuOpen ? 'rotate-180' : ''}`} />
                         </button>
                         <AnimatePresence>
@@ -620,14 +625,14 @@ const OwnerAnalyticsPage = () => {
                                         className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-green-50"
                                         style={{ color: S.success, background: 'transparent', border: 'none', cursor: 'pointer' }}>
                                         <FileSpreadsheet className="w-4 h-4" />
-                                        تحميل Excel (CSV)
+                                        {t('analytics.download_excel')}
                                     </button>
                                     <div style={{ height: 1, background: S.outlineVariant }} />
                                     <button onClick={handleExportPDF}
                                         className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-blue-50"
                                         style={{ color: S.primary, background: 'transparent', border: 'none', cursor: 'pointer' }}>
                                         <Printer className="w-4 h-4" />
-                                        طباعة / تحميل PDF
+                                        {t('analytics.print_pdf')}
                                     </button>
                                 </motion.div>
                             )}
@@ -643,55 +648,55 @@ const OwnerAnalyticsPage = () => {
                 <div className="hidden print:block mb-6" style={{ borderBottom: `2px solid ${S.primary}`, paddingBottom: 12 }}>
                     <div className="flex justify-between items-center">
                         <div>
-                            <h2 className="text-2xl font-black m-0" style={{ color: S.primary }}>تقرير التحليلات والأداء</h2>
+                            <h2 className="text-2xl font-black m-0" style={{ color: S.primary }}>{t('analytics.report_header')}</h2>
                             <p className="text-sm m-0" style={{ color: S.onSurfaceVariant }}>
                                 {user?.full_name || user?.username} — {dateRange.start} / {dateRange.end}
                             </p>
                         </div>
-                        <p className="text-xs" style={{ color: S.outline }}>SabaPost — نظام إدارة الإعلانات الرقمية</p>
+                        <p className="text-xs" style={{ color: S.outline }}>{t('analytics.sabapost_tagline')}</p>
                     </div>
                 </div>
 
                 {/* ══ KPI Grid ══ */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <KpiCard
-                        index={0} label="معدل الإشغال الكلي" sublabel="Overall Fill Rate"
+                        index={0} label={t('analytics.overall_fill_rate')} sublabel="Overall Fill Rate"
                         value={displayedAnalytics.avgFillRate.toFixed(1)} suffix="%"
                         Icon={Percent} iconBg="#f0fdf4" iconColor={S.success}
                         accentColor={displayedAnalytics.avgFillRate >= 75 ? S.success : displayedAnalytics.avgFillRate >= 40 ? S.warning : S.error}
                         borderAccent={displayedAnalytics.avgFillRate >= 40 ? S.success : S.error}
                         highlight={S.success}
-                        note={displayedAnalytics.avgFillRate >= 75 ? 'أداء إشغال ممتاز' : 'هناك وقت فراغ يمكن تحسينه'}
+                        note={displayedAnalytics.avgFillRate >= 75 ? t('analytics.excellent_fill_note') : t('analytics.room_for_improvement')}
                         noteIcon={TrendingUp}
                         noteColor={displayedAnalytics.avgFillRate >= 40 ? S.success : S.error}
                     />
                     <KpiCard
-                        index={1} label="إجمالي مرات الظهور" sublabel="Total Impressions"
+                        index={1} label={t('analytics.total_impressions_lbl')} sublabel="Total Impressions"
                         value={displayedAnalytics.totalImpressions.toLocaleString()}
                         togglable={true}
                         iconBg={S.surfaceContainer} iconColor={S.primaryContainer}
                         accentColor={S.primary}
-                        note="مجموع ظهور الإعلانات على شاشاتك"
+                        note={t('analytics.total_impressions_note')}
                         noteIcon={BarChart2} noteColor={S.primaryContainer}
                     />
                     <KpiCard
-                        index={2} label="الإيرادات المقدرة" sublabel="Est. Revenue (Period)"
+                        index={2} label={t('analytics.est_revenue')} sublabel="Est. Revenue (Period)"
                         value={`$${displayedAnalytics.totalRevenue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                         togglable={true}
                         iconBg="#f0fdf4" iconColor={S.success}
                         accentColor={S.success} borderAccent={S.success}
-                        note={`من ${displayedScreens.length} شاشة`}
+                        note={t('analytics.from_screens_count', { count: displayedScreens.length })}
                         noteIcon={Monitor} noteColor={S.success}
                     />
                     <KpiCard
-                        index={3} label="الشاشات الفارغة (بدون إعلان)" sublabel="Idle / No Active Campaign"
+                        index={3} label={t('analytics.idle_screens')} sublabel="Idle / No Active Campaign"
                         value={analytics?.offlineCount || 0}
                         Icon={AlertCircle}
                         iconBg={analytics?.offlineCount > 0 ? S.errorContainer : S.successContainer}
                         iconColor={analytics?.offlineCount > 0 ? S.error : S.success}
                         accentColor={analytics?.offlineCount > 0 ? S.error : S.success}
                         borderAccent={analytics?.offlineCount > 0 ? S.error : null}
-                        note={analytics?.offlineCount > 0 ? 'بلا إعلانات مدفوعة حالياً' : 'جميع الشاشات تعمل'}
+                        note={analytics?.offlineCount > 0 ? t('analytics.no_active_campaigns') : t('analytics.all_screens_active')}
                         noteColor={analytics?.offlineCount > 0 ? S.error : S.success}
                     />
                 </div>
@@ -709,14 +714,14 @@ const OwnerAnalyticsPage = () => {
                         }}>
                         <div className="mb-5 flex items-center justify-between">
                             <div>
-                                <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>مرات الظهور اليومية</h3>
+                                <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.daily_impressions')}</h3>
                                 <p className="text-xs font-medium mt-0.5 m-0" style={{ color: S.outline }}>
-                                    Impressions per day — آخر 7 أيام
+                                    {t('analytics.last_7_days_desc')}
                                 </p>
                             </div>
                             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: S.surfaceContainerLow }}>
                                 <div className="w-3 h-3 rounded-full" style={{ background: S.primaryContainer }} />
-                                <span className="text-[11px] font-bold" style={{ color: S.onSurfaceVariant }}>مرات الظهور</span>
+                                <span className="text-[11px] font-bold" style={{ color: S.onSurfaceVariant }}>{t('analytics.impressions_lbl')}</span>
                             </div>
                         </div>
                         <ImpressionsBarChart data={analytics?.dailyData || []} />
@@ -731,16 +736,16 @@ const OwnerAnalyticsPage = () => {
                             display: 'flex', flexDirection: 'column', alignItems: 'center',
                         }}>
                         <div className="w-full mb-4 text-center">
-                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>معدل الإشغال</h3>
-                            <p className="text-xs font-medium mt-0.5 m-0" style={{ color: S.outline }}>Fill Rate — وقت الإعلانات vs الفراغ</p>
+                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.fill_rate_lbl')}</h3>
+                            <p className="text-xs font-medium mt-0.5 m-0" style={{ color: S.outline }}>{t('analytics.fill_rate_desc')}</p>
                         </div>
                         <FillRateGauge value={displayedAnalytics.avgFillRate} />
 
                         {/* Legend */}
                         <div className="mt-4 w-full grid grid-cols-2 gap-2 text-center">
                             {[
-                                { label: 'وقت إعلانات مدفوعة', color: S.success, pct: displayedAnalytics.avgFillRate.toFixed(1) + '%' },
-                                { label: 'وقت فراغ / افتراضي', color: S.outlineVariant, pct: (100 - displayedAnalytics.avgFillRate).toFixed(1) + '%' },
+                                { label: t('analytics.paid_ads_time'), color: S.success, pct: displayedAnalytics.avgFillRate.toFixed(1) + '%' },
+                                { label: t('analytics.idle_default_time'), color: S.outlineVariant, pct: (100 - displayedAnalytics.avgFillRate).toFixed(1) + '%' },
                             ].map((item, i) => (
                                 <div key={i} className="flex flex-col items-center py-2 rounded-xl"
                                     style={{ background: S.surfaceContainerLow }}>
@@ -762,15 +767,15 @@ const OwnerAnalyticsPage = () => {
                     }}>
                     <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: `1px solid ${S.outlineVariant}` }}>
                         <div>
-                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>أداء كل شاشة</h3>
+                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.screen_performance')}</h3>
                             <p className="text-[12px] font-medium mt-1 m-0" style={{ color: S.outline }}>
-                                تفاصيل الإشغال والظهور لكل شاشة مملوكة
+                                {t('analytics.screen_performance_desc')}
                             </p>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-bold"
                             style={{ background: S.surfaceContainerLow, color: S.onSurfaceVariant }}>
                             <Filter className="w-3.5 h-3.5" />
-                            {displayedScreens.length} شاشة
+                            {displayedScreens.length} {t('analytics.screen_count')}
                         </div>
                     </div>
 
@@ -778,7 +783,7 @@ const OwnerAnalyticsPage = () => {
                         <table className="w-full" style={{ borderCollapse: 'collapse', minWidth: 700 }}>
                             <thead>
                                 <tr style={{ background: S.surfaceContainerLow }}>
-                                    {['اسم الشاشة', 'الموقع', 'معدل الإشغال', 'مرات الظهور', 'الإيرادات', 'الحالة'].map((h, i) => (
+                                    {[t('analytics.screen_name_col'), t('analytics.location_col'), t('analytics.fill_rate_col_short'), t('analytics.impressions_col'), t('analytics.revenue_col'), t('analytics.status_col')].map((h, i) => (
                                         <th key={i}
                                             className={`py-3 px-4 text-sm font-black ${i >= 2 ? 'text-center' : 'text-right'}`}
                                             style={{ color: S.onSurfaceVariant }}>
@@ -791,7 +796,7 @@ const OwnerAnalyticsPage = () => {
                                 {displayedScreens.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="py-12 text-center text-sm font-bold" style={{ color: S.outline }}>
-                                            لا توجد شاشات مسجلة
+                                            {t('analytics.no_screens')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -804,10 +809,10 @@ const OwnerAnalyticsPage = () => {
                                 <tfoot>
                                     <tr style={{ background: S.surfaceContainerLow, borderTop: `2px solid ${S.outlineVariant}` }}>
                                         <td colSpan={2} className="py-3 px-4 text-sm font-black" style={{ color: S.onSurfaceVariant }}>
-                                            المجموع الكلي
+                                            {t('analytics.grand_total')}
                                         </td>
                                         <td className="py-3 px-4 text-center text-sm font-black" style={{ color: S.primary }}>
-                                            {displayedAnalytics.avgFillRate.toFixed(1)}% متوسط
+                                            {displayedAnalytics.avgFillRate.toFixed(1)}% {t('analytics.average')}
                                         </td>
                                         <td className="py-3 px-4 text-center text-sm font-black" style={{ color: S.primary }}>
                                             {displayedAnalytics.totalImpressions.toLocaleString()}
@@ -831,10 +836,9 @@ const OwnerAnalyticsPage = () => {
                         <BarChart2 className="w-4 h-4" style={{ color: S.info }} />
                     </div>
                     <div>
-                        <p className="m-0 text-[13px] font-bold" style={{ color: S.info }}>ما هو معدل الإشغال (Fill Rate)؟</p>
+                        <p className="m-0 text-[13px] font-bold" style={{ color: S.info }}>{t('analytics.what_is_fill_rate')}</p>
                         <p className="m-0 mt-1 text-[12px] leading-relaxed" style={{ color: '#0c4a6e' }}>
-                            معدل الإشغال هو النسبة المئوية للوقت الذي تعرض فيه شاشتك إعلانات مدفوعة مقارنةً بإجمالي وقت التشغيل.
-                            كلما اقترب من 100% كلما كان أفضل — مما يعني أن شاشتك مشغولة بإعلانات لها عائد مادي.
+                            {t('analytics.fill_rate_explanation')}
                         </p>
                     </div>
                 </motion.div>

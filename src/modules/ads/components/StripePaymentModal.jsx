@@ -6,6 +6,7 @@ import { ENDPOINTS } from '../../../core/api/endpoints';
 import useToastStore from '../../../store/useToastStore';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import useTranslation from '../../../i18n/useTranslation';
 
 // --- Stripe Checkout Form Component ---
 const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
@@ -13,6 +14,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
     const elements = useElements();
     const [isProcessing, setIsProcessing] = useState(false);
     const addToast = useToastStore(state => state.addToast);
+    const { t } = useTranslation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,11 +23,11 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
         setIsProcessing(true);
         const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
-            redirect: 'if_required' // لمنع إعادة توجيه الصفحة بالكامل
+            redirect: 'if required' // لمنع إعادة توجيه الصفحة بالكامل
         });
 
         if (error) {
-            addToast(error.message || 'حدث خطأ في معالجة البطاقة', 'error');
+            addToast(error.message || t('ads.card processing error'), 'error');
             setIsProcessing(false);
         } else if (paymentIntent && paymentIntent.status === 'succeeded') {
             // إخبار السيرفر بنجاح العملية لتحديث حالة الإعلان
@@ -35,11 +37,11 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                     payment_intent_id: paymentIntent.id
                 });
                 if (res.data.success) {
-                    addToast('تمت عملية الدفع بنجاح!', 'success');
+                    addToast(t('ads.payment success toast'), 'success');
                     onSuccess();
                 }
             } catch (err) {
-                addToast('تم الخصم ولكن حدث خطأ في تحديث حالة الإعلان، يرجى مراسلة الدعم', 'error');
+                addToast(t('ads.payment deducted status error'), 'error');
             } finally {
                 setIsProcessing(false);
             }
@@ -57,7 +59,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                     disabled={!stripe || isProcessing}
                     className="flex-1 bg-[#2E7D32] hover:bg-[#1B5E20] text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center"
                 >
-                    {isProcessing ? 'جاري التأكيد والخصم...' : 'تأكيد الدفع'}
+                    {isProcessing ? t('ads.confirming and deducting') : t('ads.confirm payment')}
                 </button>
                 <button
                     type="button"
@@ -65,7 +67,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                     disabled={isProcessing}
                     className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 px-6 rounded-xl transition-all"
                 >
-                    إلغاء
+                    {t('common.cancel')}
                 </button>
             </div>
         </form>
@@ -84,6 +86,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
     const [isFetchingMethods, setIsFetchingMethods] = useState(true);
     const [receiptFile, setReceiptFile] = useState(null);
     const [stripePromise, setStripePromise] = useState(null);
+    const { t, dir } = useTranslation();
 
     useEffect(() => {
         if (isOpen) {
@@ -99,7 +102,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                         }
                     }
                 })
-                .catch(() => addToast('فشل جلب بوابات الدفع', 'error'))
+                .catch(() => addToast(t('ads.fetch gateways failed'), 'error'))
                 .finally(() => setIsFetchingMethods(false));
         }
     }, [isOpen, addToast]);
@@ -121,7 +124,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
         if (!isStripe) {
             // Manual Transfer Logic
             if (!receiptFile) {
-                addToast('يرجى إرفاق صورة سند التحويل أولاً', 'warning');
+                addToast(t('ads.please attach receipt'), 'warning');
                 return;
             }
 
@@ -135,12 +138,12 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                 const res = await axiosClient.post('/payments/manual', formData);
                 
                 if (res.data.success) {
-                    addToast('تم رفع السند بنجاح! ستتم المراجعة قريباً.', 'success');
+                    addToast(t('ads.receipt uploaded success'), 'success');
                     onSuccess();
                     onClose();
                 }
             } catch (error) {
-                addToast(error.response?.data?.message || 'فشل رفع السند، يرجى المحاولة مرة أخرى', 'error');
+                addToast(error.response?.data?.message || t('ads.receipt_upload_    failed'), 'error');
             } finally {
                 setIsLoading(false);
             }
@@ -159,7 +162,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                 // No toast here to make the transition smoother to the card form
             }
         } catch (error) {
-            addToast(error.response?.data?.message || 'فشل الاتصال ببوابة الدفع', 'error');
+            addToast(error.response?.data?.message || t('ads.gateway_connection_failed'), 'error');
             setClientSecret(null);
         } finally {
             setIsLoading(false);
@@ -170,25 +173,25 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={clientSecret ? "إدخال بيانات البطاقة" : "اختر طريقة الدفع"}
+            title={clientSecret ? t('ads.enter_card_details') : t('ads.choose_payment_method')}
             icon={CreditCard}
         >
-            <div className="space-y-6" dir="rtl">
+            <div className="space-y-6" dir={dir}>
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 shadow-sm">
                     <h3 className="text-sm font-black text-[var(--color-dark-turquoise)] mb-3 border-b pb-2">
-                        تفاصيل الفاتورة
+                        {t('ads.invoice_details')}
                     </h3>
                     <div className="space-y-2 text-sm text-gray-700">
                         <div className="flex justify-between">
-                            <span className="font-bold">رقم الإعلان:</span>
+                            <span className="font-bold">{t('ads.ad_number')}:</span>
                             <span>#{advertisement.ad_id}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-bold">العنوان:</span>
+                            <span className="font-bold">{t('ads.title')}:</span>
                             <span>{advertisement.title}</span>
                         </div>
                         <div className="flex justify-between items-center pt-2 mt-2 border-t border-gray-200">
-                            <span className="font-black text-[var(--color-dark-turquoise)]">المبلغ الإجمالي المطلـوب:</span>
+                            <span className="font-black text-[var(--color-dark-turquoise)]">{t('ads.total_amount_required')}:</span>
                             <span className="font-black text-2xl text-[var(--color-gold)]">
                                 ${advertisement.total_cost}
                             </span>
@@ -198,11 +201,11 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
 
                 {!clientSecret ? (
                     <div className="space-y-4">
-                        <div className="font-bold text-gray-700 text-sm">بوابات الدفع المتاحة:</div>
+                        <div className="font-bold text-gray-700 text-sm">{t('ads.available_payment_gateways')}:</div>
                         {isFetchingMethods ? (
-                            <div className="text-center text-sm text-gray-500 py-4">جاري تحميل بوابات الدفع...</div>
+                            <div className="text-center text-sm text-gray-500 py-4">{t('ads.loading_gateways')}</div>
                         ) : paymentMethods.length === 0 ? (
-                            <div className="text-center text-sm text-red-500 py-4">لا توجد بوابات دفع مفعلة حالياً.</div>
+                            <div className="text-center text-sm text-red-500 py-4">{t('ads.no_gateways_active')}</div>
                         ) : (
                             <div className="space-y-3">
                                 {paymentMethods.map(method => {
@@ -230,7 +233,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                                             
                                             {isSelected && !isStripeMethod && (
                                                 <div className="px-4 pb-4 border-t border-teal-100 pt-3 mt-1 bg-white">
-                                                    <label className="block text-xs font-bold text-gray-700 mb-2">إرفاق صورة سند التحويل:</label>
+                                                    <label className="block text-xs font-bold text-gray-700 mb-2">{t('ads.attach_receipt_image')}:</label>
                                                     <label className={`flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${receiptFile ? 'border-teal-400 bg-teal-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'}`}>
                                                         <div className="flex flex-col items-center justify-center pt-3 pb-4">
                                                             {receiptFile ? (
@@ -241,7 +244,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                                                             ) : (
                                                                 <>
                                                                     <UploadCloud className="w-6 h-6 text-gray-400 mb-1" />
-                                                                    <p className="text-xs text-gray-500"><span className="font-semibold text-teal-600">اضغط لرفع الصورة</span></p>
+                                                                    <p className="text-xs text-gray-500"><span className="font-semibold text-teal-600">{t('ads.click_to_upload')}</span></p>
                                                                 </>
                                                             )}
                                                         </div>
@@ -257,14 +260,14 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
 
                         <p className="text-xs text-gray-500 mb-4 flex items-center gap-1 mt-6">
                             <ShieldCheck className="w-4 h-4 text-[#2E7D32]" />
-                            معاملاتك مشفرة ومؤمنة بالكامل عبر بوابة الدفع المختارة.
+                            {t('ads.transactions_secured')}
                         </p>
                         <button
                             onClick={handleAction}
                             disabled={isLoading || paymentMethods.length === 0 || !selectedMethod}
                             className="w-full bg-[var(--color-dark-turquoise)] hover:opacity-90 text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
-                            {isLoading ? 'جاري التحضير...' : isStripe ? 'متابعة للدفع الإلكتروني' : 'تأكيد رفع الحوالة اليدوية'}
+                            {isLoading ? t('ads.preparing') : isStripe ? t('ads.continue_to_electronic_payment') : t('ads.confirm_manual_transfer')}
                         </button>
                     </div>
                 ) : (
@@ -278,7 +281,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                                 />
                             </Elements>
                         ) : (
-                            <div className="text-center text-sm text-gray-500 py-4">جاري تحميل واجهة الدفع...</div>
+                            <div className="text-center text-sm text-gray-500 py-4">{t('ads.loading_payment_interface')}</div>
                         )}
                     </div>
                 )}

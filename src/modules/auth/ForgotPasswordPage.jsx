@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, ArrowRight, Loader2, KeyRound, CheckCircle2 } from 'lucide-react';
+import useTranslation from '../../i18n/useTranslation';
 
 /**
  * Forgot Password Screen
@@ -11,6 +12,7 @@ const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const { t, dir } = useTranslation();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -38,9 +40,9 @@ const ForgotPasswordPage = () => {
                             <KeyRound className="text-white w-10 h-10 -rotate-12" />
                         </div>
 
-                        <h2 className="text-3xl font-black text-white mb-4">نسيت كلمة المرور؟</h2>
+                        <h2 className="text-3xl font-black text-white mb-4">{t('auth.forgot_title')}</h2>
                         <p className="text-gray-500 text-sm mb-8 leading-relaxed">
-                            لا تقلق، أدخل بريدك الإلكتروني أدناه وسنرسل لك تعليمات استعادة الوصول إلى حسابك.
+                            {t('auth.forgot_subtitle')}
                         </p>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -49,7 +51,7 @@ const ForgotPasswordPage = () => {
                                 <input
                                     type="email"
                                     required
-                                    placeholder="البريد الإلكتروني"
+                                    placeholder={t('auth.email')}
                                     className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-12 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-right"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -65,7 +67,7 @@ const ForgotPasswordPage = () => {
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                 ) : (
                                     <>
-                                        <span>إرسال رابط الاستعادة</span>
+                                        <span>{t('auth.send_reset_link')}</span>
                                         <ArrowRight className="w-5 h-5 rotate-180 group-hover:-translate-x-1 transition-transform" />
                                     </>
                                 )}
@@ -81,15 +83,15 @@ const ForgotPasswordPage = () => {
                         <div className="bg-green-500/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 border border-green-500/30">
                             <CheckCircle2 className="text-green-500 w-10 h-10" />
                         </div>
-                        <h2 className="text-3xl font-black text-white mb-4">تم الإرسال بنجاح!</h2>
+                        <h2 className="text-3xl font-black text-white mb-4">{t('auth.reset_sent')}</h2>
                         <p className="text-gray-500 text-sm mb-10 leading-relaxed px-4">
-                            لقد أرسلنا بريداً إلكترونياً إلى <span className="text-white font-bold">{email}</span>. يرجى مراجعة بريدك واتباع التعليمات.
+                            {t('auth.reset_sent_desc_1')}<span className="text-white font-bold">{email}</span>{t('auth.reset_sent_desc_2')}
                         </p>
                         <button
                             onClick={() => setIsSubmitted(false)}
                             className="text-indigo-400 font-bold hover:text-indigo-300 transition-colors"
                         >
-                            إعادة الإرسال مرة أخرى
+                            {t('auth.resend_again')}
                         </button>
                     </motion.div>
                 )}
@@ -97,7 +99,7 @@ const ForgotPasswordPage = () => {
                 <div className="mt-10 pt-8 border-t border-white/5">
                     <Link to="/login" className="flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-medium">
                         <ArrowRight className="w-4 h-4" />
-                        العودة لتسجيل الدخول
+                        {t('auth.back_to_login')}
                     </Link>
                 </div>
             </motion.div>

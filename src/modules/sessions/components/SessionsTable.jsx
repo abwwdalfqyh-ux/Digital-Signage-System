@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useTranslation from '../../../i18n/useTranslation';
 
 /* ─── Helpers ─── */
 export const guessDeviceType = (deviceName = '') => {
@@ -29,16 +30,16 @@ export const formatDateTime = (dateStr) => {
     }
 };
 
-export const timeAgo = (dateStr) => {
-    if (!dateStr) return '';
+export const timeAgo = (dateStr, t) => {
+    if (!dateStr || !t) return '';
     try {
         const diff = Date.now() - new Date(dateStr).getTime();
         const mins = Math.floor(diff / 60000);
-        if (mins < 1)  return 'منذ لحظات';
-        if (mins < 60) return `منذ ${mins} دقيقة`;
+        if (mins < 1)  return t('sessions.mins_ago_few');
+        if (mins < 60) return t('sessions.mins_ago', { mins });
         const hrs = Math.floor(mins / 60);
-        if (hrs < 24)  return `منذ ${hrs} ساعة`;
-        return `منذ ${Math.floor(hrs / 24)} يوم`;
+        if (hrs < 24)  return t('sessions.hrs_ago', { hrs });
+        return t('sessions.days_ago', { days: Math.floor(hrs / 24) });
     } catch {
         return '';
     }
@@ -63,63 +64,70 @@ const SkeletonRow = () => (
 );
 
 /* ─── Empty State ─── */
-const EmptyState = () => (
+const EmptyState = () => {
+    const { t } = useTranslation();
+    return (
     <tr>
         <td colSpan={6}>
             <div className="flex flex-col items-center justify-center py-20">
                 <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mb-4 border border-outline-variant">
                     <span className="material-symbols-outlined text-outline text-3xl">lock</span>
                 </div>
-                <h4 className="font-title-lg text-title-lg text-on-surface mb-1">لا توجد جلسات نشطة</h4>
+                <h4 className="font-title-lg text-title-lg text-on-surface mb-1">{t('sessions.no_active_sessions')}</h4>
                 <p className="font-body-md text-body-md text-on-surface-variant max-w-xs text-center leading-relaxed">
-                    لم يتم العثور على أي جلسات نشطة حالياً في النظام
+                    {t('sessions.no_sessions_sys')}
                 </p>
             </div>
         </td>
     </tr>
-);
+    );
+};
 
 /* ─── Error State Row ─── */
-const ErrorState = ({ onRetry }) => (
+const ErrorState = ({ onRetry }) => {
+    const { t } = useTranslation();
+    return (
     <tr>
         <td colSpan={6}>
             <div className="flex flex-col items-center justify-center py-16">
                 <div className="w-14 h-14 bg-error-container rounded-full flex items-center justify-center mb-4 border border-error/30">
                     <span className="material-symbols-outlined text-error text-2xl">warning</span>
                 </div>
-                <h4 className="font-title-lg text-title-lg text-on-surface mb-1">تعذّر تحميل البيانات</h4>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">حدث خطأ أثناء جلب بيانات الجلسات</p>
+                <h4 className="font-title-lg text-title-lg text-on-surface mb-1">{t('sessions.load_failed_table')}</h4>
+                <p className="font-body-sm text-body-sm text-on-surface-variant mb-4">{t('sessions.load_failed_table_desc')}</p>
                 <button
                     onClick={onRetry}
                     className="px-md py-sm rounded-lg font-label-md text-label-md text-on-primary bg-primary hover:opacity-90 transition-opacity"
                 >
-                    إعادة المحاولة
+                    {t('sessions.retry')}
                 </button>
             </div>
         </td>
     </tr>
-);
+    );
+};
 
 /* ═══════════════════════════════════════════════
    Main Table Component
    ═══════════════════════════════════════════════ */
 const SessionsTable = ({ sessions = [], loading, error, isSuperAdmin, onRevoke, onViewDetails, onBlockDevice, onRetry }) => {
+    const { t } = useTranslation();
     return (
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
             <div className="p-lg border-b border-outline-variant">
-                <h3 className="font-title-lg text-title-lg text-on-surface">الجلسات النشطة</h3>
+                <h3 className="font-title-lg text-title-lg text-on-surface">{t('sessions.active_sessions_tab')}</h3>
             </div>
             
             <div className="overflow-x-auto">
                 <table className="w-full text-right border-collapse">
                     <thead>
                         <tr className="bg-surface-container-low text-on-surface-variant font-label-md text-label-md border-b border-outline-variant">
-                            <th className="p-md font-medium">الجهاز</th>
-                            {isSuperAdmin && <th className="p-md font-medium">المستخدم</th>}
-                            <th className="p-md font-medium">آخر نشاط</th>
-                            <th className="p-md font-medium">بدأت في</th>
-                            <th className="p-md font-medium">الحالة</th>
-                            <th className="p-md font-medium text-left">إجراءات</th>
+                            <th className="p-md font-medium">{t('sessions.device_col')}</th>
+                            {isSuperAdmin && <th className="p-md font-medium">{t('sessions.user_col')}</th>}
+                            <th className="p-md font-medium">{t('sessions.last_activity_col')}</th>
+                            <th className="p-md font-medium">{t('sessions.started_in_col')}</th>
+                            <th className="p-md font-medium">{t('sessions.status_col')}</th>
+                            <th className="p-md font-medium text-left">{t('sessions.actions_col')}</th>
                         </tr>
                     </thead>
                     <tbody className="font-body-md text-body-md text-on-surface">
@@ -155,9 +163,9 @@ const SessionsTable = ({ sessions = [], loading, error, isSuperAdmin, onRevoke, 
                                                 </div>
                                                 <div>
                                                     <p className="font-medium flex items-center gap-xs">
-                                                        {session.device_name || 'جهاز غير معروف'}
+                                                        {session.device_name || t('sessions.unknown_device')}
                                                         {session.is_current && (
-                                                            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold">الحالية</span>
+                                                            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold">{t('sessions.current_session')}</span>
                                                         )}
                                                     </p>
                                                     <div className="flex items-center gap-2 mt-0.5">
@@ -190,7 +198,7 @@ const SessionsTable = ({ sessions = [], loading, error, isSuperAdmin, onRevoke, 
 
                                         {/* Last active */}
                                         <td className="p-md text-on-surface-variant">
-                                            {session.last_used_at ? timeAgo(session.last_used_at) : '—'}
+                                            {session.last_used_at ? timeAgo(session.last_used_at, t) : '—'}
                                         </td>
 
                                         {/* Created at */}
@@ -203,11 +211,11 @@ const SessionsTable = ({ sessions = [], loading, error, isSuperAdmin, onRevoke, 
                                             {session.is_current ? (
                                                 <span className="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-label-md text-label-md">
                                                     <span className="w-2 h-2 rounded-full bg-green-500 block" />
-                                                    نشطة الآن
+                                                    {t('sessions.active_now')}
                                                 </span>
                                             ) : (
                                                 <span className="inline-flex items-center gap-xs px-2 py-1 rounded-full bg-secondary-container/30 text-secondary font-label-md text-label-md">
-                                                    نشطة
+                                                    {t('sessions.active')}
                                                 </span>
                                             )}
                                         </td>
@@ -218,28 +226,28 @@ const SessionsTable = ({ sessions = [], loading, error, isSuperAdmin, onRevoke, 
                                                 <button
                                                     onClick={() => onViewDetails(session)}
                                                     className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-primary-container hover:text-primary transition-colors"
-                                                    title="عرض التفاصيل الأمنية"
+                                                    title={t('sessions.security_details')}
                                                 >
                                                     <span className="material-symbols-outlined text-[18px]">visibility</span>
                                                 </button>
                                                 {session.is_current ? (
-                                                    <span className="text-xs text-outline-variant font-bold px-2">الجلسة الحالية</span>
+                                                    <span className="text-xs text-outline-variant font-bold px-2">{t('sessions.current_session_title')}</span>
                                                 ) : (
                                                     <>
                                                         <button
                                                             onClick={() => onBlockDevice(session)}
                                                             className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-orange-100 hover:text-orange-600 transition-colors"
-                                                            title="حظر الـ IP أو الجهاز"
+                                                            title={t('sessions.block_ip_device')}
                                                         >
                                                             <span className="material-symbols-outlined text-[18px]">block</span>
                                                         </button>
                                                         <button
                                                             onClick={() => onRevoke(session)}
                                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error/10 hover:bg-error text-error hover:text-white text-xs font-bold transition-all shadow-sm"
-                                                            title="إنهاء الجلسة (إجباري)"
+                                                            title={t('sessions.force_terminate')}
                                                         >
                                                             <span className="material-symbols-outlined text-[15px]">logout</span>
-                                                            إنهاء
+                                                            {t('sessions.terminate')}
                                                         </button>
                                                     </>
                                                 )}

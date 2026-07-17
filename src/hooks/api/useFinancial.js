@@ -53,7 +53,7 @@ export const useApprovePayment = () => {
 
   return useMutation({
     mutationFn: async ({ id, payload }) => {
-      const res = await axiosClient.put(ENDPOINTS.FINANCIAL.APPROVE(id), payload);
+      const res = await axiosClient.post(ENDPOINTS.FINANCIAL.APPROVE(id), payload);
       return res.data;
     },
     onSuccess: () => {

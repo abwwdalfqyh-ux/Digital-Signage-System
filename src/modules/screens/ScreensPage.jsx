@@ -19,15 +19,16 @@ import { useScreens, useCreateScreen, useUpdateScreen, useDeleteScreen } from '.
 import { useGovernorates, useScreenTypes, useStreets, useUsersByRole, useRoles } from '../../hooks/api/useLookups';
 import { useQueryClient } from '@tanstack/react-query';
 import echo from '../../core/api/echo';
+import useTranslation from '../../i18n/useTranslation';
 
 // Lazy load map mapping component
 const ScreenMapView = lazy(() => import('./components/ScreenMapView'));
 
-const STATUS_CFG = {
-  Online: { label: 'متصل', dot: 'bg-[#166534]', text: 'text-[#166534]', ring: 'border-[#166534]', bg: 'bg-[#dcfce7]', icon: Wifi },
-  Offline: { label: 'غير متصل', dot: 'bg-[#ba1a1a]', text: 'text-[#ba1a1a]', ring: 'border-[#ba1a1a]', bg: 'bg-[#ffdad6]', icon: WifiOff },
-  Maintenance: { label: 'صيانة', dot: 'bg-[#eab308]', text: 'text-[#854d0e]', ring: 'border-[#eab308]', bg: 'bg-[#fef9c3]', icon: Wrench },
-};
+const getStatusCfg = (t) => ({
+  Online: { label: t('screens.status_online'), dot: 'bg-[#166534]', text: 'text-[#166534]', ring: 'border-[#166534]', bg: 'bg-[#dcfce7]', icon: Wifi },
+  Offline: { label: t('screens.status_offline'), dot: 'bg-[#ba1a1a]', text: 'text-[#ba1a1a]', ring: 'border-[#ba1a1a]', bg: 'bg-[#ffdad6]', icon: WifiOff },
+  Maintenance: { label: t('screens.status_maintenance'), dot: 'bg-[#eab308]', text: 'text-[#854d0e]', ring: 'border-[#eab308]', bg: 'bg-[#fef9c3]', icon: Wrench },
+});
 
 const CascadingSelect = ({ label, value, onChange, options, placeholder, disabled, icon: Icon = null }) => (
   <div className="bg-[#ffffff] border border-[#c3c6d7] rounded px-3 py-1 flex items-center gap-2">
@@ -72,18 +73,20 @@ const ScreensPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const addToast = useToastStore(state => state.addToast);
+  const { t, isRTL, dir } = useTranslation();
+  const STATUS_CFG = useMemo(() => getStatusCfg(t), [t]);
 
   useEffect(() => {
     const channel = echo.private('admin.screens');
     channel.listen('ScreenUpdated', (e) => {
-        queryClient.invalidateQueries(['screens']);
-        if (e.screen) {
-            addToast(`تحديث مباشر: حالة الشاشة (${e.screen.screen_name}) تغيّرت`, 'info');
-        }
+      queryClient.invalidateQueries(['screens']);
+      if (e.screen) {
+        addToast(`${t('common.refresh')}: ${e.screen.screen_name}`, 'info');
+      }
     });
 
     return () => {
-        echo.leave('admin.screens');
+      echo.leave('admin.screens');
     };
   }, [queryClient, addToast]);
 
@@ -191,14 +194,14 @@ const ScreensPage = () => {
   const filteredScreens = useMemo(() => {
     const base = filteredByGeo;
     if (statusFilter === 'all') return base;
-    return base.filter(s => s.status === statusFilter || (statusFilter === 'pending_activation' && !s.status));
+    return base.filter(s => (s.computed_status || s.status) === statusFilter || (statusFilter === 'pending_activation' && !(s.computed_status || s.status)));
   }, [filteredByGeo, statusFilter]);
 
   const stats = useMemo(() => ({
     total: screens.length,
-    online: screens.filter(s => s.status === 'Online').length,
-    offline: screens.filter(s => s.status === 'Offline').length,
-    maintenance: screens.filter(s => s.status === 'Maintenance').length,
+    online: screens.filter(s => (s.computed_status || s.status) === 'Online').length,
+    offline: screens.filter(s => (s.computed_status || s.status) === 'Offline').length,
+    maintenance: screens.filter(s => (s.computed_status || s.status) === 'Maintenance').length,
   }), [screens]);
 
   const fetchFormRegions = async (govId) => {
@@ -308,7 +311,7 @@ const ScreensPage = () => {
     e.preventDefault();
 
     if (isNewLocation && (!newLocation.governorate || !newLocation.region || !newLocation.street)) {
-      addToast('الرجاء تعبئة بيانات الموقع الجديد بالكامل', 'warning');
+      addToast(t('common.required_fields'), 'warning');
       return;
     }
 
@@ -373,7 +376,7 @@ const ScreensPage = () => {
 
       setModalConfig({ open: false, isEdit: false, screen: null });
     } catch (e) {
-      addToast(e.response?.data?.message || 'تعذر إتمام العملية', 'error');
+      addToast(e.response?.data?.message || t('common.error'), 'error');
     } finally {
       setFormLoading(false);
     }
@@ -383,9 +386,9 @@ const ScreensPage = () => {
     e.preventDefault();
     setQuickOwnerLoading(true);
     try {
-      const ownerRole = roles.find(r => r.role_name === 'ScreenOwner');
+      const ownerRole = roles.find(r => r.role_id === 3);
 
-      if (!ownerRole) throw new Error("لم يتم العثور على صلاحية 'ScreenOwner' في النظام");
+      if (!ownerRole) throw new Error("ScreenOwner role not found");
 
       const payload = {
         ...quickOwnerForm,
@@ -396,15 +399,15 @@ const ScreensPage = () => {
       const res = await axiosClient.post(ENDPOINTS.USERS.ALL, payload);
       const newUser = res.data?.data || res.data?.user;
 
-      addToast('تمت إضافة المالك بنجاح', 'success');
+      addToast(t('users.user_saved'), 'success');
 
       queryClient.invalidateQueries({ queryKey: ['users', 'role', 'ScreenOwner'] });
-      
+
       setForm(p => ({ ...p, owner_id: newUser.user_id }));
       setQuickOwnerModal(false);
       setQuickOwnerForm({ full_name: '', email: '', phone: '' });
     } catch (err) {
-      addToast(err.response?.data?.message || err.message || 'فشلت عملية إضافة المالك', 'error');
+      addToast(err.response?.data?.message || err.message || t('common.error'), 'error');
     } finally {
       setQuickOwnerLoading(false);
     }
@@ -420,11 +423,11 @@ const ScreensPage = () => {
   };
 
   const statusTabs = [
-    { key: 'all', label: 'الكل' },
-    { key: 'Online', label: 'متصلة', iconBg: 'bg-[#166534]' },
-    { key: 'Offline', label: 'غير متصلة', iconBg: 'bg-[#ba1a1a]' },
-    { key: 'Maintenance', label: 'صيانة', iconBg: 'bg-[#eab308]' },
-    { key: 'pending_activation', label: 'بانتظار التفعيل', iconType: 'hourglass' },
+    { key: 'all', label: t('screens.tab_all') },
+    { key: 'Online', label: t('screens.tab_online'), iconBg: 'bg-[#166534]' },
+    { key: 'Offline', label: t('screens.tab_offline'), iconBg: 'bg-[#ba1a1a]' },
+    { key: 'Maintenance', label: t('screens.tab_maintenance'), iconBg: 'bg-[#eab308]' },
+    { key: 'pending_activation', label: t('screens.tab_pending_activation'), iconType: 'hourglass' },
   ];
 
   return (
@@ -434,16 +437,16 @@ const ScreensPage = () => {
         <div>
           <div className="flex items-center gap-[8px] text-[#004ac6] mb-1">
             <Monitor className="w-[28px] h-[28px]" />
-            <h2 className="text-[32px] font-semibold text-[#141b2b] leading-[40px]">الشاشات والأجهزة</h2>
+            <h2 className="text-[32px] font-semibold text-[#141b2b] leading-[40px]">{t('screens.screens_and_devices')}</h2>
           </div>
-          <p className="text-[16px] text-[#434655]">مراقبة شاشات العرض جغرافياً، وتتبع حالتها التشغيلية الفورية.</p>
+          <p className="text-[16px] text-[#434655]">{t('screens.screens_subtitle')}</p>
         </div>
         {(can('manage_all') || can('manage_screens')) && (
           <div className="flex items-center gap-[12px]">
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              title="تحديث البيانات"
+              title={t('screens.update_data')}
               className="w-[48px] h-[48px] flex items-center justify-center rounded-lg bg-[#ffffff] text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm"
             >
               <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
@@ -453,7 +456,7 @@ const ScreensPage = () => {
               className="flex items-center gap-[8px] bg-[#2563eb] text-[#ffffff] px-[24px] py-3 rounded-lg hover:bg-[#004ac6] transition-colors shadow-sm text-[14px] font-medium"
             >
               <Plus className="w-5 h-5" />
-              إضافة شاشة جديدة
+              {t('screens.add_new_screen')}
             </button>
           </div>
         )}
@@ -465,7 +468,7 @@ const ScreensPage = () => {
           {/* Total */}
           <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[16px] flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[14px] font-medium text-[#434655] mb-1">إجمالي الشاشات</p>
+              <p className="text-[14px] font-medium text-[#434655] mb-1">{t('screens.total_screens')}</p>
               <p className="text-[48px] font-bold text-[#141b2b] leading-[60px]">{stats.total}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-[#dbe1ff] flex items-center justify-center text-[#004ac6]">
@@ -475,7 +478,7 @@ const ScreensPage = () => {
           {/* Active */}
           <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[16px] flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[14px] font-medium text-[#434655] mb-1">متصلة الآن</p>
+              <p className="text-[14px] font-medium text-[#434655] mb-1">{t('screens.online_now')}</p>
               <p className="text-[48px] font-bold text-[#141b2b] leading-[60px]">{stats.online}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#166534]">
@@ -485,7 +488,7 @@ const ScreensPage = () => {
           {/* Disconnected */}
           <div className="bg-[#ffffff] border border-[#E5E7EB] border-l-4 border-l-[#ba1a1a] rounded-xl p-[16px] flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[14px] font-medium text-[#434655] mb-1">مقطوعة الاتصال</p>
+              <p className="text-[14px] font-medium text-[#434655] mb-1">{t('screens.offline_now')}</p>
               <p className="text-[48px] font-bold text-[#ba1a1a] leading-[60px]">{stats.offline}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-[#ffdad6] flex items-center justify-center text-[#ba1a1a]">
@@ -495,7 +498,7 @@ const ScreensPage = () => {
           {/* Maintenance */}
           <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[16px] flex items-center justify-between shadow-sm">
             <div>
-              <p className="text-[14px] font-medium text-[#434655] mb-1">تحت الصيانة</p>
+              <p className="text-[14px] font-medium text-[#434655] mb-1">{t('screens.under_maintenance')}</p>
               <p className="text-[48px] font-bold text-[#141b2b] leading-[60px]">{stats.maintenance}</p>
             </div>
             <div className="w-12 h-12 rounded-full bg-[#fef9c3] flex items-center justify-center text-[#854d0e]">
@@ -512,17 +515,17 @@ const ScreensPage = () => {
           <div className="p-[16px] border-b border-[#c3c6d7] bg-[#f1f3ff] flex justify-between items-center">
             <div className="flex items-center gap-[8px]">
               <Layers className="text-[#004ac6] w-5 h-5" />
-              <h3 className="text-[20px] font-semibold text-[#141b2b]">جميع الشاشات المتوفرة</h3>
+              <h3 className="text-[20px] font-semibold text-[#141b2b]">{t('screens.all_available_screens')}</h3>
             </div>
             <span className="bg-[#2563eb] text-[#ffffff] px-2 py-1 rounded-full text-[12px] font-medium">
-              {featuredScreens.length} شاشة
+              {t('screens.n_screens').replace('{n}', featuredScreens.length)}
             </span>
           </div>
 
           <div className="flex-1 overflow-y-auto p-[8px] space-y-[8px] custom-scrollbar">
             {featuredScreens.length > 0 ? (
               featuredScreens.map(screen => {
-                const cfg = STATUS_CFG[screen.status] || STATUS_CFG.Offline;
+                const cfg = STATUS_CFG[screen.computed_status] || STATUS_CFG.Offline;
                 const StatusIcon = cfg.icon;
                 return (
                   <div key={screen.screen_id} className="border border-[#c3c6d7] rounded-lg p-[8px] bg-[#f9f9ff] hover:border-[#004ac6] transition-colors cursor-pointer" onClick={() => navigate(`/dashboard/screens/${screen.screen_id}`)}>
@@ -545,12 +548,12 @@ const ScreensPage = () => {
                     <div className="flex items-center gap-[4px] text-[#434655] text-[12px] font-normal mb-[16px]">
                       <MapPin className="text-[16px] w-4 h-4 shrink-0" />
                       <span className="truncate">
-                        {screen.street ? `${screen.street.name}${screen.street.region ? ` - ${screen.street.region.name}` : ''}` : 'غير محدد'}
+                        {screen.street ? `${screen.street.name}${screen.street.region ? ` - ${screen.street.region.name}` : ''}` : t('screens.not_specified')}
                       </span>
                     </div>
                     <div className="flex gap-[8px]">
-                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/screens/${screen.screen_id}`); }} className="flex-1 py-1.5 border border-[#004ac6] text-[#004ac6] rounded text-[14px] hover:bg-[#004ac6] hover:text-[#ffffff] transition-colors">تفاصيل وأداء</button>
-                      <button onClick={(e) => { e.stopPropagation(); handleOpenModal(true, screen); }} className="flex-1 py-1.5 border border-[#c3c6d7] text-[#141b2b] rounded text-[14px] hover:bg-[#e1e8fd] transition-colors">تعديل الموقع</button>
+                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/screens/${screen.screen_id}`); }} className="flex-1 py-1.5 border border-[#004ac6] text-[#004ac6] rounded text-[14px] hover:bg-[#004ac6] hover:text-[#ffffff] transition-colors">{t('screens.details_and_performance')}</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleOpenModal(true, screen); }} className="flex-1 py-1.5 border border-[#c3c6d7] text-[#141b2b] rounded text-[14px] hover:bg-[#e1e8fd] transition-colors">{t('screens.edit_location')}</button>
                     </div>
                   </div>
                 );
@@ -558,7 +561,7 @@ const ScreensPage = () => {
             ) : (
               <div className="flex flex-col items-center justify-center h-full py-8 text-center opacity-50">
                 <Monitor className="w-10 h-10 mb-2" />
-                <p>لا توجد شاشات مطابقة للبحث</p>
+                <p>{t('screens.no_screens_match')}</p>
               </div>
             )}
           </div>
@@ -572,14 +575,14 @@ const ScreensPage = () => {
               icon={Navigation}
               value={selectedGov}
               onChange={handleGovChange}
-              placeholder="كافة المحافظات"
+              placeholder={t('screens.all_governorates')}
               options={governorates.map(g => ({ value: g.gov_id, label: g.name }))}
             />
             <CascadingSelect
               icon={Building}
               value={selectedRegion}
               onChange={handleRegionChange}
-              placeholder="كافة المناطق"
+              placeholder={t('screens.all_regions')}
               options={regions.map(r => ({ value: r.region_id, label: r.name }))}
               disabled={!selectedGov || geoLoading}
             />
@@ -587,64 +590,62 @@ const ScreensPage = () => {
               icon={MapPin}
               value={selectedStreet}
               onChange={setSelectedStreet}
-              placeholder="كافة الشوارع"
+              placeholder={t('screens.all_streets')}
               options={streets.map(s => ({ value: s.street_id, label: s.name }))}
               disabled={!selectedRegion || geoLoading}
             />
             {(selectedGov || selectedRegion || selectedStreet) && (
               <button
                 onClick={clearFilters}
-                className="bg-[#ffdad6] text-[#ba1a1a] px-[8px] py-1 rounded text-[12px] hover:bg-[#ba1a1a] hover:text-white transition-colors h-8 flex items-center"
-              >
-                مسح الفلاتر
+                className="bg-[#ffdad6] text-[#ba1a1a] px-[8px] py-1 rounded text-[12px] hover:bg-[#ba1a1a] hover:text-white transition-colors h-8 flex items-center">
+                {t('screens.clear_filters')}
               </button>
             )}
-            <div className="mr-auto bg-[#f1f3ff] px-[8px] py-1 rounded text-[14px] font-medium flex items-center gap-[4px] h-8">
-              <Layers className="text-[#004ac6] w-4 h-4" />
-              خريطة الشاشات التفاعلية
-            </div>
+          <div className="mr-auto bg-[#f1f3ff] px-[8px] py-1 rounded text-[14px] font-medium flex items-center gap-[4px] h-8">
+            {t('screens.interactive_map')}
           </div>
+        </div>
 
-          <div className="flex-1 bg-[#e1e8fd] relative w-full h-full pt-12">
-            <Suspense fallback={
-              <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                <p className="text-sm font-bold text-gray-500">جاري تحميل الخريطة...</p>
-              </div>
-            }>
-              <ScreenMapView
-                screens={screens}
-                selectedGov={selectedGov}
-                selectedRegion={selectedRegion}
-                selectedStreet={selectedStreet}
-                governorates={governorates}
-                regions={regions}
-                streets={streets}
-              />
-            </Suspense>
-
-            {/* Map Legend */}
-            <div className="absolute bottom-4 right-4 bg-[#ffffff] border border-[#E5E7EB] rounded-lg p-[8px] shadow-sm z-10">
-              <p className="text-[12px] font-normal text-[#434655] mb-2">حالة الشاشات</p>
-              <div className="flex items-center gap-[4px] text-[14px] mb-1">
-                <div className="w-3 h-3 rounded-full bg-[#166534]"></div> <span>متصل</span>
-              </div>
-              <div className="flex items-center gap-[4px] text-[14px] mb-1">
-                <div className="w-3 h-3 rounded-full bg-[#ba1a1a]"></div> <span>غير متصل</span>
-              </div>
-              <div className="flex items-center gap-[4px] text-[14px]">
-                <div className="w-3 h-3 rounded-full bg-[#eab308]"></div> <span>صيانة</span>
-              </div>
+        <div className="flex-1 bg-[#e1e8fd] relative w-full h-full pt-12">
+          <Suspense fallback={
+            <div className="flex items-center justify-center w-full h-full">
+              <p className="text-sm font-bold text-gray-500">{t('screens.loading_map')}</p>
             </div>
-          </div>
+          }>
+        <ScreenMapView
+          screens={screens}
+          selectedGov={selectedGov}
+          selectedRegion={selectedRegion}
+          selectedStreet={selectedStreet}
+          governorates={governorates}
+          regions={regions}
+          streets={streets}
+        />
+      </Suspense>
+
+      {/* Map Legend */}
+      <div className="absolute bottom-4 right-4 bg-[#ffffff] border border-[#E5E7EB] rounded-lg p-[8px] shadow-sm z-10">
+        <p className="text-[12px] font-normal text-[#434655] mb-2">{t('screens.screens_status')}</p>
+        <div className="flex items-center gap-[4px] text-[14px] mb-1">
+          <div className="w-3 h-3 rounded-full bg-[#166534]"></div> <span>{t('screens.status_online')}</span>
+        </div>
+        <div className="flex items-center gap-[4px] text-[14px] mb-1">
+          <div className="w-3 h-3 rounded-full bg-[#ba1a1a]"></div> <span>{t('screens.status_offline')}</span>
+        </div>
+        <div className="flex items-center gap-[4px] text-[14px]">
+          <div className="w-3 h-3 rounded-full bg-[#eab308]"></div> <span>{t('screens.status_maintenance')}</span>
+        </div>
+      </div>
+    </div>
         </div>
       </div>
 
-      {/* ── Full Device Table ── */}
-      <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl overflow-hidden flex flex-col shadow-sm">
+  {/* ── Full Device Table ── */}
+  <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl overflow-hidden flex flex-col shadow-sm">
         <div className="p-[16px] border-b border-[#c3c6d7] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-[16px] bg-[#f9f9ff]">
           <div>
-            <h3 className="text-[20px] font-semibold text-[#141b2b] ">جدول الشاشات الكامل</h3>
-            <p className="text-[12px] text-[#434655]">عرض {filteredScreens.length} شاشة {(selectedGov || selectedRegion || selectedStreet) ? 'في التحديد الحالي' : 'في المنظومة بأكملها'}</p>
+            <h3 className="text-[20px] font-semibold text-[#141b2b] ">{t('screens.full_screens_table')}</h3>
+            <p className="text-[12px] text-[#434655]">{t('screens.showing_n_screens').replace('{n}', filteredScreens.length).replace('{condition}', (selectedGov || selectedRegion || selectedStreet) ? t('screens.in_current_selection') : t('screens.in_entire_system'))}</p>
           </div>
 
           {/* Table Tabs */}
@@ -670,26 +671,26 @@ const ScreensPage = () => {
           <table className="w-full text-right border-collapse min-w-[1000px]">
             <thead className="bg-[#F8FAFC] text-[#141b2b] text-[14px] font-medium border-b border-[#E5E7EB]">
               <tr>
-                <th className="p-[8px] whitespace-nowrap">اسم الشاشة</th>
-                <th className="p-[8px] whitespace-nowrap">معرف الشاشة</th>
-                <th className="p-[8px] whitespace-nowrap">مقاس الشاشة</th>
-                <th className="p-[8px] whitespace-nowrap text-center">الحالة</th>
-                <th className="p-[8px] whitespace-nowrap text-center">صورة</th>
-                <th className="p-[8px] whitespace-nowrap text-center">النوع</th>
-                <th className="p-[8px] whitespace-nowrap text-center">المالك</th>
-                <th className="p-[8px] whitespace-nowrap text-center">الموقع</th>
-                <th className="p-[8px] whitespace-nowrap text-center">آخر اتصال</th>
-                <th className="p-[8px] whitespace-nowrap text-center">إجراءات</th>
+                <th className="p-[8px] whitespace-nowrap">{t('screens.screen_name')}</th>
+                <th className="p-[8px] whitespace-nowrap">{t('screens.screen_id_col')}</th>
+                <th className="p-[8px] whitespace-nowrap">{t('screens.screen_size')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.status')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.image')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.type')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.owner')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.location')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.last_connection')}</th>
+                <th className="p-[8px] whitespace-nowrap text-center">{t('screens.actions')}</th>
               </tr>
             </thead>
             <tbody className="text-[16px] text-[#141b2b] divide-y divide-[#c3c6d7] bg-[#ffffff]">
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="p-8 text-center text-[#434655]">جاري التحديث...</td>
+                  <td colSpan="10" className="p-8 text-center text-[#434655]">{t('screens.updating')}</td>
                 </tr>
               ) : filteredScreens.length === 0 ? (
                 <tr>
-                  <td colSpan="10" className="p-8 text-center text-[#434655]">لا توجد بيانات مطابقة</td>
+                  <td colSpan="10" className="p-8 text-center text-[#434655]">{t('screens.no_matching_data')}</td>
                 </tr>
               ) : (
                 filteredScreens.map((row) => (
@@ -698,10 +699,10 @@ const ScreensPage = () => {
                     <td className="p-[8px] whitespace-nowrap">
                       <span className="text-[#434655] font-mono text-sm border border-[#c3c6d7] rounded px-2 m-1 inline-block">{row.mac_address}</span>
                     </td>
-                    <td className="p-[8px] text-[#434655] font-mono text-[14px]">{row.screen_size_inch ? `${row.screen_size_inch} بوصة` : '—'}</td>
+                    <td className="p-[8px] text-[#434655] font-mono text-[14px]">{row.screen_size_inch ? t('screens.n_inch').replace('{n}', row.screen_size_inch) : '—'}</td>
                     <td className="p-[8px] text-center">
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#f1f3ff] text-[#434655] text-[12px] font-medium border border-[#c3c6d7]">
-                        {row.status ? STATUS_CFG[row.status]?.label || row.status : 'بإنتظار التفعيل'}
+                        {row.status ? STATUS_CFG[row.status]?.label || row.status : t('screens.tab_pending_activation')}
                         {row.status ? <div className={`w-2 h-2 rounded-full ${STATUS_CFG[row.status]?.dot}`}></div> : <div className="w-2 h-2 rounded-full bg-[#737686]"></div>}
                       </span>
                     </td>
@@ -720,21 +721,21 @@ const ScreensPage = () => {
                     </td>
                     <td className="p-[8px]">
                       <div className="flex items-center justify-center gap-[4px]">
-                        <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/screens/${row.screen_id}`); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#004ac6] hover:bg-[#2563eb] hover:text-[#eeefff] transition-colors" title="عرض">
+                        <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/screens/${row.screen_id}`); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#004ac6] hover:bg-[#2563eb] hover:text-[#eeefff] transition-colors" title={t('screens.view')}>
                           <Eye className="w-[18px] h-[18px]" />
                         </button>
                         {(can('manage_all') || can('manage_screens')) && (
-                          <button onClick={(e) => { e.stopPropagation(); setCommandTarget(row); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#434655] hover:bg-[#e1e8fd] transition-colors" title="إعدادات">
+                          <button onClick={(e) => { e.stopPropagation(); setCommandTarget(row); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#434655] hover:bg-[#e1e8fd] transition-colors" title={t('screens.settings')}>
                             <TerminalSquare className="w-[18px] h-[18px]" />
                           </button>
                         )}
                         {(can('manage_all') || can('manage_screens')) && (
-                          <button onClick={(e) => { e.stopPropagation(); handleOpenModal(true, row); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#434655] hover:bg-[#e1e8fd] transition-colors" title="تعديل">
+                          <button onClick={(e) => { e.stopPropagation(); handleOpenModal(true, row); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#434655] hover:bg-[#e1e8fd] transition-colors" title={t('screens.edit')}>
                             <Edit2 className="w-[18px] h-[18px]" />
                           </button>
                         )}
                         {(can('manage_all') || can('manage_screens')) && (
-                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.screen_id); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a] transition-colors" title="حذف">
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(row.screen_id); }} className="w-8 h-8 rounded-full flex items-center justify-center text-[#ba1a1a] hover:bg-[#ffdad6] hover:text-[#93000a] transition-colors" title={t('screens.delete')}>
                             <Trash2 className="w-[18px] h-[18px]" />
                           </button>
                         )}
@@ -746,588 +747,588 @@ const ScreensPage = () => {
             </tbody>
           </table>
         </div>
-        <div className="p-[8px] border-t border-[#c3c6d7] bg-[#f1f3ff] text-center text-[14px] text-[#434655]">
-          عرض {filteredScreens.length} من {screens.length} شاشة
+  <div className="p-[8px] border-t border-[#c3c6d7] bg-[#f1f3ff] text-center text-[14px] text-[#434655]">
+    {t('screens.showing_n_of_total').replace('{n}', filteredScreens.length).replace('{total}', screens.length)}
+  </div>
+      </div>
+
+  <Modal
+    isOpen={modalConfig.open}
+    onClose={() => setModalConfig({ open: false, isEdit: false, screen: null })}
+    title={modalConfig.isEdit ? t('screens.update_screen_data') : t('screens.register_new_screen')}
+  >
+    <form onSubmit={handleSubmit} dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+
+      {/* ══ SECTION 1: المعلومات الأساسية ══ */}
+      <div style={{
+        background: 'linear-gradient(135deg, #f1f3ff 0%, #e9edff 100%)',
+        border: '1px solid #c3c6d7',
+        borderRadius: '14px',
+        padding: '20px',
+        marginBottom: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#004ac6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Info style={{ width: 15, height: 15, color: '#fff' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>{t('screens.basic_info_title')}</h4>
+          <span style={{ fontSize: '11px', color: '#737686', marginRight: 'auto' }}>{t('screens.step_1_of_4')}</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: modalConfig.isEdit ? '1fr' : '1fr 1fr', gap: '12px' }}>
+          {/* اسم الشاشة */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
+              {t('screens.screen_name')} <span style={{ color: '#ba1a1a' }}>*</span>
+            </label>
+            <input
+              type="text" required value={form.screen_name}
+              onChange={(e) => setForm(p => ({ ...p, screen_name: e.target.value }))}
+              placeholder={t('screens.screen_name_placeholder')}
+              style={{
+                width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                padding: '10px 14px', fontSize: '14px', color: '#141b2b',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={e => e.target.style.borderColor = '#004ac6'}
+              onBlur={e => e.target.style.borderColor = '#c3c6d7'}
+            />
+          </div>
+
+          {/* معرف الشاشة — إضافة فقط */}
+          {!modalConfig.isEdit && (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
+                {t('screens.screen_id_label')} <span style={{ color: '#ba1a1a' }}>*</span>
+              </label>
+              <input
+                type="text" required value={form.mac_address}
+                onChange={(e) => setForm(p => ({ ...p, mac_address: e.target.value }))}
+                placeholder="SB-NEG543RR"
+                dir="ltr"
+                style={{
+                  width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                  padding: '10px 14px', fontSize: '13px', fontFamily: 'monospace',
+                  color: '#141b2b', background: '#fff', outline: 'none', boxSizing: 'border-box',
+                  letterSpacing: '0.08em', transition: 'border-color 0.2s',
+                }}
+                onFocus={e => e.target.style.borderColor = '#004ac6'}
+                onBlur={e => e.target.style.borderColor = '#c3c6d7'}
+              />
+            </div>
+          )}
+
+          {/* الحالة — تعديل فقط */}
+          {modalConfig.isEdit && (
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>{t('screens.operational_status')}</label>
+              <select
+                value={form.status}
+                onChange={(e) => setForm(p => ({ ...p, status: e.target.value }))}
+                style={{
+                  width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                  padding: '10px 14px', fontSize: '14px', color: '#141b2b',
+                  background: '#fff', outline: 'none', boxSizing: 'border-box',
+                }}
+              >
+                <option value="Online">🟢 {t('screens.status_online')}</option>
+                <option value="Offline">🔴 {t('screens.status_offline')}</option>
+                <option value="Maintenance">🟡 {t('screens.status_maintenance_long')}</option>
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
-      <Modal
-        isOpen={modalConfig.open}
-        onClose={() => setModalConfig({ open: false, isEdit: false, screen: null })}
-        title={modalConfig.isEdit ? 'تحديث بيانات الشاشة' : 'تسجيل شاشة جديدة'}
-      >
-        <form onSubmit={handleSubmit} dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-
-          {/* ══ SECTION 1: المعلومات الأساسية ══ */}
-          <div style={{
-            background: 'linear-gradient(135deg, #f1f3ff 0%, #e9edff 100%)',
-            border: '1px solid #c3c6d7',
-            borderRadius: '14px',
-            padding: '20px',
-            marginBottom: '16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#004ac6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Info style={{ width: 15, height: 15, color: '#fff' }} />
-              </div>
-              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>المعلومات الأساسية</h4>
-              <span style={{ fontSize: '11px', color: '#737686', marginRight: 'auto' }}>الخطوة 1 من 4</span>
+      {/* ══ SECTION 2: الموقع الجغرافي ══ */}
+      <div style={{
+        background: '#ffffff',
+        border: '1px solid #c3c6d7',
+        borderRadius: '14px',
+        padding: '20px',
+        marginBottom: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#0060ac', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <MapPin style={{ width: 15, height: 15, color: '#fff' }} />
             </div>
+            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>{t('screens.geographic_location')}</h4>
+            <span style={{ fontSize: '11px', color: '#737686' }}>{t('screens.step_2_of_4')}</span>
+          </div>
+          <label style={{
+            display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
+            background: isNewLocation ? '#dbe1ff' : '#f9f9ff',
+            border: `1.5px solid ${isNewLocation ? '#004ac6' : '#c3c6d7'}`,
+            borderRadius: '8px', padding: '5px 10px', transition: 'all 0.2s',
+          }}>
+            <input type="checkbox" checked={isNewLocation} onChange={(e) => setIsNewLocation(e.target.checked)}
+              style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#004ac6' }} />
+            <span style={{ fontSize: '12px', fontWeight: 600, color: isNewLocation ? '#004ac6' : '#434655' }}>{t('screens.new_location')}</span>
+          </label>
+        </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: modalConfig.isEdit ? '1fr' : '1fr 1fr', gap: '12px' }}>
-              {/* اسم الشاشة */}
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
-                  اسم الشاشة <span style={{ color: '#ba1a1a' }}>*</span>
-                </label>
-                <input
-                  type="text" required value={form.screen_name}
-                  onChange={(e) => setForm(p => ({ ...p, screen_name: e.target.value }))}
-                  placeholder="مثال: شاشة مول السعيد - المدخل الرئيسي"
-                  style={{
-                    width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                    padding: '10px 14px', fontSize: '14px', color: '#141b2b',
-                    background: '#fff', outline: 'none', boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#004ac6'}
-                  onBlur={e => e.target.style.borderColor = '#c3c6d7'}
-                />
-              </div>
-
-              {/* معرف الشاشة — إضافة فقط */}
-              {!modalConfig.isEdit && (
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
-                    معرف الشاشة <span style={{ color: '#ba1a1a' }}>*</span>
-                  </label>
+        {isNewLocation ? (
+          <div style={{ background: '#f1f3ff', borderRadius: '10px', padding: '16px', border: '1px dashed #adc6ff' }}>
+            <p style={{ fontSize: '11px', color: '#004ac6', marginBottom: '12px', margin: '0 0 12px' }}>
+              📍 {t('screens.location_auto_add')}
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+              {[
+                { key: 'governorate', label: t('screens.governorate'), placeholder: t('screens.gov_placeholder') },
+                { key: 'region', label: t('screens.region_district'), placeholder: t('screens.region_placeholder') },
+                { key: 'street', label: t('screens.main_street'), placeholder: t('screens.street_placeholder') },
+              ].map(f => (
+                <div key={f.key}>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>{f.label}</label>
                   <input
-                    type="text" required value={form.mac_address}
-                    onChange={(e) => setForm(p => ({ ...p, mac_address: e.target.value }))}
-                    placeholder="SB-NEG543RR"
-                    dir="ltr"
+                    type="text" value={newLocation[f.key]} required={isNewLocation}
+                    placeholder={f.placeholder}
+                    onChange={(e) => setNewLocation(p => ({ ...p, [f.key]: e.target.value }))}
                     style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 14px', fontSize: '13px', fontFamily: 'monospace',
-                      color: '#141b2b', background: '#fff', outline: 'none', boxSizing: 'border-box',
-                      letterSpacing: '0.08em', transition: 'border-color 0.2s',
+                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
+                      padding: '8px 10px', fontSize: '13px', color: '#141b2b',
+                      background: '#fff', outline: 'none', boxSizing: 'border-box',
                     }}
                     onFocus={e => e.target.style.borderColor = '#004ac6'}
                     onBlur={e => e.target.style.borderColor = '#c3c6d7'}
                   />
                 </div>
-              )}
-
-              {/* الحالة — تعديل فقط */}
-              {modalConfig.isEdit && (
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>الحالة التشغيلية</label>
-                  <select
-                    value={form.status}
-                    onChange={(e) => setForm(p => ({ ...p, status: e.target.value }))}
-                    style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 14px', fontSize: '14px', color: '#141b2b',
-                      background: '#fff', outline: 'none', boxSizing: 'border-box',
-                    }}
-                  >
-                    <option value="Online">🟢 متصلة (Online)</option>
-                    <option value="Offline">🔴 غير متصلة (Offline)</option>
-                    <option value="Maintenance">🟡 تحت الصيانة (Maintenance)</option>
-                  </select>
-                </div>
-              )}
+              ))}
             </div>
           </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+            {/* المحافظة */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>{t('screens.governorate')}</label>
+              <select
+                value={formGovId} onChange={(e) => handleFormGovChange(e.target.value)} required={!isNewLocation}
+                style={{
+                  width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                  padding: '10px 12px', fontSize: '13px', color: '#141b2b',
+                  background: '#fff', outline: 'none', boxSizing: 'border-box',
+                }}>
+                <option value="">{t('screens.select_gov')}</option>
+                {(Array.isArray(governorates) ? governorates : []).map(g => <option key={g.gov_id} value={g.gov_id}>{g.name}</option>)}
+              </select>
+            </div>
+            {/* المنطقة */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>{t('screens.region')}</label>
+              <select
+                value={formRegionId} onChange={(e) => handleFormRegionChange(e.target.value)} required={!isNewLocation}
+                disabled={!formGovId || formGeoLoading}
+                style={{
+                  width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                  padding: '10px 12px', fontSize: '13px', color: '#141b2b',
+                  background: formGeoLoading ? '#f1f3ff' : '#fff', outline: 'none', boxSizing: 'border-box',
+                  opacity: formGeoLoading || (!formGovId && !formRegionId) ? 0.5 : 1,
+                }}>
+                <option value="">{t('screens.select_region')}</option>
+                {(Array.isArray(formRegions) ? formRegions : []).map(r => <option key={r.region_id} value={r.region_id}>{r.name}</option>)}
+              </select>
+            </div>
+            {/* الشارع */}
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>{t('screens.street')}</label>
+              <select
+                value={form.street_id} onChange={(e) => setForm(p => ({ ...p, street_id: e.target.value }))} required={!isNewLocation}
+                disabled={!formRegionId || formGeoLoading}
+                style={{
+                  width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                  padding: '10px 12px', fontSize: '13px', color: '#141b2b',
+                  background: formGeoLoading ? '#f1f3ff' : '#fff', outline: 'none', boxSizing: 'border-box',
+                  opacity: formGeoLoading || (!formRegionId && !form.street_id) ? 0.5 : 1,
+                }}>
+                <option value="">{t('screens.select_street')}</option>
+                {(Array.isArray(formStreets) ? formStreets : []).map(s => <option key={s.street_id} value={s.street_id}>{s.name}</option>)}
+              </select>
+            </div>
+          </div>
+        )}
 
-          {/* ══ SECTION 2: الموقع الجغرافي ══ */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #c3c6d7',
-            borderRadius: '14px',
-            padding: '20px',
-            marginBottom: '16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#0060ac', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MapPin style={{ width: 15, height: 15, color: '#fff' }} />
-                </div>
-                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>الموقع الجغرافي</h4>
-                <span style={{ fontSize: '11px', color: '#737686' }}>الخطوة 2 من 4</span>
+        {/* Map Picker UI */}
+        <div style={{ marginTop: '16px', background: '#f9f9ff', padding: '12px', borderRadius: '10px', border: '1px solid #c3c6d7' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <MapPin style={{ color: '#004ac6', width: 20, height: 20 }} />
+              <div>
+                <h5 style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#141b2b' }}>{t('screens.map_coordinates')}</h5>
+                <span style={{ fontSize: '11px', color: '#737686' }}>
+                  {form.latitude && form.longitude
+                    ? `${t('screens.lng')}: ${Number(form.longitude).toFixed(5)} | ${t('screens.lat')}: ${Number(form.latitude).toFixed(5)}`
+                    : t('screens.no_exact_location')}
+                </span>
               </div>
-              <label style={{
-                display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
-                background: isNewLocation ? '#dbe1ff' : '#f9f9ff',
-                border: `1.5px solid ${isNewLocation ? '#004ac6' : '#c3c6d7'}`,
-                borderRadius: '8px', padding: '5px 10px', transition: 'all 0.2s',
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowMapModal(true)}
+              style={{
+                background: '#004ac6', color: '#fff', border: 'none', padding: '6px 16px',
+                borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              {t('screens.pick_on_map')}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ SECTION 3: التصنيف والملكية والتسعير ══ */}
+      <div style={{
+        background: '#ffffff',
+        border: '1px solid #c3c6d7',
+        borderRadius: '14px',
+        padding: '20px',
+        marginBottom: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Layers style={{ width: 15, height: 15, color: '#fff' }} />
+          </div>
+          <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>{t('screens.classification_ownership_pricing')}</h4>
+          <span style={{ fontSize: '11px', color: '#737686', marginRight: 'auto' }}>{t('screens.step_3_of_4')}</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+          {/* طراز الشاشة */}
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>{t('screens.screen_model')}</label>
+            <select
+              value={form.type_id} onChange={e => setForm(p => ({ ...p, type_id: e.target.value }))} required
+              style={{
+                width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                padding: '10px 12px', fontSize: '13px', color: '#141b2b',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
               }}>
-                <input type="checkbox" checked={isNewLocation} onChange={(e) => setIsNewLocation(e.target.checked)}
-                  style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#004ac6' }} />
-                <span style={{ fontSize: '12px', fontWeight: 600, color: isNewLocation ? '#004ac6' : '#434655' }}>موقع جديد</span>
-              </label>
-            </div>
-
-            {isNewLocation ? (
-              <div style={{ background: '#f1f3ff', borderRadius: '10px', padding: '16px', border: '1px dashed #adc6ff' }}>
-                <p style={{ fontSize: '11px', color: '#004ac6', marginBottom: '12px', margin: '0 0 12px' }}>
-                  📍 سيُضاف هذا الموقع تلقائياً لقاعدة البيانات
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-                  {[
-                    { key: 'governorate', label: 'المحافظة', placeholder: 'مثال: صنعاء' },
-                    { key: 'region', label: 'المنطقة / المديرية', placeholder: 'مثال: السبعين' },
-                    { key: 'street', label: 'الشارع الرئيسي', placeholder: 'مثال: شارع حدة' },
-                  ].map(f => (
-                    <div key={f.key}>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>{f.label}</label>
-                      <input
-                        type="text" value={newLocation[f.key]} required={isNewLocation}
-                        placeholder={f.placeholder}
-                        onChange={(e) => setNewLocation(p => ({ ...p, [f.key]: e.target.value }))}
-                        style={{
-                          width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
-                          padding: '8px 10px', fontSize: '13px', color: '#141b2b',
-                          background: '#fff', outline: 'none', boxSizing: 'border-box',
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#004ac6'}
-                        onBlur={e => e.target.style.borderColor = '#c3c6d7'}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-                {/* المحافظة */}
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>المحافظة</label>
-                  <select
-                    value={formGovId} onChange={(e) => handleFormGovChange(e.target.value)} required={!isNewLocation}
-                    style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 12px', fontSize: '13px', color: '#141b2b',
-                      background: '#fff', outline: 'none', boxSizing: 'border-box',
-                    }}>
-                    <option value="">-- المحافظة --</option>
-                    {(Array.isArray(governorates) ? governorates : []).map(g => <option key={g.gov_id} value={g.gov_id}>{g.name}</option>)}
-                  </select>
-                </div>
-                {/* المنطقة */}
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>المنطقة</label>
-                  <select
-                    value={formRegionId} onChange={(e) => handleFormRegionChange(e.target.value)} required={!isNewLocation}
-                    disabled={!formGovId || formGeoLoading}
-                    style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 12px', fontSize: '13px', color: '#141b2b',
-                      background: formGeoLoading ? '#f1f3ff' : '#fff', outline: 'none', boxSizing: 'border-box',
-                      opacity: formGeoLoading || (!formGovId && !formRegionId) ? 0.5 : 1,
-                    }}>
-                    <option value="">-- المنطقة --</option>
-                    {(Array.isArray(formRegions) ? formRegions : []).map(r => <option key={r.region_id} value={r.region_id}>{r.name}</option>)}
-                  </select>
-                </div>
-                {/* الشارع */}
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>الشارع</label>
-                  <select
-                    value={form.street_id} onChange={(e) => setForm(p => ({ ...p, street_id: e.target.value }))} required={!isNewLocation}
-                    disabled={!formRegionId || formGeoLoading}
-                    style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 12px', fontSize: '13px', color: '#141b2b',
-                      background: formGeoLoading ? '#f1f3ff' : '#fff', outline: 'none', boxSizing: 'border-box',
-                      opacity: formGeoLoading || (!formRegionId && !form.street_id) ? 0.5 : 1,
-                    }}>
-                    <option value="">-- الشارع --</option>
-                    {(Array.isArray(formStreets) ? formStreets : []).map(s => <option key={s.street_id} value={s.street_id}>{s.name}</option>)}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {/* Map Picker UI */}
-            <div style={{ marginTop: '16px', background: '#f9f9ff', padding: '12px', borderRadius: '10px', border: '1px solid #c3c6d7' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <MapPin style={{ color: '#004ac6', width: 20, height: 20 }} />
-                  <div>
-                    <h5 style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#141b2b' }}>الإحداثيات الجغرافية على الخريطة</h5>
-                    <span style={{ fontSize: '11px', color: '#737686' }}>
-                      {form.latitude && form.longitude
-                        ? `الطول: ${Number(form.longitude).toFixed(5)} | العرض: ${Number(form.latitude).toFixed(5)}`
-                        : 'لم يتم تحديد موقع دقيق للشاشة'}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowMapModal(true)}
-                  style={{
-                    background: '#004ac6', color: '#fff', border: 'none', padding: '6px 16px',
-                    borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
-                  }}
-                >
-                  تحديد على الخريطة
-                </button>
-              </div>
-            </div>
+              <option value="">{t('screens.select_type')}</option>
+              {(Array.isArray(lookups.types) ? lookups.types : []).map(t => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
+            </select>
           </div>
 
-          {/* ══ SECTION 3: التصنيف والملكية والتسعير ══ */}
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid #c3c6d7',
-            borderRadius: '14px',
-            padding: '20px',
-            marginBottom: '16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Layers style={{ width: 15, height: 15, color: '#fff' }} />
-              </div>
-              <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>التصنيف والملكية والتسعير</h4>
-              <span style={{ fontSize: '11px', color: '#737686', marginRight: 'auto' }}>الخطوة 3 من 4</span>
-            </div>
+          {/* حجم الشاشة */}
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>📺 {t('screens.screen_size_inch')}</label>
+            <select value={form.screen_size_inch} onChange={(e) => setForm(p => ({ ...p, screen_size_inch: e.target.value }))}
+              style={{
+                width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                padding: '10px 12px', fontSize: '13px', color: '#141b2b',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
+              }}>
+              <option value="32">32 {t('screens.inch')} (1.0×)</option>
+              <option value="43">43 {t('screens.inch')} (1.0×)</option>
+              <option value="55">55 {t('screens.inch')} (1.0×)</option>
+              <option value="65">65 {t('screens.inch')} (1.1×)</option>
+              <option value="75">75 {t('screens.inch')} (1.2×)</option>
+              <option value="86">86 {t('screens.inch')} (1.35×)</option>
+              <option value="98">98 {t('screens.inch')} (1.5×)</option>
+            </select>
+          </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              {/* طراز الشاشة */}
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>طراز الشاشة</label>
+          {/* السعر الأساسي */}
+          <div>
+            <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
+              💰 {t('screens.daily_base_price')} <span style={{ color: '#ba1a1a' }}>*</span>
+            </label>
+            <input
+              type="number" min="0" step="0.5" required
+              value={form.base_price}
+              onChange={(e) => setForm(p => ({ ...p, base_price: e.target.value }))}
+              placeholder={t('screens.price_placeholder')}
+              style={{
+                width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                padding: '10px 14px', fontSize: '14px', color: '#141b2b',
+                background: '#fff', outline: 'none', boxSizing: 'border-box',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={e => e.target.style.borderColor = '#004ac6'}
+              onBlur={e => e.target.style.borderColor = '#c3c6d7'}
+            />
+            <p style={{ fontSize: '11px', color: '#737686', margin: '4px 0 0' }}>{t('screens.price_desc')}</p>
+          </div>
+
+          {/* مالك الشاشة */}
+          {can('manage_all') && (
+            <div>
+              <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
+                👑 {t('screens.screen_owner_optional')}
+              </label>
+              <div className="flex items-center gap-2">
                 <select
-                    value={form.type_id} onChange={e => setForm(p => ({ ...p, type_id: e.target.value }))} required
-                    style={{
-                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                      padding: '10px 12px', fontSize: '13px', color: '#141b2b',
-                      background: '#fff', outline: 'none', boxSizing: 'border-box',
-                    }}>
-                    <option value="">-- اختر الطراز --</option>
-                    {(Array.isArray(lookups.types) ? lookups.types : []).map(t => <option key={t.type_id} value={t.type_id}>{t.type_name}</option>)}
-                  </select>
-              </div>
-
-              {/* حجم الشاشة */}
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>📺 حجم الشاشة (إنش)</label>
-                <select value={form.screen_size_inch} onChange={(e) => setForm(p => ({ ...p, screen_size_inch: e.target.value }))}
+                  value={form.owner_id || ''}
+                  onChange={(e) => setForm(p => ({ ...p, owner_id: e.target.value }))}
                   style={{
-                    width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                    padding: '10px 12px', fontSize: '13px', color: '#141b2b',
-                    background: '#fff', outline: 'none', boxSizing: 'border-box',
-                  }}>
-                  <option value="32">32 إنش (1.0×)</option>
-                  <option value="43">43 إنش (1.0×)</option>
-                  <option value="55">55 إنش (1.0×)</option>
-                  <option value="65">65 إنش (1.1×)</option>
-                  <option value="75">75 إنش (1.2×)</option>
-                  <option value="86">86 إنش (1.35×)</option>
-                  <option value="98">98 إنش (1.5×)</option>
-                </select>
-              </div>
-
-              {/* السعر الأساسي */}
-              <div>
-                <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
-                  💰 السعر الأساسي اليومي ($) <span style={{ color: '#ba1a1a' }}>*</span>
-                </label>
-                <input
-                  type="number" min="0" step="0.5" required
-                  value={form.base_price}
-                  onChange={(e) => setForm(p => ({ ...p, base_price: e.target.value }))}
-                  placeholder="مثال: 15"
-                  style={{
-                    width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '10px',
+                    flex: 1, border: '1.5px solid #c3c6d7', borderRadius: '10px',
                     padding: '10px 14px', fontSize: '14px', color: '#141b2b',
                     background: '#fff', outline: 'none', boxSizing: 'border-box',
                     transition: 'border-color 0.2s',
                   }}
                   onFocus={e => e.target.style.borderColor = '#004ac6'}
                   onBlur={e => e.target.style.borderColor = '#c3c6d7'}
-                />
-                <p style={{ fontSize: '11px', color: '#737686', margin: '4px 0 0' }}>سعر عرض الإعلان لمدة يوم كامل</p>
+                >
+                  <option value="">{t('screens.select_owner')}</option>
+                  {(lookups.owners?.data || lookups.owners || []).map(o => (
+                    <option key={o.user_id} value={o.user_id}>{o.full_name} ({o.email})</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setQuickOwnerModal(true)}
+                  style={{
+                    width: '42px', height: '42px', backgroundColor: '#e1e8fd',
+                    color: '#004ac6', borderRadius: '10px', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', border: 'none',
+                    cursor: 'pointer', transition: '0.2s', padding: 0
+                  }}
+                  title={t('screens.add_owner_quick')}
+                  onMouseOver={e => e.currentTarget.style.backgroundColor = '#dbe1ff'}
+                  onMouseOut={e => e.currentTarget.style.backgroundColor = '#e1e8fd'}
+                >
+                  <Plus style={{ width: '20px', height: '20px' }} />
+                </button>
               </div>
-
-              {/* مالك الشاشة */}
-              {can('manage_all') && (
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '6px' }}>
-                    👑 مالك الشاشة (اختياري)
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={form.owner_id || ''}
-                      onChange={(e) => setForm(p => ({ ...p, owner_id: e.target.value }))}
-                      style={{
-                        flex: 1, border: '1.5px solid #c3c6d7', borderRadius: '10px',
-                        padding: '10px 14px', fontSize: '14px', color: '#141b2b',
-                        background: '#fff', outline: 'none', boxSizing: 'border-box',
-                        transition: 'border-color 0.2s',
-                      }}
-                      onFocus={e => e.target.style.borderColor = '#004ac6'}
-                      onBlur={e => e.target.style.borderColor = '#c3c6d7'}
-                    >
-                      <option value="">-- اختر مالك الشاشة --</option>
-                      {(lookups.owners?.data || lookups.owners || []).map(o => (
-                        <option key={o.user_id} value={o.user_id}>{o.full_name} ({o.email})</option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={() => setQuickOwnerModal(true)}
-                      style={{
-                        width: '42px', height: '42px', backgroundColor: '#e1e8fd',
-                        color: '#004ac6', borderRadius: '10px', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center', border: 'none',
-                        cursor: 'pointer', transition: '0.2s', padding: 0
-                      }}
-                      title="إضافة مالك جديد سريعاً"
-                      onMouseOver={e => e.currentTarget.style.backgroundColor = '#dbe1ff'}
-                      onMouseOut={e => e.currentTarget.style.backgroundColor = '#e1e8fd'}
-                    >
-                      <Plus style={{ width: '20px', height: '20px' }} />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ══ SECTION 4: أوقات الذروة ══ */}
-          <div style={{
-            background: '#fff',
-            border: '1px solid #c3c6d7',
-            borderRadius: '14px',
-            padding: '20px',
-            marginBottom: '16px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#eab308', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Clock style={{ width: 15, height: 15, color: '#fff' }} />
-                </div>
-                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>أوقات الذروة والتسعير الديناميكي</h4>
-                <span style={{ fontSize: '11px', color: '#737686' }}>الخطوة 4 من 4</span>
-              </div>
-              <button type="button" onClick={handleAddSlot}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '5px',
-                  padding: '6px 12px', borderRadius: '8px',
-                  border: '1.5px solid #004ac6', background: '#fff',
-                  color: '#004ac6', fontSize: '12px', fontWeight: 600,
-                  cursor: 'pointer', transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#e1e8fd'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
-              >
-                <Plus style={{ width: 14, height: 14 }} /> إضافة فترة ذروة
-              </button>
-            </div>
-            <p style={{ fontSize: '11px', color: '#737686', marginBottom: '12px', lineHeight: 1.6 }}>
-              حدد الأوقات التي يتضاعف فيها السعر. بعد الانتهاء يعود للسعر الأساسي (${form.base_price || 0}) تلقائياً.
-            </p>
-
-            {slotsLoading ? (
-              <div style={{ textAlign: 'center', padding: '16px', color: '#737686', fontSize: '13px' }}>⏳ جاري تحميل أوقات الذروة...</div>
-            ) : peakSlots.length === 0 ? (
-              <div style={{
-                textAlign: 'center', padding: '20px', background: '#f9f9ff',
-                borderRadius: '10px', border: '1px dashed #c3c6d7',
-              }}>
-                <p style={{ fontSize: '12px', color: '#737686', margin: 0 }}>لم تُضف أي أوقات ذروة — التسعيرة الأساسية معتمدة دائماً</p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {peakSlots.map((slot) => (
-                  <div key={slot.id} style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr 160px 36px',
-                    gap: '10px', alignItems: 'end',
-                    background: '#f9f9ff', padding: '12px', borderRadius: '10px',
-                    border: '1px solid #dce2f7',
-                  }}>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>وقت البدء</label>
-                      <input type="time" value={slot.start_time}
-                        onChange={(e) => handleUpdateSlot(slot.id, 'start_time', e.target.value)} required
-                        style={{
-                          width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
-                          padding: '7px 10px', fontSize: '13px', color: '#141b2b',
-                          background: '#fff', outline: 'none', boxSizing: 'border-box',
-                        }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>وقت الانتهاء</label>
-                      <input type="time" value={slot.end_time}
-                        onChange={(e) => handleUpdateSlot(slot.id, 'end_time', e.target.value)} required
-                        style={{
-                          width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
-                          padding: '7px 10px', fontSize: '13px', color: '#141b2b',
-                          background: '#fff', outline: 'none', boxSizing: 'border-box',
-                        }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '5px' }}>
-                        <Zap style={{ width: 12, height: 12, color: '#eab308' }} /> المضاعف × السعر
-                      </label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <input type="number" step="0.1" min="1.1"
-                          value={slot.price_multiplier}
-                          onChange={(e) => handleUpdateSlot(slot.id, 'price_multiplier', e.target.value)} required
-                          style={{
-                            width: '60px', border: '1.5px solid #eab308', borderRadius: '8px',
-                            padding: '7px 8px', fontSize: '13px', fontWeight: 700,
-                            color: '#854d0e', background: '#fef9c3', outline: 'none',
-                          }} />
-                        <span style={{ fontSize: '11px', color: '#737686', whiteSpace: 'nowrap' }}>
-                          = ${(parseFloat(form.base_price || 0) * parseFloat(slot.price_multiplier || 1)).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                    <button type="button" onClick={() => handleRemoveSlot(slot.id)}
-                      style={{
-                        width: 34, height: 34, borderRadius: '8px', border: 'none',
-                        background: '#ffdad6', color: '#ba1a1a', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.background = '#ba1a1a'; e.currentTarget.style.color = '#fff'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = '#ffdad6'; e.currentTarget.style.color = '#ba1a1a'; }}
-                    >
-                      <Trash2 style={{ width: 15, height: 15 }} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* ══ SECTION: صورة مرجعية (إضافة فقط) ══ */}
-          {!modalConfig.isEdit && (
-            <div style={{
-              border: '2px dashed #004ac6', borderRadius: '14px',
-              background: '#f1f3ff', marginBottom: '16px', overflow: 'hidden',
-            }}>
-              <label style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                justifyContent: 'center', padding: '24px', cursor: 'pointer',
-              }}>
-                {form.photo ? (
-                  <div style={{ textAlign: 'center', color: '#004ac6' }}>
-                    <ImageIcon style={{ width: 32, height: 32, marginBottom: '8px' }} />
-                    <p style={{ fontSize: '13px', fontWeight: 600, margin: 0 }}>{form.photo.name}</p>
-                    <p style={{ fontSize: '11px', color: '#737686', margin: '4px 0 0' }}>انقر لتغيير الصورة</p>
-                  </div>
-                ) : (
-                  <div style={{ textAlign: 'center' }}>
-                    <UploadCloud style={{ width: 36, height: 36, color: '#004ac6', marginBottom: '8px' }} />
-                    <p style={{ fontSize: '14px', fontWeight: 600, color: '#141b2b', margin: '0 0 4px' }}>صورة مرجعية للشاشة</p>
-                    <p style={{ fontSize: '12px', color: '#737686', margin: 0 }}>JPG · PNG · WEBP — انقر للرفع أو اسحب هنا</p>
-                  </div>
-                )}
-                <input type="file" accept="image/*" required style={{ display: 'none' }}
-                  onChange={(e) => setForm(p => ({ ...p, photo: e.target.files[0] }))} />
-              </label>
             </div>
           )}
+        </div>
+      </div>
 
-          {/* ══ زر الحفظ ══ */}
-          <button
-            type="submit"
-            disabled={formLoading}
+      {/* ══ SECTION 4: أوقات الذروة ══ */}
+      <div style={{
+        background: '#fff',
+        border: '1px solid #c3c6d7',
+        borderRadius: '14px',
+        padding: '20px',
+        marginBottom: '16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '8px', background: '#eab308', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Clock style={{ width: 15, height: 15, color: '#fff' }} />
+            </div>
+            <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#141b2b' }}>{t('screens.peak_hours_pricing')}</h4>
+            <span style={{ fontSize: '11px', color: '#737686' }}>{t('screens.step_4_of_4')}</span>
+          </div>
+          <button type="button" onClick={handleAddSlot}
             style={{
-              width: '100%', padding: '14px',
-              background: formLoading ? '#c3c6d7' : 'linear-gradient(135deg, #004ac6 0%, #2563eb 100%)',
-              color: '#fff', border: 'none', borderRadius: '12px',
-              fontSize: '15px', fontWeight: 700, cursor: formLoading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-              boxShadow: formLoading ? 'none' : '0 4px 16px rgba(0,74,198,0.30)',
-              letterSpacing: '0.01em',
+              display: 'flex', alignItems: 'center', gap: '5px',
+              padding: '6px 12px', borderRadius: '8px',
+              border: '1.5px solid #004ac6', background: '#fff',
+              color: '#004ac6', fontSize: '12px', fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.2s',
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#e1e8fd'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
           >
-            {formLoading ? '⏳ جاري التنفيذ...' : (modalConfig.isEdit ? '✅ اعتماد التحديثات' : '🚀 حفظ وإضافة الشاشة')}
+            <Plus style={{ width: 14, height: 14 }} /> {t('screens.add_peak_slot')}
           </button>
-        </form>
-      </Modal>
+        </div>
+        <p style={{ fontSize: '11px', color: '#737686', marginBottom: '12px', lineHeight: 1.6 }}>
+          {t('screens.peak_hours_desc').replace('{price}', form.base_price || 0)}
+        </p>
+
+        {slotsLoading ? (
+          <div style={{ textAlign: 'center', padding: '16px', color: '#737686', fontSize: '13px' }}>⏳ {t('screens.loading_peak_slots')}</div>
+        ) : peakSlots.length === 0 ? (
+          <div style={{
+            textAlign: 'center', padding: '20px', background: '#f9f9ff',
+            borderRadius: '10px', border: '1px dashed #c3c6d7',
+          }}>
+            <p style={{ fontSize: '12px', color: '#737686', margin: 0 }}>{t('screens.no_peak_slots')}</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {peakSlots.map((slot) => (
+              <div key={slot.id} style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr 160px 36px',
+                gap: '10px', alignItems: 'end',
+                background: '#f9f9ff', padding: '12px', borderRadius: '10px',
+                border: '1px solid #dce2f7',
+              }}>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>{t('screens.start_time')}</label>
+                  <input type="time" value={slot.start_time}
+                    onChange={(e) => handleUpdateSlot(slot.id, 'start_time', e.target.value)} required
+                    style={{
+                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
+                      padding: '7px 10px', fontSize: '13px', color: '#141b2b',
+                      background: '#fff', outline: 'none', boxSizing: 'border-box',
+                    }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'block', marginBottom: '5px' }}>{t('screens.end_time')}</label>
+                  <input type="time" value={slot.end_time}
+                    onChange={(e) => handleUpdateSlot(slot.id, 'end_time', e.target.value)} required
+                    style={{
+                      width: '100%', border: '1.5px solid #c3c6d7', borderRadius: '8px',
+                      padding: '7px 10px', fontSize: '13px', color: '#141b2b',
+                      background: '#fff', outline: 'none', boxSizing: 'border-box',
+                    }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 600, color: '#434655', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '5px' }}>
+                    <Zap style={{ width: 12, height: 12, color: '#eab308' }} /> {t('screens.multiplier_price')}
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input type="number" step="0.1" min="1.1"
+                      value={slot.price_multiplier}
+                      onChange={(e) => handleUpdateSlot(slot.id, 'price_multiplier', e.target.value)} required
+                      style={{
+                        width: '60px', border: '1.5px solid #eab308', borderRadius: '8px',
+                        padding: '7px 8px', fontSize: '13px', fontWeight: 700,
+                        color: '#854d0e', background: '#fef9c3', outline: 'none',
+                      }} />
+                    <span style={{ fontSize: '11px', color: '#737686', whiteSpace: 'nowrap' }}>
+                      = ${(parseFloat(form.base_price || 0) * parseFloat(slot.price_multiplier || 1)).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <button type="button" onClick={() => handleRemoveSlot(slot.id)}
+                  style={{
+                    width: 34, height: 34, borderRadius: '8px', border: 'none',
+                    background: '#ffdad6', color: '#ba1a1a', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#ba1a1a'; e.currentTarget.style.color = '#fff'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#ffdad6'; e.currentTarget.style.color = '#ba1a1a'; }}
+                >
+                  <Trash2 style={{ width: 15, height: 15 }} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ══ SECTION: صورة مرجعية (إضافة فقط) ══ */}
+      {!modalConfig.isEdit && (
+        <div style={{
+          border: '2px dashed #004ac6', borderRadius: '14px',
+          background: '#f1f3ff', marginBottom: '16px', overflow: 'hidden',
+        }}>
+          <label style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center', padding: '24px', cursor: 'pointer',
+          }}>
+            {form.photo ? (
+              <div style={{ textAlign: 'center', color: '#004ac6' }}>
+                <ImageIcon style={{ width: 32, height: 32, marginBottom: '8px' }} />
+                <p style={{ fontSize: '13px', fontWeight: 600, margin: 0 }}>{form.photo.name}</p>
+                <p style={{ fontSize: '11px', color: '#737686', margin: '4px 0 0' }}>{t('screens.click_to_change_image')}</p>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <UploadCloud style={{ width: 36, height: 36, color: '#004ac6', marginBottom: '8px' }} />
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#141b2b', margin: '0 0 4px' }}>{t('screens.reference_image')}</p>
+                <p style={{ fontSize: '12px', color: '#737686', margin: 0 }}>{t('screens.upload_formats_desc')}</p>
+              </div>
+            )}
+            <input type="file" accept="image/*" required style={{ display: 'none' }}
+              onChange={(e) => setForm(p => ({ ...p, photo: e.target.files[0] }))} />
+          </label>
+        </div>
+      )}
+
+      {/* ══ زر الحفظ ══ */}
+      <button
+        type="submit"
+        disabled={formLoading}
+        style={{
+          width: '100%', padding: '14px',
+          background: formLoading ? '#c3c6d7' : 'linear-gradient(135deg, #004ac6 0%, #2563eb 100%)',
+          color: '#fff', border: 'none', borderRadius: '12px',
+          fontSize: '15px', fontWeight: 700, cursor: formLoading ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+          boxShadow: formLoading ? 'none' : '0 4px 16px rgba(0,74,198,0.30)',
+          letterSpacing: '0.01em',
+        }}
+      >
+        {formLoading ? `⏳ ${t('screens.processing')}` : (modalConfig.isEdit ? `✅ ${t('screens.apply_updates')}` : `🚀 ${t('screens.save_add_screen')}`)}
+      </button>
+    </form>
+  </Modal>
 
 
 
-      {/* ── Delete Confirm ── */}
+{/* ── Delete Confirm ── */ }
       <ConfirmDialog
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="إزالة الشاشة من الشبكة"
-        message="هل أنت متأكد من حذف هذه الشاشة؟ سيؤدي ذلك إلى إيقاف كافة الحملات المرتبطة بشكل فوري."
-        confirmText="نعم، تنفيذ الإسقاط"
+        title={t('screens.remove_screen_title')}
+        message={t('screens.remove_screen_confirm')}
+        confirmText={t('screens.yes_remove')}
       />
 
       <ScreenCommandModal isOpen={!!commandTarget} onClose={() => setCommandTarget(null)} screen={commandTarget} />
 
-      {/* ── Map Picker Modal ── */}
-      <Modal
-        isOpen={showMapModal}
-        onClose={() => setShowMapModal(false)}
-        title="تحديد موقع الشاشة"
-      >
-        {showMapModal && <LocationPickerMap
-          initialLat={form.latitude}
-          initialLng={form.longitude}
-          onSelect={(lat, lng) => {
-            setForm(p => ({ ...p, latitude: lat, longitude: lng }));
-            setShowMapModal(false);
-          }}
-          onClose={() => setShowMapModal(false)} />}
-      </Modal>
+{/* ── Map Picker Modal ── */ }
+<Modal
+  isOpen={showMapModal}
+  onClose={() => setShowMapModal(false)}
+  title={t('screens.pick_screen_location')}
+>
+  {showMapModal && <LocationPickerMap
+    initialLat={form.latitude}
+    initialLng={form.longitude}
+    onSelect={(lat, lng) => {
+      setForm(p => ({ ...p, latitude: lat, longitude: lng }));
+      setShowMapModal(false);
+    }}
+    onClose={() => setShowMapModal(false)} />}
+</Modal>
 
-      {/* ── Image Preview Modal ── */}
-      <Modal isOpen={!!showImageModal} onClose={() => setShowImageModal(null)} title="استعراض الصورة">
-        <div className="flex justify-center bg-[#f9f9ff] rounded-2xl border border-[#c3c6d7] overflow-hidden shadow-inner p-2">
-          {showImageModal && (
-            <img src={showImageModal} alt="Preview" className="max-w-full h-auto object-contain max-h-[60vh] rounded" />
-          )}
-        </div>
-        <button onClick={() => setShowImageModal(null)}
-          className="mt-4 w-full bg-[#f1f3ff] text-[#004ac6] font-semibold py-3 rounded-xl hover:bg-[#dce2f7] transition-colors border border-[#dce2f7]">
-          إنهاء المعاينة
-        </button>
-      </Modal>
+{/* ── Image Preview Modal ── */ }
+<Modal isOpen={!!showImageModal} onClose={() => setShowImageModal(null)} title={t('screens.preview_image')}>
+  <div className="flex justify-center bg-[#f9f9ff] rounded-2xl border border-[#c3c6d7] overflow-hidden shadow-inner p-2">
+    {showImageModal && (
+      <img src={showImageModal} alt="Preview" className="max-w-full h-auto object-contain max-h-[60vh] rounded" />
+    )}
+  </div>
+  <button onClick={() => setShowImageModal(null)}
+    className="mt-4 w-full bg-[#f1f3ff] text-[#004ac6] font-semibold py-3 rounded-xl hover:bg-[#dce2f7] transition-colors border border-[#dce2f7]">
+    {t('screens.end_preview')}
+  </button>
+</Modal>
 
-      {/* ── Quick Add Owner Modal ── */}
-      <Modal
-        isOpen={quickOwnerModal}
-        onClose={() => setQuickOwnerModal(false)}
-        title="➕ إضافة مالك شاشة جديد"
-      >
-        <form onSubmit={handleQuickAddOwner} dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-[#434655] text-[13px] mb-1 font-semibold">الاسم الكامل *</label>
-            <input required type="text" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
-              value={quickOwnerForm.full_name} onChange={e => setQuickOwnerForm(p => ({ ...p, full_name: e.target.value }))} placeholder="مثال: أحمد عبدلله" />
-          </div>
-          <div>
-            <label className="block text-[#434655] text-[13px] mb-1 font-semibold">البريد الإلكتروني *</label>
-            <input required type="email" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
-              value={quickOwnerForm.email} onChange={e => setQuickOwnerForm(p => ({ ...p, email: e.target.value }))} placeholder="example@email.com" />
-          </div>
-          <div>
-            <label className="block text-[#434655] text-[13px] mb-1 font-semibold">رقم الهاتف *</label>
-            <input required type="text" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
-              value={quickOwnerForm.phone} onChange={e => setQuickOwnerForm(p => ({ ...p, phone: e.target.value }))} placeholder="05xxxxxxxx" />
-          </div>
-          <div className="bg-[#f1f3ff] text-[#004ac6] p-3 rounded-lg text-xs leading-relaxed border border-[#dbe1ff]">
-            <strong>ملاحظة هامة:</strong> سيتم تعيين كلمة مرور افتراضية (<code>password123</code>) للمالك عند الإنشاء. يمكنه تغييرها لاحقاً من تطبيق الملاك.
-          </div>
-          <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-[#e5e7eb]">
-            <button type="button" onClick={() => setQuickOwnerModal(false)} disabled={quickOwnerLoading} className="px-4 py-2 rounded-lg text-[#434655] bg-[#f8fafc] hover:bg-[#e1e8fd] font-medium transition-colors">
-              إلغاء الأمر
-            </button>
-            <button type="submit" disabled={quickOwnerLoading} className="px-5 py-2 rounded-lg bg-[#004ac6] text-white font-medium hover:bg-[#2563eb] transition-colors disabled:opacity-50">
-              {quickOwnerLoading ? 'جاري الحفظ...' : 'حفظ واختيار المالك الآن'}
-            </button>
-          </div>
-        </form>
-      </Modal>
+{/* ── Quick Add Owner Modal ── */ }
+<Modal
+  isOpen={quickOwnerModal}
+  onClose={() => setQuickOwnerModal(false)}
+  title={`➕ ${t('screens.add_new_owner')}`}
+>
+  <form onSubmit={handleQuickAddOwner} dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }} className="flex flex-col gap-4">
+    <div>
+      <label className="block text-[#434655] text-[13px] mb-1 font-semibold">{t('screens.full_name')} *</label>
+      <input required type="text" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
+        value={quickOwnerForm.full_name} onChange={e => setQuickOwnerForm(p => ({ ...p, full_name: e.target.value }))} placeholder={t('screens.name_placeholder')} />
+    </div>
+    <div>
+      <label className="block text-[#434655] text-[13px] mb-1 font-semibold">{t('screens.email')} *</label>
+      <input required type="email" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
+        value={quickOwnerForm.email} onChange={e => setQuickOwnerForm(p => ({ ...p, email: e.target.value }))} placeholder="example@email.com" />
+    </div>
+    <div>
+      <label className="block text-[#434655] text-[13px] mb-1 font-semibold">{t('screens.phone')} *</label>
+      <input required type="text" className="w-full border border-[#c3c6d7] rounded-lg px-3 py-2 outline-none focus:border-[#004ac6] transition-colors"
+        value={quickOwnerForm.phone} onChange={e => setQuickOwnerForm(p => ({ ...p, phone: e.target.value }))} placeholder="05xxxxxxxx" />
+    </div>
+    <div className="bg-[#f1f3ff] text-[#004ac6] p-3 rounded-lg text-xs leading-relaxed border border-[#dbe1ff]">
+      <strong>{t('screens.important_note')}</strong> <span dangerouslySetInnerHTML={{ __html: t('screens.default_password_note') }} />
+    </div>
+    <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-[#e5e7eb]">
+      <button type="button" onClick={() => setQuickOwnerModal(false)} disabled={quickOwnerLoading} className="px-4 py-2 rounded-lg text-[#434655] bg-[#f8fafc] hover:bg-[#e1e8fd] font-medium transition-colors">
+        {t('screens.cancel')}
+      </button>
+      <button type="submit" disabled={quickOwnerLoading} className="px-5 py-2 rounded-lg bg-[#004ac6] text-white font-medium hover:bg-[#2563eb] transition-colors disabled:opacity-50">
+        {quickOwnerLoading ? t('screens.saving') : t('screens.save_and_select_owner')}
+      </button>
+    </div>
+  </form>
+</Modal>
     </div>
   );
 };

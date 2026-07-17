@@ -5,6 +5,7 @@ import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
 import { useOwnerDashboard } from '../../hooks/api/useDashboard';
+import useTranslation from '../../i18n/useTranslation';
 
 /* ─── Stitch colour tokens ─── */
 const S = {
@@ -86,7 +87,10 @@ const WeeklyChart = ({ data = [] }) => {
     const W = 580, H = 220, pL = 52, pR = 16, pT = 16, pB = 32;
     const iW = W - pL - pR, iH = H - pT - pB;
 
-    const WEEK_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const WEEK_DAYS = [
+        t('common.days.0'), t('common.days.1'), t('common.days.2'),
+        t('common.days.3'), t('common.days.4'), t('common.days.5'), t('common.days.6')
+    ];
     const pts = data.length > 0
         ? data.map(item => ({ label: item.day, value: Number(item.amount) }))
         : WEEK_DAYS.map(d => ({ label: d, value: 0 }));
@@ -174,7 +178,7 @@ const WeeklyChart = ({ data = [] }) => {
 /* ══════════════════════════════════════════════════════
    DONUT CHART 
 ══════════════════════════════════════════════════════ */
-const StatusDonutChart = ({ data = [] }) => {
+const StatusDonutChart = ({ data = [], t }) => {
     const cx = 90, cy = 90, R = 75, r = 50;
     const total = data.reduce((s, d) => s + (d.count || 0), 0) || 1;
 
@@ -213,7 +217,7 @@ const StatusDonutChart = ({ data = [] }) => {
                         {total}
                     </text>
                     <text x={cx} y={cy + 15} textAnchor="middle" fontSize="12" fontWeight="600" fill={S.outline}>
-                        إجمالي الشاشات
+                        {t('dashboard.total_screens')}
                     </text>
                 </svg>
             </div>
@@ -238,6 +242,7 @@ const StatusDonutChart = ({ data = [] }) => {
 ══════════════════════════════════════════════════════ */
 const OwnerDashboard = () => {
     const { data: dashboardData, isLoading: loading } = useOwnerDashboard();
+    const { t, dir } = useTranslation();
     const kpis = dashboardData || {};
 
     const stats = {
@@ -263,8 +268,8 @@ const OwnerDashboard = () => {
         try {
             const parsed = JSON.parse(text);
             text = parsed.rejection_reason 
-                ? `رفض سحب: ${parsed.rejection_reason}` 
-                : (parsed.bank_name ? `سحب بنكي - ${parsed.bank_name}` : text);
+                ? `${t('financial.withdraw_rejected')}: ${parsed.rejection_reason}` 
+                : (parsed.bank_name ? `${t('financial.bank_withdraw')} - ${parsed.bank_name}` : text);
         } catch(e) {}
         return {
             id: act.id,
@@ -279,31 +284,31 @@ const OwnerDashboard = () => {
     }
 
     const donutData = [
-        { name: 'متصلة (Online)', count: stats.online_screens, color: S.success },
-        { name: 'مقطوعة (Offline)', count: stats.offline_screens, color: S.error },
+        { name: t('screens.status_online'), count: stats.online_screens, color: S.success },
+        { name: t('screens.status_offline'), count: stats.offline_screens, color: S.error },
     ];
 
     return (
-        <div className="p-6 md:p-8 space-y-6 max-w-[1600px] mx-auto w-full" style={{ direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <div className="p-6 md:p-8 space-y-6 max-w-[1600px] mx-auto w-full" style={{ direction: dir, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             
             {/* ── Header ── */}
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-[#141b2b] m-0 mb-2 tracking-tight">نظرة عامة على الأصول</h1>
-                    <p className="text-sm font-medium text-gray-500 m-0">مراقبة الأداء، الإيرادات، والحالة التشغيلية لشاشاتك.</p>
+                    <h1 className="text-3xl font-black text-[#141b2b] m-0 mb-2 tracking-tight">{t('dashboard.overview')}</h1>
+                    <p className="text-sm font-medium text-gray-500 m-0">{t('dashboard.overview_desc')}</p>
                 </div>
             </motion.div>
 
             {/* ── KPI Grid ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <KpiCard label="أرباح اليوم" sublabel="خلال 24 ساعة الماضية" value={`$${stats.today_revenue || 0}`} note="+5% عن الأمس" noteIcon={TrendingUp} noteColor={S.success} accentColor={S.primary} iconBg={S.primaryFixed} iconColor={S.primary} Icon={DollarSign} borderAccent={S.primary} index={0} />
-                <KpiCard label="إجمالي الأرباح" sublabel="أرباح هذا الشهر" value={`$${stats.monthly_revenue || 0}`} note="+12% عن الشهر الماضي" noteIcon={TrendingUp} noteColor={S.success} accentColor={S.secondary} iconBg={S.secondaryFixed} iconColor={S.secondaryContainer} Icon={Activity} borderAccent={S.secondary} index={1} />
+                <KpiCard label={t('dashboard.today_revenue')} sublabel={t('dashboard.last_24h')} value={`$${stats.today_revenue || 0}`} note={t('dashboard.today_revenue_note')} noteIcon={TrendingUp} noteColor={S.success} accentColor={S.primary} iconBg={S.primaryFixed} iconColor={S.primary} Icon={DollarSign} borderAccent={S.primary} index={0} />
+                <KpiCard label={t('dashboard.total_revenue')} sublabel={t('dashboard.this_month')} value={`$${stats.monthly_revenue || 0}`} note={t('dashboard.total_revenue_note')} noteIcon={TrendingUp} noteColor={S.success} accentColor={S.secondary} iconBg={S.secondaryFixed} iconColor={S.secondaryContainer} Icon={Activity} borderAccent={S.secondary} index={1} />
                 <KpiCard
-                    index={2} label="إجمالي الأصول (الشاشات)" sublabel="Total Screens Owned" value={stats.total_screens}
+                    index={2} label={t('dashboard.total_screens')} sublabel="Total Screens Owned" value={stats.total_screens}
                     Icon={Monitor} iconBg={S.surfaceContainer} iconColor={S.primaryContainer}
                 />
                 <KpiCard
-                    index={3} label="تنبيهات وأعطال" sublabel="Offline / Action Required" value={stats.offline_screens}
+                    index={3} label={t('dashboard.alerts_errors')} sublabel="Offline / Action Required" value={stats.offline_screens}
                     Icon={AlertCircle} iconBg={S.errorContainer} iconColor={S.error} accentColor={S.error} borderAccent={stats.offline_screens > 0 ? S.error : null}
                 />
             </div>
@@ -315,8 +320,8 @@ const OwnerDashboard = () => {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2"
                     style={{ background: S.surfaceContainerLowest, border: `1px solid ${S.outlineVariant}`, borderRadius: '20px', padding: '24px' }}>
                     <div className="mb-6">
-                        <h3 className="m-0 text-lg font-bold text-[#141b2b]">نمو الأرباح اليومية</h3>
-                        <p className="text-xs text-gray-400 font-medium">نظرة تحليلية على العوائد المالية آخر 7 أيام</p>
+                        <h3 className="m-0 text-lg font-bold text-[#141b2b]">{t('dashboard.revenue_growth')}</h3>
+                        <p className="text-xs text-gray-400 font-medium">{t('dashboard.revenue_growth_desc')}</p>
                     </div>
                     <WeeklyChart data={weeklyData} />
                 </motion.div>
@@ -325,9 +330,9 @@ const OwnerDashboard = () => {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                     style={{ background: S.surfaceContainerLowest, border: `1px solid ${S.outlineVariant}`, borderRadius: '20px', padding: '24px' }}>
                     <div className="mb-4 text-center">
-                        <h3 className="m-0 text-lg font-bold text-[#141b2b]">الحالة التشغيلية</h3>
+                        <h3 className="m-0 text-lg font-bold text-[#141b2b]">{t('dashboard.operational_status')}</h3>
                     </div>
-                    <StatusDonutChart data={donutData} />
+                    <StatusDonutChart data={donutData} t={t} />
                 </motion.div>
 
             </div>
@@ -339,14 +344,14 @@ const OwnerDashboard = () => {
                     <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
                         <Info className="w-4 h-4 text-blue-600" />
                     </div>
-                    <h3 className="m-0 text-lg font-bold text-[#141b2b]">الإشعارات والتحديثات الحية</h3>
+                    <h3 className="m-0 text-lg font-bold text-[#141b2b]">{t('dashboard.live_updates')}</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <AnimatePresence>
                         {quickAlerts.length === 0 ? (
                             <div className="col-span-1 md:col-span-3 text-center text-gray-400 py-8 font-medium">
-                                لا توجد نشاطات أو تحديثات حية حالياً.
+                                {t('dashboard.no_activities')}
                             </div>
                         ) : quickAlerts.map(alert => (
                             <motion.div key={alert.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="group"

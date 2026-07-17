@@ -5,6 +5,7 @@ import { usePlaybackLogs } from '../../../hooks/api/useLogs';
 import axiosClient from '../../../core/api/axiosClient';
 import { ENDPOINTS } from '../../../core/api/endpoints';
 import useToastStore from '../../../store/useToastStore';
+import useTranslation from '../../../i18n/useTranslation';
 
 const S = {
     surfaceContainerLowest: '#ffffff',
@@ -28,6 +29,7 @@ const glassCard = {
 };
 
 const RecentPlaybackLogs = () => {
+    const { t } = useTranslation();
     const addToast = useToastStore(state => state.addToast);
     const [page, setPage] = useState(1);
     const [isExporting, setIsExporting] = useState(false);
@@ -66,26 +68,26 @@ const RecentPlaybackLogs = () => {
             document.body.appendChild(link);
             link.click();
             link.remove();
-            addToast('تم التصدير بنجاح', 'success');
+            addToast(t('dashboard.export_success'), 'success');
         } catch (error) {
-            addToast('حدث خطأ أثناء التصدير', 'error');
+            addToast(t('dashboard.export_error'), 'error');
         } finally {
             setIsExporting(false);
         }
     };
 
     const handleCleanup = async () => {
-        const daysLabel = cleanupDays == 1 ? 'يوم' : cleanupDays == 7 ? 'أسبوع' : `${cleanupDays} يوماً`;
-        if (!window.confirm(`هل أنت متأكد من رغبتك في حذف جميع السجلات الأقدم من ${daysLabel}؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
+        const daysLabel = cleanupDays == 1 ? t('dashboard.cleanup_day') : cleanupDays == 7 ? t('dashboard.cleanup_week') : t('dashboard.cleanup_days', { days: cleanupDays });
+        if (!window.confirm(t('dashboard.cleanup_confirm', { daysLabel }))) return;
         
         try {
             setIsCleaning(true);
             const response = await axiosClient.delete(ENDPOINTS.LOGS.PLAYBACK_CLEANUP, {
                 params: { days: cleanupDays }
             });
-            addToast(response.data.message || 'تم تنظيف السجلات بنجاح', 'success');
+            addToast(response.data.message || t('dashboard.cleanup_success'), 'success');
         } catch (error) {
-            addToast('حدث خطأ أثناء تنظيف السجلات', 'error');
+            addToast(t('dashboard.cleanup_error'), 'error');
         } finally {
             setIsCleaning(false);
         }
@@ -112,7 +114,7 @@ const RecentPlaybackLogs = () => {
                         color: S.onBackground, direction: 'rtl',
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                     }}>
-                        سجلات التشغيل الحديثة (Live)
+                        {t('dashboard.live_playback_logs')}
                         <span style={{
                             display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
                             background: '#34d399', marginRight: 8,
@@ -120,7 +122,7 @@ const RecentPlaybackLogs = () => {
                         }}></span>
                     </h3>
                     <span style={{ fontSize: '12px', background: S.surfaceContainerLow, padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold' }}>
-                        إجمالي السجلات: {stats.total_plays}
+                        {t('dashboard.total_logs', { total: stats.total_plays })}
                     </span>
                 </div>
 
@@ -138,10 +140,10 @@ const RecentPlaybackLogs = () => {
                                 direction: 'rtl', cursor: 'pointer'
                             }}
                         >
-                            <option value="30">أقدم من شهر</option>
-                            <option value="15">أقدم من 15 يوم</option>
-                            <option value="7">أقدم من أسبوع</option>
-                            <option value="1">أقدم من يوم</option>
+                            <option value="30">{t('dashboard.older_than_month')}</option>
+                            <option value="15">{t('dashboard.older_than_15_days')}</option>
+                            <option value="7">{t('dashboard.older_than_week')}</option>
+                            <option value="1">{t('dashboard.older_than_day')}</option>
                         </select>
                         <button 
                             onClick={handleCleanup}
@@ -154,10 +156,10 @@ const RecentPlaybackLogs = () => {
                                 cursor: isCleaning ? 'wait' : 'pointer', fontWeight: 600,
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px'
                             }}
-                            title="حذف السجلات"
+                            title={t('dashboard.delete_logs_title')}
                         >
                             <Trash2 style={{ fontSize: '16px', width: '16px', height: '16px' }} />
-                            مسح
+                            {t('dashboard.clear_btn')}
                         </button>
                     </div>
 
@@ -189,7 +191,7 @@ const RecentPlaybackLogs = () => {
                             }}
                         >
                             <Download style={{ fontSize: '16px', width: '16px', height: '16px' }} />
-                            تصدير
+                            {t('dashboard.export_btn')}
                         </button>
                     </div>
 
@@ -247,12 +249,12 @@ const RecentPlaybackLogs = () => {
                             borderBottom: `1px solid ${S.outlineVariant}`,
                         }}>
                             {[
-                                'المعرّف',
-                                'اسم الإعلان',
-                                'الشاشة العارضة',
-                                'المدة المحتسبة',
-                                'وقت التشغيل',
-                                'الحالة'
+                                t('dashboard.id_col'),
+                                t('dashboard.ad_name_col'),
+                                t('dashboard.screen_col'),
+                                t('dashboard.duration_col'),
+                                t('dashboard.play_time_col'),
+                                t('dashboard.status_col')
                             ].map((label, i) => (
                                 <th key={i} style={{
                                     padding: '16px 20px',
@@ -273,7 +275,7 @@ const RecentPlaybackLogs = () => {
                                     <td colSpan={6} style={{ padding: '40px', textAlign: 'center' }}>
                                         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                                             <div className="w-5 h-5 border-2 border-[#e8efae] border-t-[#4d5118] rounded-full animate-spin"></div>
-                                            <span style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>جاري تحميل السجلات...</span>
+                                            <span style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('dashboard.loading_logs')}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -330,7 +332,7 @@ const RecentPlaybackLogs = () => {
                                             color: S.onSurface,
                                             fontFamily: "'IBM Plex Sans Arabic', sans-serif"
                                         }}>
-                                            {log.duration} ثانية
+                                            {log.duration} {t('dashboard.seconds_unit')}
                                         </span>
                                     </td>
                                     <td style={{ padding: '16px 20px', direction: 'rtl' }}>
@@ -348,7 +350,7 @@ const RecentPlaybackLogs = () => {
                                             background: 'rgba(52, 211, 153, 0.1)', color: '#059669',
                                             padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold'
                                         }}>
-                                            مكتمل
+                                            {t('dashboard.completed_status')}
                                         </span>
                                     </td>
                                 </motion.tr>
@@ -359,7 +361,7 @@ const RecentPlaybackLogs = () => {
                                             fontSize: '14px', color: S.outline, margin: 0,
                                             fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                         }}>
-                                            لا توجد سجلات تشغيل حديثة
+                                            {t('dashboard.no_recent_logs')}
                                         </p>
                                     </td>
                                 </tr>

@@ -2,31 +2,32 @@ import useAuthStore from '../store/useAuthStore';
 
 /**
  * Permission & Role Configuration
- * Maps roles to their sidebar items and permissions.
+ * Maps roles to their sidebar items and permissions using role_id.
  */
 
-// Role names from backend
+// Role IDs from backend database
 export const ROLES = {
-    SUPER_ADMIN: 'SuperAdmin',
-    ADMIN: 'Admin',
-    ADVERTISER: 'Advertiser',
-    SCREEN_OWNER: 'ScreenOwner',
-    MAINTENANCE: 'Maintenance',
-    SECRETARY: 'Secretary',
+    SUPER_ADMIN: 1,
+    ADVERTISER: 2,
+    SCREEN_OWNER: 3,
+    MAINTENANCE: 4,
+    SECRETARY: 6,
+    ADMIN: 7, // If you have a separate Admin role, else map it as needed
 };
 
 /**
- * Hook to check permissions based on user role.
+ * Hook to check permissions based on user role ID.
  */
 const usePermission = () => {
     const user = useAuthStore(state => state.user);
-    const roleName = useAuthStore(state => state.getRoleName());
+    const roleId = useAuthStore(state => state.getRoleId());
+    const roleName = useAuthStore(state => state.getRoleName()); // Keep for UI display
 
-    const isAdmin = roleName === ROLES.SUPER_ADMIN || roleName === ROLES.ADMIN;
-    const isAdvertiser = roleName === ROLES.ADVERTISER;
-    const isScreenOwner = roleName === ROLES.SCREEN_OWNER;
-    const isMaintenance = roleName === ROLES.MAINTENANCE;
-    const isSecretary = roleName === ROLES.SECRETARY;
+    const isAdmin = roleId === ROLES.SUPER_ADMIN || roleId === ROLES.ADMIN;
+    const isAdvertiser = roleId === ROLES.ADVERTISER;
+    const isScreenOwner = roleId === ROLES.SCREEN_OWNER;
+    const isMaintenance = roleId === ROLES.MAINTENANCE;
+    const isSecretary = roleId === ROLES.SECRETARY;
 
     // Permission checks matching backend capabilities
     const can = (permission) => {
@@ -60,6 +61,7 @@ const usePermission = () => {
 
     return {
         user,
+        roleId,
         roleName,
         isAdmin,
         isAdvertiser,
