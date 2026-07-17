@@ -15,18 +15,36 @@ const PaymentOperationsPage = () => {
     const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
     const [selectedReceipt, setSelectedReceipt] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    
+    // Date Filters
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    
+    // Details Modal
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
+    
+    // Rejected Tab Support
+    const [rejectedPayments, setRejectedPayments] = useState([]);
 
     const fetchPayments = async () => {
         setIsLoading(true);
         try {
-            const res = await axiosClient.get(ENDPOINTS.FINANCIAL.LEDGER);
+            const params = {};
+            if (startDate) params.start_date = startDate;
+            if (endDate) params.end_date = endDate;
+            
+            const res = await axiosClient.get(ENDPOINTS.FINANCIAL.LEDGER, { params });
             if (res.data.success) {
                 const ledger = res.data.data?.transactions || (Array.isArray(res.data.data) ? res.data.data : []);
                 setPendingPayments(
                     ledger.filter(item => item.transaction_type === 'payment_pending' && item.status === 'pending')
                 );
                 setCompletedPayments(
-                    ledger.filter(item => (item.transaction_type === 'payment_in' && item.status === 'completed') || item.status === 'rejected')
+                    ledger.filter(item => (item.transaction_type === 'payment_in' || item.transaction_type === 'payment') && item.status === 'completed')
+                );
+                setRejectedPayments(
+                    ledger.filter(item => item.status === 'rejected')
                 );
             }
         } catch (error) {
@@ -36,7 +54,7 @@ const PaymentOperationsPage = () => {
         }
     };
 
-    useEffect(() => { fetchPayments(); }, []);
+    useEffect(() => { fetchPayments(); }, [startDate, endDate]);
 
     const handleApprove = async (ledgerId) => {
         if (!window.confirm(t('payment_ops.confirm_approve'))) return;
@@ -74,7 +92,12 @@ const PaymentOperationsPage = () => {
         }
     };
 
-    const currentList = activeTab === 'pending' ? pendingPayments : completedPayments;
+    const openDetails = (item) => {
+        setSelectedTransaction(item);
+        setIsDetailsModalOpen(true);
+    };
+
+    const currentList = activeTab === 'pending' ? pendingPayments : activeTab === 'completed' ? completedPayments : rejectedPayments;
 
     const filteredList = currentList.filter(item => {
         const q = searchQuery.toLowerCase();
@@ -87,6 +110,39 @@ const PaymentOperationsPage = () => {
 
     const totalPending = pendingPayments.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
     const totalCompleted = completedPayments.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
+    const totalRejected = rejectedPayments.reduce((acc, i) => acc + parseFloat(i.amount || 0), 0);
+
+    const exportCSV = () => {
+        if (filteredList.length === 0) {
+            addToast(t('common.no_data_to_export'), 'warning');
+            return;
+        }
+        
+        const headers = ['#', t('payment_ops.advertisement'), t('payment_ops.advertiser'), t('payment_ops.amount'), t('payment_ops.status'), t('payment_ops.date'), t('payment_ops.reference')];
+        const rows = filteredList.map((item, index) => [
+            index + 1,
+            item.advertisement?.title || '—',
+            item.user?.full_name || '—',
+            parseFloat(item.amount || 0).toFixed(2),
+            item.status,
+            new Date(item.created_at).toLocaleDateString('en-US'),
+            item.reference_number || '—'
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(e => e.map(String).map(v => v.replaceAll('"', '""')).map(v => `"${v}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `payment_operations_${activeTab}_${new Date().getTime()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <div className="space-y-6 pb-12" dir="rtl">
@@ -156,13 +212,13 @@ const PaymentOperationsPage = () => {
             {/* ───── Main Table Card ───── */}
             <div className="bg-surface rounded-2xl border border-outline-variant shadow-sm overflow-hidden mt-4">
 
-                {/* Table topbar: Tabs + Search (centered) */}
-                <div className="p-5 border-b border-outline-variant flex flex-col sm:flex-row gap-4 items-center justify-between bg-surface">
-                    {/* Tabs — right side */}
-                    <div className="flex bg-surface-container-low p-1 rounded-lg border border-outline-variant/50 shrink-0">
+                {/* Table topbar: Tabs + Actions */}
+                <div className="p-4 border-b border-outline-variant flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between bg-surface">
+                    {/* Tabs */}
+                    <div className="flex bg-surface-container-low p-1 rounded-lg border border-outline-variant/50 shrink-0 w-full xl:w-auto overflow-x-auto custom-scrollbar">
                         <button
                             onClick={() => { setActiveTab('pending'); setSearchQuery(''); }}
-                            className={`font-label-md text-label-md px-5 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${
+                            className={`font-label-md text-label-md px-5 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-2 flex-1 xl:flex-none whitespace-nowrap ${
                                 activeTab === 'pending'
                                     ? 'bg-white text-primary shadow-sm border border-outline-variant/30'
                                     : 'text-on-surface-variant hover:text-on-surface'
@@ -178,40 +234,76 @@ const PaymentOperationsPage = () => {
                         </button>
                         <button
                             onClick={() => { setActiveTab('completed'); setSearchQuery(''); }}
-                            className={`font-label-md text-label-md px-5 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${
+                            className={`font-label-md text-label-md px-5 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-2 flex-1 xl:flex-none whitespace-nowrap ${
                                 activeTab === 'completed'
-                                    ? 'bg-white text-primary shadow-sm border border-outline-variant/30'
-                                    : 'text-on-surface-variant hover:text-on-surface'
+                                    ? 'bg-white text-emerald-600 shadow-sm border border-outline-variant/30'
+                                    : 'text-on-surface-variant hover:text-emerald-600'
                             }`}
                         >
                             <span className="material-symbols-outlined text-[16px]">check_circle</span>
                             {t('payment_ops.completed')}
                         </button>
+                        <button
+                            onClick={() => { setActiveTab('rejected'); setSearchQuery(''); }}
+                            className={`font-label-md text-label-md px-5 py-2 rounded-md text-sm font-bold transition-all flex items-center justify-center gap-2 flex-1 xl:flex-none whitespace-nowrap ${
+                                activeTab === 'rejected'
+                                    ? 'bg-white text-error shadow-sm border border-outline-variant/30'
+                                    : 'text-on-surface-variant hover:text-error'
+                            }`}
+                        >
+                            <span className="material-symbols-outlined text-[16px]">cancel</span>
+                            {t('payment_ops.rejected')}
+                        </button>
                     </div>
 
-                    {/* Search — Left side */}
-                    <div className="relative flex-1 max-w-md mr-auto group">
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                            <span className="material-symbols-outlined text-on-surface-variant/60 group-focus-within:text-primary transition-colors duration-300 text-[22px]">
-                                search
-                            </span>
+                    {/* Actions (Date, Search, Export) */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto items-stretch sm:items-center">
+                        {/* Date Filters */}
+                        <div className="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/60 rounded-xl px-1 py-1 shadow-sm">
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={e => setStartDate(e.target.value)}
+                                className="bg-transparent px-2 py-1.5 text-sm outline-none text-on-surface"
+                                title={t('common.start_date')}
+                            />
+                            <span className="text-outline-variant">-</span>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={e => setEndDate(e.target.value)}
+                                className="bg-transparent px-2 py-1.5 text-sm outline-none text-on-surface"
+                                title={t('common.end_date')}
+                            />
+                            {(startDate || endDate) && (
+                                <button onClick={() => { setStartDate(''); setEndDate(''); }} className="p-1.5 text-error hover:bg-error/10 rounded-lg transition-colors" title={t('common.clear_filter')}>
+                                    <span className="material-symbols-outlined text-[16px]">close</span>
+                                </button>
+                            )}
                         </div>
-                        <input
-                            type="text"
-                            placeholder={t('payment_ops.search_placeholder')}
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            className="w-full bg-surface-container-lowest hover:bg-surface border border-outline-variant/60 focus:border-primary/80 rounded-2xl py-3.5 pr-12 pl-12 text-base text-on-surface placeholder-on-surface-variant/60 outline-none focus:ring-4 focus:ring-primary/10 transition-all shadow-sm"
-                        />
-                        <div className={`absolute inset-y-0 left-0 flex items-center pl-3 transition-opacity duration-300 ${searchQuery ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 transition-all"
-                                title={t('common.clear_search')}
-                            >
-                                <span className="material-symbols-outlined text-[18px]">close</span>
-                            </button>
+
+                        {/* Search */}
+                        <div className="relative flex-1 sm:w-64 group">
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[20px] pointer-events-none">search</span>
+                            <input
+                                type="text"
+                                placeholder={t('payment_ops.search_placeholder')}
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                className="w-full bg-surface-container-lowest hover:bg-surface border border-outline-variant/60 focus:border-primary/80 rounded-xl py-2.5 pr-10 pl-10 text-sm text-on-surface placeholder-on-surface-variant/60 outline-none focus:ring-2 focus:ring-primary/10 transition-all shadow-sm"
+                            />
+                            {searchQuery && (
+                                <button onClick={() => setSearchQuery('')} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 transition-all" title={t('common.clear_search')}>
+                                    <span className="material-symbols-outlined text-[16px]">close</span>
+                                </button>
+                            )}
                         </div>
+                        
+                        {/* Export */}
+                        <button onClick={exportCSV} className="flex items-center justify-center gap-2 bg-surface-container-low border border-outline-variant hover:bg-surface-container-highest text-on-surface px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm whitespace-nowrap">
+                            <span className="material-symbols-outlined text-[18px]">download</span>
+                            {t('common.export')}
+                        </button>
                     </div>
                 </div>
 
@@ -298,6 +390,13 @@ const PaymentOperationsPage = () => {
                                             )}
                                             <td className="py-4 px-6 text-left whitespace-nowrap">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={() => openDetails(item)}
+                                                        className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-colors"
+                                                        title={t('payment_ops.view_details')}
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">info</span>
+                                                    </button>
                                                     {!isCompleted && item.has_receipt == 1 && (
                                                         <button
                                                             onClick={() => openReceipt(item.ledger_id)}
@@ -383,6 +482,108 @@ const PaymentOperationsPage = () => {
                         {t('common.close')}
                     </button>
                 </div>
+            </Modal>
+
+            {/* ───── Transaction Details Modal ───── */}
+            <Modal isOpen={isDetailsModalOpen} onClose={() => setIsDetailsModalOpen(false)} title={t('payment_ops.transaction_details')}>
+                {selectedTransaction && (
+                    <div className="flex flex-col gap-6 pt-4" dir="rtl">
+                        {/* Summary Header */}
+                        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant flex items-center justify-between shadow-sm">
+                            <div>
+                                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-1">{t('payment_ops.total_amount')}</p>
+                                <p className="text-2xl font-black text-on-surface">${parseFloat(selectedTransaction.amount || 0).toFixed(2)}</p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                <span className="material-symbols-outlined text-2xl">attach_money</span>
+                            </div>
+                        </div>
+
+                        {/* Breakdown */}
+                        <div className="bg-surface border border-outline-variant rounded-2xl overflow-hidden shadow-sm">
+                            <div className="p-4 border-b border-outline-variant bg-surface-container-low flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary text-xl">pie_chart</span>
+                                <h3 className="font-bold text-on-surface">{t('payment_ops.financial_breakdown')}</h3>
+                            </div>
+                            <div className="p-5 flex flex-col gap-4">
+                                {/* Platform Commission */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-error/10 flex items-center justify-center text-error shrink-0">
+                                            <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-on-surface">{t('payment_ops.platform_commission')}</p>
+                                            <p className="text-xs text-on-surface-variant">{t('payment_ops.commission_rate', { rate: '20%' })}</p>
+                                        </div>
+                                    </div>
+                                    <span className="font-black text-error">
+                                        ${(parseFloat(selectedTransaction.amount || 0) * 0.20).toFixed(2)}
+                                    </span>
+                                </div>
+                                
+                                <hr className="border-outline-variant/50 border-dashed" />
+                                
+                                {/* Owner Profit */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                                            <span className="material-symbols-outlined text-sm">savings</span>
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-sm text-on-surface">{t('payment_ops.owner_net_profit')}</p>
+                                            <p className="text-xs text-on-surface-variant">{t('payment_ops.profit_rate', { rate: '80%' })}</p>
+                                        </div>
+                                    </div>
+                                    <span className="font-black text-emerald-600">
+                                        ${(parseFloat(selectedTransaction.amount || 0) * 0.80).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Additional Information */}
+                        <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm space-y-4">
+                            <h3 className="font-bold text-on-surface mb-2">{t('payment_ops.additional_info')}</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-xs text-on-surface-variant mb-1">{t('payment_ops.advertisement')}</p>
+                                    <p className="font-medium text-sm text-on-surface">{selectedTransaction.advertisement?.title || '—'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-on-surface-variant mb-1">{t('payment_ops.advertiser')}</p>
+                                    <p className="font-medium text-sm text-on-surface">{selectedTransaction.user?.full_name || '—'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-on-surface-variant mb-1">{t('payment_ops.transaction_date')}</p>
+                                    <p className="font-medium text-sm text-on-surface" dir="ltr">
+                                        {new Date(selectedTransaction.created_at).toLocaleString('en-US')}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-on-surface-variant mb-1">{t('payment_ops.reference')}</p>
+                                    <p className="font-mono text-sm text-on-surface">{selectedTransaction.reference_number || '—'}</p>
+                                </div>
+                            </div>
+                            
+                            {selectedTransaction.notes && (
+                                <div className="mt-4 pt-4 border-t border-outline-variant/50">
+                                    <p className="text-xs text-on-surface-variant mb-1">{t('payment_ops.notes')}</p>
+                                    <p className="text-sm text-on-surface bg-surface-container-lowest p-3 rounded-lg">
+                                        {selectedTransaction.notes}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setIsDetailsModalOpen(false)}
+                            className="mt-2 w-full bg-surface-container-highest text-on-surface py-3 rounded-xl font-bold text-sm hover:bg-outline-variant transition-colors"
+                        >
+                            {t('common.close')}
+                        </button>
+                    </div>
+                )}
             </Modal>
         </div>
     );

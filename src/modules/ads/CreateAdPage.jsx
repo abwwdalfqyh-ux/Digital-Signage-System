@@ -227,13 +227,20 @@ const CreateAdPage = () => {
             setCalculatedCost(data.total_cost);
             setCostDetails(data);
             setForm(p => ({ ...p, total_cost: data.total_cost }));
-            addToast(t('ads.cost_calculated_successfully'), 'success');
+            // addToast(t('ads.cost_calculated_successfully'), 'success'); // Removed to avoid spam on auto-calculate
         } catch (e) {
             addToast(e.response?.data?.message || t('ads.cost_calculation_failed'), 'error');
         } finally {
             setCostLoading(false);
         }
     };
+
+    // Auto-calculate cost when reaching step 5
+    useEffect(() => {
+        if (currentStep === 5 && selectedScreens.length > 0 && form.start_date && form.end_date) {
+            handleCalculateCost();
+        }
+    }, [currentStep, selectedScreens, form.start_date, form.end_date]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -328,8 +335,16 @@ const CreateAdPage = () => {
                 addToast(t('ads.please_select_full_campaign_date'), 'warning');
                 return;
             }
+            if (new Date(form.end_date) < new Date(form.start_date)) {
+                addToast(t('ads.end_date_before_start_date'), 'error');
+                return;
+            }
             if (!form.target_start_time || !form.target_end_time) {
                 addToast(t('ads.please_select_daily_display_times'), 'warning');
+                return;
+            }
+            if (form.target_end_time <= form.target_start_time && form.daily_shift !== 'all') {
+                addToast(t('ads.end_time_before_start_time'), 'error');
                 return;
             }
         }
@@ -504,7 +519,7 @@ const CreateAdPage = () => {
                                                             <span className="font-caption text-caption text-primary bg-primary/10 px-2 py-0.5 rounded-md">{t('ads.quick_option_available')}</span>
                                                         )}
                                                     </label>
-                                                    <div className="relative mb-5">
+                                                    <div className="relative">
                                                         <input
                                                             type="date"
                                                             value={form.end_date}
@@ -515,7 +530,21 @@ const CreateAdPage = () => {
                                                         />
                                                         <span className={`material-symbols-outlined text-[26px] absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-error pointer-events-none`}>event_busy</span>
                                                     </div>
-                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+                                                    
+                                                    {/* Duration Visual Summary */}
+                                                    {form.start_date && form.end_date && (
+                                                        <div className="mt-4 p-3 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-between transition-all">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="material-symbols-outlined text-primary">timelapse</span>
+                                                                <span className="font-label-md text-on-background">{t('common.duration')}:</span>
+                                                            </div>
+                                                            <div className="font-bold text-primary">
+                                                                {Math.max(1, Math.ceil((new Date(form.end_date) - new Date(form.start_date)) / (1000 * 60 * 60 * 24)))} {t('common.days')}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
                                                         <button type="button" onClick={() => addDays(7)}
                                                             className="group relative py-4 px-5 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[15px] font-extrabold rounded-2xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-md hover:shadow-primary/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col items-center gap-1">
                                                             <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">date_range</span>
@@ -711,10 +740,10 @@ const CreateAdPage = () => {
                                             </div>
 
                                             {/* ── Screens Layout (Map + Cards) ── */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                            <div className="flex flex-col gap-6">
 
                                                 {/* Map View */}
-                                                <div className="lg:col-span-2 h-[450px] lg:h-[500px] w-full bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden shadow-sm relative z-0">
+                                                <div className="w-full h-[350px] bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden shadow-sm relative z-0">
                                                     <ScreenMapView
                                                         screens={screens}
                                                         selectedGov={filterGov}
@@ -727,8 +756,8 @@ const CreateAdPage = () => {
                                                 </div>
 
                                                 {/* Screen Cards Grid */}
-                                                <div className="lg:col-span-1 h-[450px] bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden p-4 shadow-sm flex flex-col">
-                                                    <div className="h-full overflow-y-auto custom-scrollbar pr-2">
+                                                <div className="bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden p-4 shadow-sm flex flex-col">
+                                                    <div className="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
                                                         {screens.length === 0 ? (
                                                             <div className="text-center py-16">
                                                                 <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">desktop_windows</span>
@@ -742,7 +771,7 @@ const CreateAdPage = () => {
                                                                 <p className="font-body-md text-body-md text-outline">{t('ads.try_adjusting_filters')}</p>
                                                             </div>
                                                         ) : (
-                                                            <div className="grid grid-cols-2 gap-3 p-2">
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2">
                                                                 {filteredScreensForAd.map(screen => {
                                                                     const isSelected = selectedScreens.includes(screen.screen_id);
                                                                     const currentStatus = screen.computed_status || screen.status;
@@ -752,59 +781,55 @@ const CreateAdPage = () => {
                                                                     return (
                                                                         <div key={screen.screen_id}
                                                                             onClick={() => toggleScreen(screen.screen_id)}
-                                                                            className={`flex flex-col p-3 rounded-xl border transition-all cursor-pointer relative aspect-square
-                                                                    ${isSelected ? 'border-primary-container bg-primary-container/5 shadow-sm ring-1 ring-primary-container' : 'border-border-color bg-white hover:border-primary-container/40 hover:shadow-sm'}`}>
+                                                                            className={`flex flex-col p-4 rounded-xl border transition-all cursor-pointer relative
+                                                                    ${isSelected ? 'border-primary-container bg-primary-container/5 shadow-md ring-1 ring-primary-container' : 'border-border-color bg-white hover:border-primary-container/40 hover:shadow-md'}`}>
 
                                                                             {/* Status Dot & Info Icon */}
-                                                                            <div className="flex justify-between items-start mb-2">
-                                                                                <span className="flex items-center gap-1.5 bg-surface-container-low px-1.5 py-0.5 rounded-full">
+                                                                            <div className="flex justify-between items-start mb-3">
+                                                                                <span className="flex items-center gap-1.5 bg-surface-container-low px-2 py-1 rounded-full border border-border-color/50">
                                                                                     <span className={`w-2 h-2 rounded-full ${statusColorClass}`}></span>
-                                                                                    <span className="text-[10px] text-on-surface-variant font-bold truncate">{statusLabel}</span>
+                                                                                    <span className="text-xs text-on-surface-variant font-bold truncate">{statusLabel}</span>
                                                                                 </span>
                                                                                 <span title={t('ads.targeted_screen')}>
-                                                                                    {isSelected && <span className="material-symbols-outlined text-primary text-[16px]" style={{ fontVariationSettings: '"FILL" 1' }}>campaign</span>}
+                                                                                    {isSelected && <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>}
                                                                                 </span>
                                                                             </div>
 
                                                                             {/* Main Info */}
-                                                                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                                                                <h5 className={`font-bold text-[13px] leading-tight mb-1.5 truncate ${isSelected ? 'text-primary' : 'text-on-background'}`} title={screen.screen_name}>
+                                                                            <div className="flex-1 min-w-0 flex flex-col justify-center mb-4 gap-2">
+                                                                                <h5 className={`font-bold text-base leading-snug mb-1 ${isSelected ? 'text-primary' : 'text-on-background'}`} title={screen.screen_name}>
                                                                                     {screen.screen_name}
                                                                                 </h5>
-                                                                                <p className="font-caption text-[10px] text-outline flex items-center gap-1 truncate mb-0.5">
-                                                                                    <span className="material-symbols-outlined text-[12px]">map</span>
-                                                                                    {screen.street?.region?.name || t('ads.region_not_specified')}
-                                                                                </p>
-                                                                                <p className="font-caption text-[10px] text-on-surface-variant flex items-center gap-1 truncate">
-                                                                                    <span className="material-symbols-outlined text-[12px]">fork_right</span>
-                                                                                    {screen.street?.name || t('ads.location_not_specified')}
-                                                                                </p>
+                                                                                <div className="flex flex-col gap-1">
+                                                                                    <p className="font-caption text-xs text-on-surface-variant flex items-start gap-1.5">
+                                                                                        <span className="material-symbols-outlined text-[14px] text-outline mt-0.5">map</span>
+                                                                                        <span className="leading-tight">{screen.street?.region?.name || t('ads.region_not_specified')}</span>
+                                                                                    </p>
+                                                                                    <p className="font-caption text-xs text-on-surface-variant flex items-start gap-1.5">
+                                                                                        <span className="material-symbols-outlined text-[14px] text-outline mt-0.5">fork_right</span>
+                                                                                        <span className="leading-tight">{screen.street?.name || t('ads.location_not_specified')}</span>
+                                                                                    </p>
+                                                                                </div>
                                                                             </div>
 
                                                                             {/* Footer (Price & Selection state) */}
-                                                                            <div className="flex items-center justify-between mt-auto pt-2.5 border-t border-border-color/50">
-                                                                                <div className="flex flex-col gap-0.5">
-                                                                                    <span className="text-[11px] font-bold text-on-surface-variant">
+                                                                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-color">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <span className="text-sm font-bold text-on-surface">
                                                                                         {screen.price ? `$${screen.price}/${t('common.day')}` : t('ads.offer')}
                                                                                     </span>
-                                                                                    {/* Button to check peak times explicitly */}
                                                                                     <button
                                                                                         type="button"
                                                                                         onClick={(e) => { e.stopPropagation(); setAvailabilityScreen(screen); }}
-                                                                                        className={`text-[9px] flex items-center gap-1 font-bold px-1.5 py-0.5 rounded transition-colors
-                                                                                            ${isSelected ? 'bg-primary border border-primary/20 text-white' : 'bg-surface-container text-primary hover:bg-primary/10'}`}
+                                                                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container text-primary hover:bg-primary/10 transition-colors"
+                                                                                        title={t('ads.peak_hours')}
                                                                                     >
-                                                                                        <span className="material-symbols-outlined text-[10px]">analytics</span>
-                                                                                        {t('ads.peak_hours')}
+                                                                                        <span className="material-symbols-outlined text-[18px]">analytics</span>
                                                                                     </button>
                                                                                 </div>
-                                                                                {isSelected ? (
-                                                                                    <span className="flex items-center gap-0.5 font-bold text-[10px] text-primary">
-                                                                                        <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
-                                                                                    </span>
-                                                                                ) : (
-                                                                                    <span className="font-bold text-[10px] text-outline flex items-center gap-1">
-                                                                                        <span className="material-symbols-outlined text-[14px]">add_circle</span>
+                                                                                {!isSelected && (
+                                                                                    <span className="font-bold text-xs text-primary flex items-center gap-1 bg-primary/10 px-2.5 py-1.5 rounded-lg">
+                                                                                        <span className="material-symbols-outlined text-[16px]">add</span>
                                                                                         {t('common.select')}
                                                                                     </span>
                                                                                 )}
@@ -816,7 +841,6 @@ const CreateAdPage = () => {
                                                         )}
                                                     </div>
                                                 </div>
-                                            </div>
                                         </motion.div>
                                     )}
 
@@ -837,21 +861,50 @@ const CreateAdPage = () => {
                                                         <label className="font-label-md text-label-md font-bold text-on-background mb-3 flex items-center gap-1.5">
                                                             <span className="material-symbols-outlined text-[18px] text-primary">upload</span> {t('ads.ad_material')} <span className="text-error">*</span>
                                                         </label>
-                                                        <div className="relative group">
-                                                            <input type="file" accept="video/*,image/*" onChange={handleFileChange}
-                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                                                            <div className={`p-8 rounded-2xl border border-dashed flex flex-col items-center justify-center text-center transition-all bg-surface-container-lowest 
-                                                        ${form.file ? 'border-primary ring-1 ring-primary bg-primary-container/10' : 'border-outline group-hover:border-primary group-hover:bg-surface-container-low'}`}>
-                                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors
-                                                            ${form.file ? 'bg-primary text-white shadow-sm' : 'bg-surface-container text-on-surface-variant group-hover:bg-primary-container group-hover:text-primary'}`}>
-                                                                    <span className="material-symbols-outlined text-[24px]">cloud_upload</span>
+                                                        {form.file ? (
+                                                            <div className="bg-surface-container-low p-5 rounded-2xl border border-border-color shadow-sm relative overflow-hidden group">
+                                                                <div className={`absolute top-0 ${dir === 'rtl' ? 'right-0' : 'left-0'} w-1 h-full bg-primary`}></div>
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                                                            <span className="material-symbols-outlined text-[28px]">
+                                                                                {form.file.type.startsWith('video/') ? 'movie' : 'image'}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h4 className="font-title-sm text-title-sm text-on-background font-bold truncate max-w-[200px]" title={form.file.name}>
+                                                                                {form.file.name}
+                                                                            </h4>
+                                                                            <div className="flex items-center gap-2 mt-1">
+                                                                                <span className="font-caption text-caption text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-md">
+                                                                                    {(form.file.size / (1024 * 1024)).toFixed(2)} MB
+                                                                                </span>
+                                                                                <span className="font-caption text-caption text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase font-bold">
+                                                                                    {form.file.name.split('.').pop()}
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="button" onClick={() => { setForm(p => ({ ...p, file: null })); setPreviewUrl(null); }} className="w-10 h-10 flex items-center justify-center text-error bg-error/10 hover:bg-error hover:text-white rounded-xl transition-all shadow-sm" title={t('common.delete')}>
+                                                                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                                    </button>
                                                                 </div>
-                                                                <p className="font-title-md text-title-md text-on-background mb-1 font-bold">
-                                                                    {form.file ? form.file.name : t('ads.click_or_drag_file')}
-                                                                </p>
-                                                                <p className="font-caption text-caption text-outline">MP4, MOV, JPEG, PNG ({t('ads.max_size_50mb')})</p>
                                                             </div>
-                                                        </div>
+                                                        ) : (
+                                                            <div className="relative group">
+                                                                <input type="file" accept="video/*,image/*" onChange={handleFileChange}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                                                <div className="p-8 rounded-2xl border border-dashed border-outline group-hover:border-primary group-hover:bg-surface-container-low flex flex-col items-center justify-center text-center transition-all bg-surface-container-lowest">
+                                                                    <div className="w-14 h-14 bg-surface-container text-on-surface-variant group-hover:bg-primary-container group-hover:text-primary rounded-2xl flex items-center justify-center mb-4 transition-colors">
+                                                                        <span className="material-symbols-outlined text-[24px]">cloud_upload</span>
+                                                                    </div>
+                                                                    <p className="font-title-md text-title-md text-on-background mb-1 font-bold">
+                                                                        {t('ads.click_or_drag_file')}
+                                                                    </p>
+                                                                    <p className="font-caption text-caption text-outline">MP4, MOV, JPEG, PNG ({t('ads.max_size_50mb')})</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Receipt Upload moved to Step 5 (Pricing & Submission) */}
@@ -898,71 +951,14 @@ const CreateAdPage = () => {
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                                                 <div className="space-y-6 z-10">
 
-                                                    {!calculatedCost && (() => {
-                                                        const sd = form.start_date ? new Date(form.start_date) : null;
-                                                        const ed = form.end_date ? new Date(form.end_date) : null;
-                                                        const days = sd && ed && !isNaN(sd) && !isNaN(ed) ? Math.max(1, Math.ceil((ed - sd) / (1000 * 60 * 60 * 24)) + 1) : 0;
-
-                                                        let basePriceSum = 0;
-                                                        const selectedScreensData = screens.filter(s => selectedScreens.includes(s.screen_id));
-
-                                                        selectedScreensData.forEach(s => {
-                                                            const base = Number(s.base_price) || 10;
-                                                            const sizeInch = Number(s.screen_size_inch) || 55;
-                                                            let sizeMultiplier = 1.0;
-                                                            if (sizeInch >= 98) sizeMultiplier = 1.5;
-                                                            else if (sizeInch >= 86) sizeMultiplier = 1.35;
-                                                            else if (sizeInch >= 75) sizeMultiplier = 1.2;
-                                                            else if (sizeInch >= 65) sizeMultiplier = 1.1;
-                                                            basePriceSum += (base * sizeMultiplier);
-                                                        });
-
-                                                        const estimatedBaseCost = (basePriceSum * days).toFixed(2);
-
-                                                        return (
-                                                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-primary-container/20 border border-primary/20 p-5 rounded-2xl shadow-sm">
-                                                                <h4 className="font-label-md text-label-md font-bold text-primary mb-3 flex items-center gap-2">
-                                                                    <span className="material-symbols-outlined text-[20px]">analytics</span>
-                                                                    {t('ads.initial_indicators')}
-                                                                </h4>
-
-                                                                <div className="grid grid-cols-3 gap-3 mb-4">
-                                                                    <div className="bg-surface rounded-xl p-3 text-center border border-primary/10">
-                                                                        <span className="block font-caption text-caption text-outline mb-1">{t('common.duration')}</span>
-                                                                        <span className="font-headline-sm text-headline-sm text-primary font-bold">{days > 0 ? `${days} ${t('common.day')}` : '-'}</span>
-                                                                    </div>
-                                                                    <div className="bg-surface rounded-xl p-3 text-center border border-primary/10">
-                                                                        <span className="block font-caption text-caption text-outline mb-1">{t('common.screens')}</span>
-                                                                        <span className="font-headline-sm text-headline-sm text-primary font-bold">{selectedScreens.length > 0 ? selectedScreens.length : '-'}</span>
-                                                                    </div>
-                                                                    <div className="bg-surface rounded-xl p-3 text-center border border-primary/10">
-                                                                        <span className="block font-caption text-caption text-outline mb-1">{t('ads.expected_cost')}</span>
-                                                                        <span className="font-headline-sm text-headline-sm text-primary font-bold" dir="ltr">{days > 0 && selectedScreens.length > 0 ? `$${estimatedBaseCost}` : '-'}</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <p className="font-caption text-caption text-on-surface-variant leading-relaxed mb-3">
-                                                                    {t('ads.estimated_cost_note')}
-                                                                </p>
-
-                                                                <div className="bg-surface border border-primary/10 rounded-xl p-3 flex items-start gap-3">
-                                                                    <span className="material-symbols-outlined text-primary text-[18px] mt-0.5">info</span>
-                                                                    <p className="font-caption text-caption text-outline">
-                                                                        {t('ads.calculate_cost_note')}
-                                                                    </p>
-                                                                </div>
-                                                            </motion.div>
-                                                        );
-                                                    })()}
-
-                                                    <button type="button" onClick={handleCalculateCost} disabled={costLoading}
-                                                        className="w-full bg-surface hover:bg-surface-container-low border border-border-color text-on-background font-label-lg py-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 group outline-none">
-                                                        <span className="material-symbols-outlined text-primary">calculate</span>
-                                                        {costLoading ? t('ads.simulating') : t('ads.calculate_total_cost')}
-                                                    </button>
+                                                    {!calculatedCost && costLoading && (
+                                                        <div className="flex justify-center py-10">
+                                                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                                        </div>
+                                                    )}
 
                                                     <AnimatePresence>
-                                                        {calculatedCost !== null && costDetails && (
+                                                        {calculatedCost !== null && costDetails && !costLoading && (
                                                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="overflow-hidden">
                                                                 <div className="bg-surface p-6 rounded-2xl border border-border-color shadow-sm">
                                                                     <div className="flex justify-between items-center mb-6 border-b border-border-color pb-4">
@@ -970,14 +966,14 @@ const CreateAdPage = () => {
                                                                         <span className="font-display-sm text-display-sm text-primary font-bold tracking-tighter" dir="ltr">${(calculatedCost ? Number(calculatedCost).toFixed(2) : "0.00")}</span>
                                                                     </div>
 
-                                                                    {costDetails.discount_multiplier < 1.0 && (
+                                                                    {costDetails.discount_percentage > 0 && (
                                                                         <div className="mb-6 bg-green-50/50 border border-green-200 p-4 rounded-xl flex items-start gap-3">
                                                                             <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                                                                 <span className="material-symbols-outlined text-green-600">celebration</span>
                                                                             </div>
                                                                             <div>
                                                                                 <h4 className="font-label-md text-label-md font-bold text-green-800 mb-1">{t('ads.long_duration_reward')}</h4>
-                                                                                <p className="font-caption text-caption text-green-700">{t('ads.discount_applied')} <strong>{costDetails.discount_label}</strong> {t('ads.for_long_duration')}</p>
+                                                                                <p className="font-caption text-caption text-green-700">{t('ads.discount_applied')} <strong>{costDetails.discount_percentage}%</strong> {t('ads.for_long_duration')}</p>
                                                                             </div>
                                                                         </div>
                                                                     )}
@@ -985,7 +981,7 @@ const CreateAdPage = () => {
                                                                     <div className="grid grid-cols-3 gap-3 mb-6">
                                                                         <div className="bg-surface-container-lowest rounded-xl p-3 text-center border border-border-color">
                                                                             <span className="block font-caption text-caption text-outline mb-1">{t('ads.fees')}</span>
-                                                                            <span className="font-headline-sm text-headline-sm text-on-background font-bold" dir="ltr">${costDetails.base_price}</span>
+                                                                            <span className="font-headline-sm text-headline-sm text-on-background font-bold" dir="ltr">${costDetails.subtotal}</span>
                                                                         </div>
                                                                         <div className="bg-surface-container-lowest rounded-xl p-3 text-center border border-border-color">
                                                                             <span className="block font-caption text-caption text-outline mb-1">{t('common.duration')}</span>

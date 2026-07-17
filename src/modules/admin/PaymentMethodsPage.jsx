@@ -248,7 +248,7 @@ const PaymentMethodsPage = () => {
             <div className="bg-surface rounded-2xl border border-outline-variant shadow-sm overflow-hidden flex flex-col min-h-[300px] mt-8">
                 <div className="p-5 border-b border-outline-variant flex justify-between items-center bg-surface relative">
                     <h3 className="font-title-lg text-title-lg text-on-surface font-semibold flex items-center gap-2">
-                        إدارة سجل بوابات التحصيل
+                        {t('admin.manage_payment_gateways_log')}
                         {isTestingConnections && <span className="flex w-3 h-3 bg-primary rounded-full animate-ping ml-2"></span>}
                     </h3>
                     

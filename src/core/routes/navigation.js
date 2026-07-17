@@ -40,6 +40,8 @@ const NAV_LABELS = {
     myFinancials:       { ar: 'السجل المالي',     en: 'My Financials' },
     earnings:           { ar: 'العوائد المالية',  en: 'Earnings' },
     reports:            { ar: 'التقارير',         en: 'Reports' },
+    reportsFinancial:   { ar: 'التقرير المالي',  en: 'Financial Report' },
+    reportsAdPerformance: { ar: 'تقرير الأداء', en: 'Ad Performance' },
     analytics:          { ar: 'التحليلات والأداء', en: 'Analytics & Reports' },
     // Maintenance specific
     nocCenter:          { ar: 'مركز العمليات',    en: 'NOC Center' },
@@ -64,6 +66,8 @@ export const getNavItems = (roleId, lang = 'ar') => {
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
                 { path: '/dashboard/financial', icon: Wallet, label: t('financial', lang) },
                 { path: '/dashboard/reports/screen', icon: FileText, label: t('reports', lang) },
+                { path: '/dashboard/reports/financial', icon: DollarSign, label: t('reportsFinancial', lang) },
+                { path: '/dashboard/reports/ad-performance', icon: BarChart2, label: t('reportsAdPerformance', lang) },
                 { path: '/dashboard/users', icon: Users, label: t('users', lang) },
                 { path: '/dashboard/roles', icon: Shield, label: t('roles', lang) },
                 { path: '/dashboard/locations', icon: MapPin, label: t('locations', lang) },
@@ -97,6 +101,8 @@ export const getNavItems = (roleId, lang = 'ar') => {
                 { path: '/dashboard/ads', icon: Megaphone, label: t('ads', lang) },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: t('paymentOps', lang) },
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
+                { path: '/dashboard/reports/financial', icon: DollarSign, label: t('reportsFinancial', lang) },
+                { path: '/dashboard/reports/ad-performance', icon: BarChart2, label: t('reportsAdPerformance', lang) },
                 { path: '/dashboard/sessions', icon: ShieldCheck, label: t('mySessions', lang) },
                 { path: '/dashboard/settings', icon: Settings, label: t('settings', lang) },
             ];
