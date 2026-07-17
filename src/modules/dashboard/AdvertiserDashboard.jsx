@@ -57,7 +57,7 @@ const DashboardSkeleton = () => (
     </div>
 );
 
-const DashboardError = ({ onRetry }) => (
+const DashboardError = ({ onRetry, t }) => (
     <div className="flex flex-col items-center justify-center py-32 text-center space-y-5" dir="rtl">
         <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center shadow-inner">
             <AlertCircle className="w-10 h-10 text-red-500" />
@@ -116,7 +116,7 @@ const AdvertiserDashboard = () => {
     };
 
     if (loading) return <DashboardSkeleton />;
-    if (error && !data) return <DashboardError onRetry={fetchDashboard} />;
+    if (error && !data) return <DashboardError onRetry={fetchDashboard} t={t} />;
 
     // Filter recent ads by Status AND Search
     const filteredAds = data?.recent_ads?.filter(ad => {
@@ -145,7 +145,7 @@ const AdvertiserDashboard = () => {
                         {t('dashboard.overview')}
                     </h1>
                     <p className="mt-1 text-[13px] text-outline font-sans">
-                        Dashboard Overview
+                        {t('dashboard.overview_desc')}
                     </p>
                 </div>
 
