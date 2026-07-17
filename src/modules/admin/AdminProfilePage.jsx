@@ -8,7 +8,7 @@ import useTranslation from '../../i18n/useTranslation';
 const AdminProfilePage = () => {
     const { t, dir } = useTranslation();
     const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
+    const { user, logout, impersonatedRole } = useAuthStore();
     const [logoutHover, setLogoutHover] = useState(false);
 
     const handleLogout = async () => {
@@ -27,7 +27,18 @@ const AdminProfilePage = () => {
     const fullName = user?.full_name || t('admin.default_name_aws');
     const email    = user?.email            || 'and@gmail.com';
     const phone    = user?.phone            || '7701244071';
-    const roleName = user?.role?.role_name  || 'SuperAdmin';
+    const getRoleName = () => {
+        if (impersonatedRole) {
+            switch (impersonatedRole) {
+                case 2: return t('common.role advertiser');
+                case 3: return t('common.role screen owner');
+                case 6: return t('common.role secretary');
+                case 4: return t('common.role maintenance');
+            }
+        }
+        return user?.role?.role_name || 'SuperAdmin';
+    };
+    const roleName = getRoleName();
     const joinDate = user?.created_at
         ? new Date(user.created_at).toLocaleDateString(dir === 'rtl' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long' })
         : t('admin.default_join_date');

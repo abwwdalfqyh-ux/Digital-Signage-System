@@ -908,6 +908,8 @@
         "file_size_exceeds_50mb": "حجم الملف يتجاوز 50 ميجابايت",
         "fill_screens_and_dates_before_cost": "يرجى تحديد الشاشات وتواريخ الحملة قبل حساب التكلفة",
         "basic_info_title": "المعلومات الأساسية",
+        "campaign_date": "تاريخ الحملة",
+        "total_cost": "التكلفة الإجمالية",
         "basic_info_desc": "أدخل عنوان الحملة وتفاصيل المعلن",
         "assign_to_advertiser": "تخصيص لمعلن",
         "issue_under_admin": "إصدار تحت إدارة النظام",
@@ -1940,6 +1942,9 @@
         "pending_ads_note": "بانتظار الموافقة",
         "active_screens_label": "شاشات نشطة",
         "try_changing_filters": "جرب تغيير عوامل التصفية",
-        "search_ads": "ابحث عن إعلان..."
+        "search_ads": "ابحث عن إعلان...",
+        "recent_ads_registry": "سجل الإعلانات الأخيرة",
+        "browse_latest_ads": "تصفح أحدث إعلاناتك",
+        "overview_desc": "نظرة عامة على الإحصائيات"
     }
 }

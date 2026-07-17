@@ -908,6 +908,8 @@
         "file_size_exceeds_50mb": "File size exceeds 50MB",
         "fill_screens_and_dates_before_cost": "Please select screens and dates before calculating cost",
         "basic_info_title": "Basic Information",
+        "campaign_date": "Campaign Date",
+        "total_cost": "Total Cost",
         "basic_info_desc": "Enter the campaign title and advertiser details",
         "assign_to_advertiser": "Assign to Advertiser",
         "issue_under_admin": "Issue under System Admin",
@@ -1940,6 +1942,9 @@
         "pending_ads_note": "Awaiting Approval",
         "active_screens_label": "Active Screens",
         "try_changing_filters": "Try changing filters",
-        "search_ads": "Search ads..."
+        "search_ads": "Search for an ad...",
+        "recent_ads_registry": "Recent Ads Registry",
+        "browse_latest_ads": "Browse your latest ads",
+        "overview_desc": "Overview of statistics"
     }
 }
