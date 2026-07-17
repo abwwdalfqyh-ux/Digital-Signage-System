@@ -11,13 +11,52 @@ const FinancialReportPage = () => {
     const addToast = useToastStore(state => state.addToast);
 
     // Filters State
+    const [reportType, setReportType] = useState('comprehensive');
     const [filters, setFilters] = useState({
         start_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
         end_date: new Date().toISOString().split('T')[0],
     });
 
     const [reportData, setReportData] = useState(null);
+    const [detailedData, setDetailedData] = useState(null);
     const [loadingReport, setLoadingReport] = useState(false);
+    
+    // Users and Roles for filtering
+    const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [selectedRole, setSelectedRole] = useState('');
+    
+    React.useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const res = await axiosClient.get('/users');
+                if (res.data && res.data.users) {
+                    setUsers(res.data.users);
+                } else if (Array.isArray(res.data)) {
+                    setUsers(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch users", error);
+            }
+        };
+        const fetchRoles = async () => {
+            try {
+                const res = await axiosClient.get('/lookups/roles');
+                if (res.data && res.data.roles) {
+                    setRoles(res.data.roles);
+                } else if (Array.isArray(res.data)) {
+                    setRoles(res.data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch roles", error);
+            }
+        };
+        // Only fetch users and roles if the current user has permission (Admin/SuperAdmin)
+        if ([1, 2, 7, 8].includes(Number(user?.role_id))) {
+            fetchUsers();
+            fetchRoles();
+        }
+    }, [user]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -31,14 +70,22 @@ const FinancialReportPage = () => {
         }
 
         setLoadingReport(true);
+        setReportData(null);
+        setDetailedData(null);
         try {
-            const res = await axiosClient.get('/reports/comprehensive-financial', { params: filters });
-            setReportData(res.data);
+            if (reportType === 'comprehensive') {
+                const res = await axiosClient.get('/reports/comprehensive-financial', { params: filters });
+                setReportData(res.data);
+            } else {
+                const res = await axiosClient.get('/financial/ledger', { params: filters });
+                setDetailedData(res.data.data.transactions);
+            }
             addToast(t('reports.report_generated_success'), 'success');
         } catch (error) {
             console.error("Error generating report", error);
             addToast(t('reports.report_generate_failed'), 'error');
             setReportData(null);
+            setDetailedData(null);
         } finally {
             setLoadingReport(false);
         }
@@ -63,8 +110,20 @@ const FinancialReportPage = () => {
 
             {/* Filters Section - Hidden on Print */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm mb-8 print:hidden">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                     
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-on-surface block">{t('reports.report_type', 'Report Type')}</label>
+                        <select 
+                            value={reportType} 
+                            onChange={(e) => setReportType(e.target.value)}
+                            className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                        >
+                            <option value="comprehensive">{t('reports.comprehensive_report', 'Comprehensive Report')}</option>
+                            <option value="detailed">{t('reports.detailed_ledger', 'Detailed Ledger')}</option>
+                        </select>
+                    </div>
+
                     <div className="space-y-2">
                         <label className="text-sm font-semibold text-on-surface block">{t('reports.from_date')}</label>
                         <div className="relative">
@@ -92,12 +151,47 @@ const FinancialReportPage = () => {
                             />
                         </div>
                     </div>
+                    
+                    {[1, 2, 7, 8].includes(Number(user?.role_id)) && (
+                        <>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-on-surface block">{t('reports.role', 'الصلاحية')}</label>
+                                <select 
+                                    value={selectedRole} 
+                                    onChange={(e) => {
+                                        setSelectedRole(e.target.value);
+                                        setFilters(prev => ({ ...prev, user_id: '' })); // reset user
+                                    }}
+                                    className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                >
+                                    <option value="">{t('reports.all_roles', 'الكل')}</option>
+                                    {roles.map(r => (
+                                        <option key={r.role_id} value={r.role_id}>{r.role_name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-on-surface block">{t('reports.advertiser_owner', 'المستخدم (معلن / مالك)')}</label>
+                                <select 
+                                    name="user_id"
+                                    value={filters.user_id || ''} 
+                                    onChange={handleFilterChange}
+                                    className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                >
+                                    <option value="">{t('reports.all_users', 'الكل')}</option>
+                                    {users.filter(u => selectedRole ? u.role_id == selectedRole : true).map(u => (
+                                        <option key={u.user_id} value={u.user_id}>{u.full_name || u.username}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )}
 
-                    <div className="flex gap-3 h-11">
+                    <div className={`flex justify-end gap-3 mt-2 ${[1, 2, 7, 8].includes(Number(user?.role_id)) ? 'md:col-span-3' : 'col-span-1'}`}>
                         <button 
                             onClick={generateReport}
                             disabled={loadingReport}
-                            className="flex-1 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                            className="bg-primary hover:bg-primary/90 text-white px-8 h-11 font-medium rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 shadow-sm"
                         >
                             {loadingReport ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -111,8 +205,8 @@ const FinancialReportPage = () => {
                         
                         <button 
                             onClick={handlePrint}
-                            disabled={!reportData}
-                            className="px-5 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary font-medium rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                            disabled={!reportData && !detailedData}
+                            className="w-11 h-11 shrink-0 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary font-medium rounded-xl flex items-center justify-center transition-all disabled:opacity-50 shadow-sm"
                             title={t('reports.print_report')}
                         >
                             <Printer className="w-5 h-5" />
@@ -144,7 +238,7 @@ const FinancialReportPage = () => {
             </style>
 
             {/* Report Content - This area gets printed */}
-            {reportData && (
+            {(reportData || detailedData) && (
                 <div className="print-area bg-white relative overflow-hidden font-sans shadow-sm border border-outline-variant rounded-2xl print:border-none print:rounded-none" dir="rtl" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
                     
                     {/* Top Header Polygon */}
@@ -161,7 +255,7 @@ const FinancialReportPage = () => {
                         <div className="w-48 bg-[#102a43]" style={{ clipPath: 'polygon(0 0, 100% 0, 75% 100%, 25% 100%)' }}></div>
 
                         <div className="flex-1 flex items-center justify-end px-12 bg-[#1c5b8e]">
-                            <h1 className="text-4xl font-black tracking-tight" style={{ color: '#ffffff' }}>{t('reports.financial_report_header', 'Comprehensive Financial Report')}</h1>
+                            <h1 className="text-4xl font-black tracking-tight" style={{ color: '#ffffff' }}>{reportType === 'comprehensive' ? t('reports.financial_report_header', 'Comprehensive Financial Report') : t('reports.detailed_ledger_header', 'Detailed Financial Ledger')}</h1>
                         </div>
                     </div>
 
@@ -188,7 +282,9 @@ const FinancialReportPage = () => {
                     <div className="px-16 flex-1 mb-10">
                         
                         {/* KPI Cards */}
-                        <div className="grid grid-cols-3 gap-6 mb-10">
+                        {reportType === 'comprehensive' && reportData && (
+                            <>
+                                <div className="grid grid-cols-3 gap-6 mb-10">
                             <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl text-center">
                                 <DollarSign className="w-10 h-10 text-blue-600 mx-auto mb-2" />
                                 <h3 className="text-gray-600 font-medium text-sm mb-1">{t('reports.total_revenue_lbl', 'Total Collected Revenue')}</h3>
@@ -270,6 +366,103 @@ const FinancialReportPage = () => {
                                 </div>
                             </div>
                         </div>
+                            </>
+                        )}
+
+                        {reportType === 'detailed' && detailedData && (
+                            <div className="border border-gray-200 rounded-2xl overflow-hidden shadow-sm mt-8">
+                                <table className="w-full text-right text-sm">
+                                    <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                                        <tr>
+                                            <th className="py-3 px-4 font-medium">{t('reports.transaction_id', 'Trans. ID')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.date', 'Date')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.advertiser', 'Advertiser')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.screen', 'Screen')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.statement', 'البيان')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.payment_method', 'Payment Method')}</th>
+                                            <th className="py-3 px-4 font-medium">{t('reports.reference_number', 'Ref Number')}</th>
+                                            <th className="py-3 px-4 font-medium text-left">{t('reports.amount', 'Amount')}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {detailedData.map((tx, idx) => (
+                                            <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                                <td className="py-3 px-4 text-gray-800 font-medium" dir="ltr">#{tx.ledger_id}</td>
+                                                <td className="py-3 px-4 text-gray-600">{new Date(tx.created_at).toLocaleDateString()}</td>
+                                                <td className="py-3 px-4 text-gray-800">{tx.user?.full_name || t('reports.unknown', 'Unknown')}</td>
+                                                <td className="py-3 px-4 text-gray-600">{tx.screen?.screen_name || '-'}</td>
+                                                <td className="py-3 px-4 text-gray-600">
+                                                    {(() => {
+                                                        const txType = t(`reports.tx_type_${tx.transaction_type}`, tx.transaction_type);
+                                                        let adName = tx.advertisement ? tx.advertisement.title : '';
+                                                        let screenName = tx.screen ? tx.screen.screen_name : '';
+                                                        
+                                                        if (tx.transaction_type === 'platform_fee' && adName) {
+                                                            return `عمولة منصة مقابل الإعلان (${adName})`;
+                                                        } else if ((tx.transaction_type === 'payment' || tx.transaction_type === 'payment_in') && adName) {
+                                                            return `دفع للإعلان (${adName})`;
+                                                        } else if (tx.transaction_type === 'payout_completed') {
+                                                            return `سحب أرباح`;
+                                                        } else if (tx.transaction_type === 'payout_requested') {
+                                                            return `طلب سحب أرباح`;
+                                                        } else if (tx.transaction_type === 'payout_pending' && adName && screenName) {
+                                                            return `أرباح الشاشة (${screenName}) من الإعلان (${adName})`;
+                                                        }
+                                                        
+                                                        let notesText = '';
+                                                        if (tx.notes) {
+                                                            try {
+                                                                const parsed = JSON.parse(tx.notes);
+                                                                if (typeof parsed === 'object' && parsed !== null) {
+                                                                    notesText = Object.entries(parsed).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                                                                } else {
+                                                                    notesText = tx.notes;
+                                                                }
+                                                            } catch (e) {
+                                                                notesText = tx.notes;
+                                                            }
+                                                        }
+                                                        
+                                                        if (notesText && (notesText.includes('إعلان') || notesText.includes('شاشة') || notesText.includes('دفع'))) {
+                                                            return notesText;
+                                                        }
+
+                                                        if (notesText) {
+                                                            return `${txType} - ${notesText}`;
+                                                        }
+                                                        return txType;
+                                                    })()}
+                                                </td>
+                                                <td className="py-3 px-4 text-gray-600">{tx.payment_method || '-'}</td>
+                                                <td className="py-3 px-4 text-gray-600">
+                                                    {tx.reference_number ? (
+                                                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{tx.reference_number}</span>
+                                                    ) : tx.advertisement ? (
+                                                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100 flex items-center gap-1 w-max">
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                                            {t('ad', 'إعلان')} #{tx.advertisement.ad_id}
+                                                        </span>
+                                                    ) : tx.screen ? (
+                                                        <span className="text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded border border-purple-100 flex items-center gap-1 w-max">
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                                            {t('screen', 'شاشة')} #{tx.screen.screen_id}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-400">-</span>
+                                                    )}
+                                                </td>
+                                                <td className="py-3 px-4 text-left font-bold text-gray-900">${parseFloat(tx.amount).toFixed(2)}</td>
+                                            </tr>
+                                        ))}
+                                        {detailedData.length === 0 && (
+                                            <tr>
+                                                <td colSpan="8" className="py-6 text-center text-gray-400">{t('reports.no_data', 'No data available')}</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                         
                         {/* Conditions and Info */}
                         <div className="mt-16 grid grid-cols-2 gap-8 items-end w-full">
@@ -301,7 +494,7 @@ const FinancialReportPage = () => {
             )}
             
             {/* Empty State when no report is generated yet */}
-            {!reportData && !loadingReport && (
+            {!reportData && !detailedData && !loadingReport && (
                 <div className="w-full bg-surface-container-low border border-outline-variant/50 border-dashed rounded-3xl py-24 px-4 flex flex-col items-center justify-center text-center print:hidden">
                     <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center shadow-sm mb-6">
                         <FileText className="w-10 h-10 text-primary/40" />

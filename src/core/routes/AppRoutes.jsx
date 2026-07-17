@@ -35,6 +35,7 @@ import MaintenanceReportsPage from '../../modules/reports/MaintenanceReportsPage
 import OwnerAnalyticsPage from '../../modules/reports/OwnerAnalyticsPage';
 import FinancialReportPage from '../../modules/reports/FinancialReportPage';
 import AdPerformanceReportPage from '../../modules/reports/AdPerformanceReportPage';
+import ReportsHubPage from '../../modules/reports/ReportsHubPage';
 import SupportPage from '../../modules/support/SupportPage';
 
 // Admin Modules
@@ -181,22 +182,25 @@ const AppRoutes = () => {
                 <Route path="notifications" element={<NotificationsPage />} />
 
                 {/* Reports */}
-                <Route path="reports/screen" element={<ScreenReportsPage />} />
-                <Route path="reports/maintenance" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MAINTENANCE]}>
-                        <MaintenanceReportsPage />
-                    </RoleRoute>
-                } />
-                <Route path="reports/financial" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.SECRETARY]}>
-                        <FinancialReportPage />
-                    </RoleRoute>
-                } />
-                <Route path="reports/ad-performance" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.SECRETARY]}>
-                        <AdPerformanceReportPage />
-                    </RoleRoute>
-                } />
+                <Route path="reports" element={<ReportsHubPage />}>
+                    <Route index element={<Navigate to="screen" replace />} />
+                    <Route path="screen" element={<ScreenReportsPage />} />
+                    <Route path="maintenance" element={
+                        <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.MAINTENANCE]}>
+                            <MaintenanceReportsPage />
+                        </RoleRoute>
+                    } />
+                    <Route path="financial" element={
+                        <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.SECRETARY]}>
+                            <FinancialReportPage />
+                        </RoleRoute>
+                    } />
+                    <Route path="ad-performance" element={
+                        <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.SECRETARY]}>
+                            <AdPerformanceReportPage />
+                        </RoleRoute>
+                    } />
+                </Route>
 
                 {/* Owner Analytics (Screen Owner only) */}
                 <Route path="analytics/owner" element={

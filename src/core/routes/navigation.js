@@ -65,9 +65,7 @@ export const getNavItems = (roleId, lang = 'ar') => {
                 { path: '/dashboard/ads', icon: Megaphone, label: t('ads', lang) },
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
                 { path: '/dashboard/financial', icon: Wallet, label: t('financial', lang) },
-                { path: '/dashboard/reports/screen', icon: FileText, label: t('reports', lang) },
-                { path: '/dashboard/reports/financial', icon: DollarSign, label: t('reportsFinancial', lang) },
-                { path: '/dashboard/reports/ad-performance', icon: BarChart2, label: t('reportsAdPerformance', lang) },
+                { path: '/dashboard/reports', icon: FileText, label: t('reports', lang) },
                 { path: '/dashboard/users', icon: Users, label: t('users', lang) },
                 { path: '/dashboard/roles', icon: Shield, label: t('roles', lang) },
                 { path: '/dashboard/locations', icon: MapPin, label: t('locations', lang) },
@@ -101,8 +99,7 @@ export const getNavItems = (roleId, lang = 'ar') => {
                 { path: '/dashboard/ads', icon: Megaphone, label: t('ads', lang) },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: t('paymentOps', lang) },
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
-                { path: '/dashboard/reports/financial', icon: DollarSign, label: t('reportsFinancial', lang) },
-                { path: '/dashboard/reports/ad-performance', icon: BarChart2, label: t('reportsAdPerformance', lang) },
+                { path: '/dashboard/reports', icon: FileText, label: t('reports', lang) },
                 { path: '/dashboard/sessions', icon: ShieldCheck, label: t('mySessions', lang) },
                 { path: '/dashboard/settings', icon: Settings, label: t('settings', lang) },
             ];
@@ -110,7 +107,7 @@ export const getNavItems = (roleId, lang = 'ar') => {
             return [
                 { path: '/dashboard',         icon: LayoutDashboard, label: t('nocCenter', lang) },
                 { path: '/dashboard/screens', icon: Monitor,         label: t('screenStatus', lang), badge: { value: 2, color: '#dc2626', bg: '#fee2e2', title: 'شاشات منقطعة' } },
-                { path: '/dashboard/reports/maintenance', icon: FileText, label: t('reports', lang) },
+                { path: '/dashboard/reports', icon: FileText, label: t('reports', lang) },
                 { path: '/dashboard/sessions', icon: ShieldCheck,   label: t('mySessions', lang) },
                 { path: '/dashboard/settings', icon: Settings,       label: t('settings', lang) },
             ];

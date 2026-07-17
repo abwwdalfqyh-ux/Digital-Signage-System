@@ -841,6 +841,7 @@ const CreateAdPage = () => {
                                                         )}
                                                     </div>
                                                 </div>
+                                            </div>
                                         </motion.div>
                                     )}
 

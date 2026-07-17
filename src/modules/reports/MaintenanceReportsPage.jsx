@@ -213,11 +213,11 @@ const MaintenanceReportsPage = () => {
                             <div className="flex justify-start gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.mobile_number')}</span> <span className="text-gray-700">{reportData.screen.owner?.phone || t('reports.not_listed')}</span></div>
                         </div>
 
-                        <div className="flex-1 text-left space-y-3">
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.screen_id} - {reportData.screen.screen_name}</span> <span className="font-bold text-gray-900">{t('reports.screen_number')}</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{reportData.screen.street ? `${reportData.screen.street.street_name} - ${reportData.screen.street.region?.region_name}` : t('reports.unspecified')}</span> <span className="font-bold text-gray-900">{t('reports.screen_location')}</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700">{new Date().toLocaleDateString('ar-SA')}</span> <span className="font-bold text-gray-900">{t('reports.issue_date')}</span></div>
-                            <div className="flex justify-end gap-3"><span className="text-gray-700" dir="ltr">{filters.start_date} <span className="mx-1">/</span> {filters.end_date}</span> <span className="font-bold text-gray-900">{t('reports.period')}</span></div>
+                        <div className="flex-1 text-right space-y-3">
+                            <div className="flex justify-end gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.screen_number')}</span> <span className="text-gray-700">{reportData.screen.screen_id} - {reportData.screen.screen_name}</span></div>
+                            <div className="flex justify-end gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.screen_location')}</span> <span className="text-gray-700">{reportData.screen.street ? `${reportData.screen.street.name} - ${reportData.screen.street.region?.name}` : t('reports.unspecified')}</span></div>
+                            <div className="flex justify-end gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.issue_date')}</span> <span className="text-gray-700">{new Date().toLocaleDateString('ar-SA')}</span></div>
+                            <div className="flex justify-end gap-3"><span className="font-bold text-gray-900 w-32">{t('reports.period')}</span> <span className="text-gray-700" dir="ltr">{filters.start_date} <span className="mx-1">/</span> {filters.end_date}</span></div>
                         </div>
                     </div>
 
@@ -318,12 +318,12 @@ const MaintenanceReportsPage = () => {
             
             {/* Empty State when no report is generated yet */}
             {!reportData && !loadingReport && (
-                <div className="bg-surface-container-low border border-outline-variant/50 border-dashed rounded-3xl py-24 flex flex-col items-center justify-center text-center print:hidden">
+                <div className="w-full bg-surface-container-low border border-outline-variant/50 border-dashed rounded-3xl py-24 px-4 flex flex-col items-center justify-center text-center print:hidden">
                     <div className="w-20 h-20 bg-surface rounded-full flex items-center justify-center shadow-sm mb-6">
                         <Activity className="w-10 h-10 text-primary/40" />
                     </div>
-                    <h3 className="text-xl font-bold text-on-background mb-2">{t('reports.technical_reports_ready')}</h3>
-                    <p className="text-on-surface-variant max-w-md">{t('reports.technical_reports_instructions')}</p>
+                    <h3 className="text-xl font-bold text-on-background mb-2 whitespace-nowrap">{t('reports.technical_reports_ready')}</h3>
+                    <p className="text-on-surface-variant min-w-[min(100%,400px)] max-w-[500px] w-full mx-auto leading-relaxed">{t('reports.technical_reports_instructions')}</p>
                 </div>
             )}
         </div>
