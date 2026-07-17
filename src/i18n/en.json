@@ -1,5 +1,9 @@
 {
     "common": {
+        "save_confirm": "Confirm Save",
+        "minutes_short": "min",
+        "app_name": "SabaPost",
+        "app_desc": "Digital Signage and Advertising Management System",
         "save": "Save",
         "cancel": "Cancel",
         "delete": "Delete",
@@ -822,6 +826,12 @@
         "status_maintenance_long": "Under Maintenance"
     },
     "ads": {
+        "capacity_map_desc": "A map showing booked and available ad capacity per screen throughout the day.",
+        "paid_peak_time": "Paid Peak Time",
+        "fully_booked": "Fully Booked",
+        "fully_available": "Fully Available",
+        "partially_available": "Partially Available",
+        "today": "Today",
         "end_date_before_start_date": "End date cannot be before start date",
         "end_time_before_start_time": "End time cannot be before or equal to start time",
         "page_title": "Ads Management",
@@ -1033,6 +1043,14 @@
         "delete_campaign_msg": "Are you sure you want to permanently delete this campaign? This action cannot be undone."
     },
     "financial": {
+        "sav_transaction": "Save Transaction",
+        "placeholder": "Type here...",
+        "platform_management": "Platform Management",
+        "time_period": "Time Period",
+        "admin_signature": "Admin Signature",
+        "number_of_transactions": "Number of Transactions",
+        "total_profits": "Total Profits",
+        "platform_profits": "Platform Profits",
         "page_title": "Financial System",
         "ledger": "Financial Ledger",
         "transaction_type": "Transaction Type",
@@ -1193,6 +1211,9 @@
         "reference_number_label": "Reference Number (Optional)"
     },
     "users": {
+        "delete_dialog_confirm": "Confirm Delete",
+        "delete_dialog_title": "Delete User",
+        "delete_dialog_message": "Are you sure you want to delete this user? This action cannot be undone and all related data will be removed.",
         "page_title": "Users Management",
         "add_user": "Add User",
         "edit_user": "Edit User",

@@ -1,5 +1,9 @@
 {
     "common": {
+        "save_confirm": "تأكيد الحفظ",
+        "minutes_short": "دقيقة",
+        "app_name": "سبأ بوست",
+        "app_desc": "نظام إدارة الإعلانات الرقمية والشاشات الذكية",
         "save": "حفظ",
         "cancel": "إلغاء",
         "delete": "حذف",
@@ -823,6 +827,12 @@
         "status_maintenance_long": "تحت الصيانة (Maintenance)"
     },
     "ads": {
+        "capacity_map_desc": "خريطة توضح سعة الإعلانات المحجوزة والمتاحة لكل شاشة خلال أوقات اليوم.",
+        "paid_peak_time": "أوقات الذروة المدفوعة",
+        "fully_booked": "محجوز بالكامل",
+        "fully_available": "متاح بالكامل",
+        "partially_available": "متاح جزئياً",
+        "today": "اليوم",
         "end_date_before_start_date": "لا يمكن أن يكون تاريخ الانتهاء قبل تاريخ البدء",
         "end_time_before_start_time": "لا يمكن أن يكون وقت الانتهاء قبل أو مساوي لوقت البدء",
         "page_title": "إدارة الإعلانات",
@@ -1032,6 +1042,14 @@
         "delete_campaign_msg": "هل أنت متأكد أنك تريد حذف هذه الحملة الإعلانية بشكل نهائي؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "financial": {
+        "sav_transaction": "حفظ العملية",
+        "placeholder": "اكتب هنا...",
+        "platform_management": "إدارة المنصة",
+        "time_period": "الفترة الزمنية",
+        "admin_signature": "توقيع الإدارة",
+        "number_of_transactions": "عدد العمليات",
+        "total_profits": "إجمالي الأرباح",
+        "platform_profits": "أرباح المنصة",
         "page_title": "النظام المالي",
         "ledger": "الدفتر المالي",
         "transaction_type": "نوع العملية",
@@ -1192,6 +1210,9 @@
         "reference_number_label": "الرقم المرجعي (اختياري)"
     },
     "users": {
+        "delete_dialog_confirm": "تأكيد حذف المستخدم",
+        "delete_dialog_title": "تأكيد حذف المستخدم",
+        "delete_dialog_message": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء وسيتم مسح كافة البيانات المتعلقة به.",
         "page_title": "إدارة المستخدمين",
         "add_user": "إضافة مستخدم",
         "edit_user": "تعديل المستخدم",
