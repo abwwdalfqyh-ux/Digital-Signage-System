@@ -26,10 +26,11 @@ const CreateAdPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
 
     const [form, setForm] = useState({
-        title: '', start_date: '', end_date: '', target_start_time: '00:00', target_end_time: '23:59', daily_shift: '24h',
+        title: '', category_id: '', start_date: '', end_date: '', target_start_time: '00:00', target_end_time: '23:59', daily_shift: '24h',
         total_cost: '', file: null,
         advertiser_id: '', video_duration_sec: 0
     });
+    const [categories, setCategories] = useState([]);
     const [calculatedCost, setCalculatedCost] = useState(null);
     const [costDetails, setCostDetails] = useState(null);
     const [costLoading, setCostLoading] = useState(false);
@@ -71,9 +72,17 @@ const CreateAdPage = () => {
             } catch (e) { console.error(e); }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.CATEGORIES);
+                setCategories(res.data || []);
+            } catch (e) { console.error(e); }
+        };
+
         fetchScreens();
         fetchAdvertisers();
         fetchGovs();
+        fetchCategories();
 
         return () => {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -323,6 +332,10 @@ const CreateAdPage = () => {
                 addToast(t('ads.please_write_campaign_title'), 'warning');
                 return;
             }
+            if (!form.category_id) {
+                addToast(t('ads.please_select_category', { defaultValue: 'يرجى اختيار تصنيف الحملة' }), 'warning');
+                return;
+            }
         }
         if (currentStep === 2) {
             if (selectedScreens.length === 0) {
@@ -469,11 +482,24 @@ const CreateAdPage = () => {
                                                     </div>
                                                 )}
 
-                                                <div className="grid grid-cols-1 gap-8">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                                     <div>
                                                         <label className={labelClass}>{t('ads.campaign_title_label')} <span className="text-error">*</span></label>
                                                         <input type="text" value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('ads.campaign_title_placeholder')} className={inputClass} />
                                                         <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.campaign_title_note')}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className={labelClass}>{t('ads.category_label', { defaultValue: 'تصنيف الحملة' })} <span className="text-error">*</span></label>
+                                                        <div className="relative">
+                                                            <select value={form.category_id} onChange={(e) => setForm(p => ({ ...p, category_id: e.target.value }))} className={`${inputClass} appearance-none cursor-pointer bg-white`}>
+                                                                <option value="">-- {t('ads.select_category', { defaultValue: 'اختر تصنيف الإعلان' })} --</option>
+                                                                {categories.map(cat => (
+                                                                    <option key={cat.category_id} value={cat.category_id}>{cat.category_name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-outline pointer-events-none`}>expand_content</span>
+                                                        </div>
+                                                        <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.category_note', { defaultValue: 'يساعد في تصنيف إعلانك وعرضه للجمهور المستهدف' })}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -776,7 +802,7 @@ const CreateAdPage = () => {
                                                                     const isSelected = selectedScreens.includes(screen.screen_id);
                                                                     const currentStatus = screen.computed_status || screen.status;
                                                                     const statusColorClass = currentStatus === 'Online' ? 'bg-green-500' : currentStatus === 'Offline' ? 'bg-red-500' : currentStatus === 'Maintenance' ? 'bg-yellow-500' : 'bg-gray-400';
-                                                                    const statusLabel = currentStatus === 'Online' ? t('common.online') : currentStatus === 'Offline' ? t('common.offline') : currentStatus === 'Maintenance' ? t('common.maintenance') : currentStatus;
+                                                                    const statusLabel = currentStatus === 'Online' ? t('common.online') : currentStatus === 'Offline' ? t('common.offline') : currentStatus === 'Maintenance' ? t('common.maintenance') : currentStatus === 'pending_activation' ? t('screens.tab_pending_activation', { defaultValue: 'بانتظار التفعيل' }) : currentStatus;
 
                                                                     return (
                                                                         <div key={screen.screen_id}
