@@ -1260,6 +1260,8 @@
         "reference_number_label": "الرقم المرجعي (اختياري)"
     },
     "users": {
+        "account_name": "اسم الحساب",
+        "account_number": "رقم الحساب",
         "delete_dialog_confirm": "تأكيد حذف المستخدم",
         "delete_dialog_title": "تأكيد حذف المستخدم",
         "delete_dialog_message": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء وسيتم مسح كافة البيانات المتعلقة به.",

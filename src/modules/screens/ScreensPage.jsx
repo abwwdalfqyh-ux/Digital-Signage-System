@@ -52,7 +52,7 @@ const ScreensPage = () => {
   const { data: governorates = [], isLoading: govLoading } = useGovernorates();
   const [geoLoading, setGeoLoading] = useState(false);
   const { data: types = [] } = useScreenTypes();
-  const { data: ownersData = [] } = useUsersByRole('ScreenOwner');
+  const { data: ownersData = [] } = useUsersByRole(3); // 3 is the ScreenOwner role_id
   const { data: roles = [] } = useRoles();
 
   const { mutateAsync: createScreen } = useCreateScreen();
