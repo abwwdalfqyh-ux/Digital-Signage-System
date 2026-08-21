@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Bell, User as UserIcon, Menu, LogOut, Grid, Sun, Moon, Languages, Users, Plus, X } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 import usePermission from '../../hooks/usePermission';
@@ -59,6 +59,7 @@ const DashboardLayout = () => {
     const { theme, toggleTheme, language, setLanguage } = useUIStore();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -75,6 +76,26 @@ const DashboardLayout = () => {
     // Pass roleId to getNavItems instead of roleName
     const navItems = getNavItems(roleId, language);
     const launchableItems = navItems.filter(i => i.path !== '/dashboard');
+
+    /* ── Keyboard Sidebar Navigation ── */
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                const currentIndex = navItems.findIndex(item => 
+                    item.path === '/dashboard' ? location.pathname === '/dashboard' : location.pathname.startsWith(item.path)
+                );
+                if (currentIndex === -1) return;
+                let nextIndex = e.key === 'ArrowUp' ? currentIndex - 1 : currentIndex + 1;
+                if (nextIndex < 0) nextIndex = navItems.length - 1;
+                if (nextIndex >= navItems.length) nextIndex = 0;
+                navigate(navItems[nextIndex].path);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [navItems, location.pathname, navigate]);
 
     const [savedPaths, setSavedPaths] = useState(() => {
         try {

@@ -30,9 +30,9 @@ const LocationsPage = () => {
     useEffect(() => { if (selectedGov) fetchRegions(selectedGov); else setRegions([]); }, [selectedGov]);
     useEffect(() => { if (selectedRegion) fetchStreets(selectedRegion); else setStreets([]); }, [selectedRegion]);
 
-    const fetchGovs = async () => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.GOVERNORATES); setGovs(r.data); } catch(e){} finally { setLoading(false); } };
-    const fetchRegions = async (govId) => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.REGIONS_BY_GOV(govId)); setRegions(r.data); } catch(e){} };
-    const fetchStreets = async (regionId) => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.STREETS_BY_REGION(regionId)); setStreets(r.data); } catch(e){} };
+    const fetchGovs = async () => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.GOVERNORATES); setGovs(Array.isArray(r.data) ? r.data : Object.values(r.data || {})); } catch(e){} finally { setLoading(false); } };
+    const fetchRegions = async (govId) => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.REGIONS_BY_GOV(govId)); setRegions(Array.isArray(r.data) ? r.data : Object.values(r.data || {})); } catch(e){} };
+    const fetchStreets = async (regionId) => { try { const r = await axiosClient.get(ENDPOINTS.LOOKUPS.STREETS_BY_REGION(regionId)); setStreets(Array.isArray(r.data) ? r.data : Object.values(r.data || {})); } catch(e){} };
 
     const handleSave = async () => {
         if (!formName.trim()) {
