@@ -223,13 +223,14 @@
 }
 
 /* Maximize Modal Grid Support */
-.is-maximized .modal-form-grid {
+.is-maximized form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     align-items: start;
 }
-.is-maximized .modal-form-grid > button[type="submit"] {
+.is-maximized form > button[type="submit"],
+.is-maximized form > div:last-child {
     grid-column: 1 / -1;
     margin-top: auto;
 }

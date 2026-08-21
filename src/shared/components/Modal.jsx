@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Modal = ({ isOpen, onClose, title, children, allowMaximize = false }) => {
+const Modal = ({ isOpen, onClose, title, children, allowMaximize = true }) => {
     const [isMaximized, setIsMaximized] = useState(false);
     return (
         <AnimatePresence>
