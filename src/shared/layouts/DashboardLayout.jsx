@@ -66,6 +66,7 @@ const DashboardLayout = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
     const roleMenuRef = useRef(null);
+    const isSidebarHoveredRef = useRef(false);
 
     /* ── Quick Access Launcher State ── */
     const maxItems = 4;
@@ -80,6 +81,7 @@ const DashboardLayout = () => {
     /* ── Keyboard Sidebar Navigation ── */
     useEffect(() => {
         const handleKeyDown = (e) => {
+            if (!isSidebarHoveredRef.current) return; // Only trigger if mouse is hovering the sidebar
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
             if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                 e.preventDefault();
@@ -90,7 +92,14 @@ const DashboardLayout = () => {
                 let nextIndex = e.key === 'ArrowUp' ? currentIndex - 1 : currentIndex + 1;
                 if (nextIndex < 0) nextIndex = navItems.length - 1;
                 if (nextIndex >= navItems.length) nextIndex = 0;
-                navigate(navItems[nextIndex].path);
+                const nextPath = navItems[nextIndex].path;
+                navigate(nextPath);
+                
+                // Scroll into view
+                setTimeout(() => {
+                    const el = document.getElementById(`nav-link-${nextPath}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 50);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -324,6 +333,7 @@ const DashboardLayout = () => {
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
+                        id={`nav-link-${item.path}`}
                         to={item.path}
                         end={item.path === '/dashboard'}
                         onClick={() => setIsMobileMenuOpen(false)}
@@ -461,6 +471,8 @@ const DashboardLayout = () => {
             {/* ════ Desktop Sidebar ════ */}
             <aside
                 className="ds-sidebar"
+                onMouseEnter={() => { isSidebarHoveredRef.current = true; }}
+                onMouseLeave={() => { isSidebarHoveredRef.current = false; }}
                 style={{
                     width: isSidebarCollapsed ? `${SIDEBAR_MINI}px` : `${SIDEBAR_FULL}px`,
                     flexShrink: 0,
