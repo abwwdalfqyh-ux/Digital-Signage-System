@@ -221,3 +221,15 @@
     border-radius: 8px !important;
     padding: 2px 6px !important;
 }
+
+/* Maximize Modal Grid Support */
+.is-maximized .modal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+.is-maximized .modal-form-grid > button[type="submit"] {
+    grid-column: 1 / -1;
+    margin-top: auto;
+}

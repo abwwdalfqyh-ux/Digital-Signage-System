@@ -756,8 +756,9 @@ const ScreensPage = () => {
     isOpen={modalConfig.open}
     onClose={() => setModalConfig({ open: false, isEdit: false, screen: null })}
     title={modalConfig.isEdit ? t('screens.update_screen_data') : t('screens.register_new_screen')}
+    allowMaximize={true}
   >
-    <form onSubmit={handleSubmit} dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+    <form onSubmit={handleSubmit} dir="rtl" className="modal-form-grid" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
 
       {/* ══ SECTION 1: المعلومات الأساسية ══ */}
       <div style={{
