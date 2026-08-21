@@ -26,7 +26,7 @@ const CreateAdPage = () => {
     const [currentStep, setCurrentStep] = useState(1);
 
     const [form, setForm] = useState({
-        title: '', category_id: '', start_date: '', end_date: '', target_start_time: '00:00', target_end_time: '23:59', daily_shift: '24h',
+        title: '', category_id: '', start_date: '', end_date: '', target_start_time: '00:00', target_end_time: '23:59', daily_shift: '24h', interval_minutes: '',
         total_cost: '', file: null,
         advertiser_id: '', video_duration_sec: 0
     });
@@ -44,10 +44,11 @@ const CreateAdPage = () => {
     const [filterGov, setFilterGov] = useState('');
     const [filterRegion, setFilterRegion] = useState('');
     const [filterStreet, setFilterStreet] = useState('');
+    const [geoFilterLoading, setGeoFilterLoading] = useState(false);
+    const [packages, setPackages] = useState([]);
     const [govList, setGovList] = useState([]);
     const [regionList, setRegionList] = useState([]);
     const [streetList, setStreetList] = useState([]);
-    const [geoFilterLoading, setGeoFilterLoading] = useState(false);
 
     useEffect(() => {
         const fetchScreens = async () => {
@@ -79,10 +80,18 @@ const CreateAdPage = () => {
             } catch (e) { console.error(e); }
         };
 
+        const fetchPackages = async () => {
+            try {
+                const res = await axiosClient.get(ENDPOINTS.PACKAGES.ACTIVE);
+                setPackages(res.data?.data || []);
+            } catch (e) { console.error(e); }
+        };
+
         fetchScreens();
         fetchAdvertisers();
         fetchGovs();
         fetchCategories();
+        fetchPackages();
 
         return () => {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -227,7 +236,7 @@ const CreateAdPage = () => {
                 target_start_time: form.target_start_time,
                 end_date: ed,
                 target_end_time: form.target_end_time,
-                // interval_minutes تم إلغاؤه
+                interval_minutes: parseInt(form.interval_minutes) || 1,
                 video_duration_sec: form.video_duration_sec || 30,
             };
 
@@ -599,6 +608,59 @@ const CreateAdPage = () => {
                                                 </div>
                                             </div>
 
+                                            {/* Repetition Packages */}
+                                            {packages.length > 0 && (
+                                                <div className="bg-surface-container-low border border-border-color rounded-2xl p-6 mb-10 shadow-sm relative overflow-hidden">
+                                                    <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+                                                    <h4 className="font-title-sm text-title-sm text-on-background mb-2 flex items-center justify-center gap-2">
+                                                        <span className="material-symbols-outlined text-primary">layers</span>
+                                                        {t('packages.select_package', { defaultValue: 'باقة التكرار' })}
+                                                    </h4>
+                                                    <p className="text-center font-body-md text-body-md text-on-surface-variant mb-6">
+                                                        {t('packages.package_info', { defaultValue: 'تحديد مدى تكرار إعلانك على الشاشة' })}
+                                                    </p>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        {packages.map((pkg) => {
+                                                            const isSelected = form.interval_minutes == pkg.interval_minutes;
+                                                            return (
+                                                                <button
+                                                                    key={pkg.package_id}
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setForm(p => ({ ...p, interval_minutes: pkg.interval_minutes.toString() }));
+                                                                        if (calculatedCost) setCalculatedCost(null);
+                                                                    }}
+                                                                    className={`relative p-5 rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-3 ${isSelected ? 'border-primary bg-primary/5 shadow-md scale-[1.02]' : 'border-border-color bg-white hover:border-primary/40 hover:bg-surface-container-lowest'}`}
+                                                                >
+                                                                    {isSelected && (
+                                                                        <div className="absolute top-3 right-3 text-primary">
+                                                                            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
+                                                                        </div>
+                                                                    )}
+                                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                                                                        <span className="material-symbols-outlined text-[24px]">repeat</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h5 className="font-title-sm text-title-sm text-on-background mb-1">
+                                                                            {dir === 'rtl' ? pkg.name_ar : pkg.name_en}
+                                                                        </h5>
+                                                                        <div className="text-sm font-bold text-primary mb-1">
+                                                                            {pkg.interval_minutes} {t('common.minutes_short', { defaultValue: 'دقيقة' })}
+                                                                        </div>
+                                                                        {pkg.price_multiplier != 1 && (
+                                                                            <span className="text-xs px-2 py-0.5 rounded-md bg-primary-container text-on-primary-container font-medium">
+                                                                                x{pkg.price_multiplier}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* Target Timing (Replaces rigid shift packages) */}
                                             <div className="bg-surface-container-low border border-border-color rounded-2xl p-6 mb-10 text-center shadow-sm relative overflow-hidden">
                                                 <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
@@ -689,87 +751,89 @@ const CreateAdPage = () => {
                                             </div>
 
                                             {/* ── Search + Geo Filters ── */}
-                                            <div className="bg-surface-container-low border border-border-color rounded-2xl p-4 mb-4 flex flex-col gap-3">
-                                                {/* Text search */}
-                                                <div className="relative">
-                                                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">search</span>
-                                                    <input
-                                                        type="text"
-                                                        value={screenSearch}
-                                                        onChange={e => setScreenSearch(e.target.value)}
-                                                        placeholder={t('ads.search_screen_placeholder')}
-                                                        className="w-full bg-white border border-border-color rounded-xl pr-10 pl-4 py-2.5 font-body-md focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors"
-                                                    />
-                                                    {screenSearch && (
-                                                        <button type="button" onClick={() => setScreenSearch('')}
-                                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-outline hover:text-error transition-colors">
-                                                            <span className="material-symbols-outlined text-[18px]">close</span>
+                                            <div className="bg-white border border-border-color rounded-3xl p-5 mb-6 shadow-sm flex flex-col gap-4">
+                                                <div className="flex flex-col md:flex-row items-center gap-4">
+                                                    {/* Text search */}
+                                                    <div className="relative flex-1 w-full">
+                                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/70 pointer-events-none text-[22px]">search</span>
+                                                        <input
+                                                            type="text"
+                                                            value={screenSearch}
+                                                            onChange={e => setScreenSearch(e.target.value)}
+                                                            placeholder={t('ads.search_screen_placeholder')}
+                                                            className="w-full bg-surface-container-lowest border border-border-color rounded-2xl pr-12 pl-4 py-3 font-body-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-inner"
+                                                        />
+                                                        {screenSearch && (
+                                                            <button type="button" onClick={() => setScreenSearch('')}
+                                                                className="absolute left-4 top-1/2 -translate-y-1/2 text-outline hover:text-error transition-colors flex items-center justify-center">
+                                                                <span className="material-symbols-outlined text-[20px]">close</span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Clear filters button (Only shows if something is selected) */}
+                                                    {(screenSearch || filterGov || filterRegion || filterStreet) && (
+                                                        <button type="button" onClick={clearGeoFilters}
+                                                            className="flex-shrink-0 flex items-center justify-center gap-2 text-error bg-error/5 hover:bg-error/15 px-5 py-3 rounded-2xl transition-colors font-label-lg font-bold h-full">
+                                                            <span className="material-symbols-outlined text-[20px]">filter_alt_off</span>
+                                                            {t('ads.clear_all_filters')}
                                                         </button>
                                                     )}
                                                 </div>
 
                                                 {/* Cascade dropdowns */}
-                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                     {/* المحافظة */}
                                                     <div className="relative">
-                                                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">map</span>
+                                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/70 pointer-events-none text-[20px]">map</span>
                                                         <select
                                                             value={filterGov}
                                                             onChange={e => handleFilterGovChange(e.target.value)}
-                                                            className="w-full bg-white border border-border-color rounded-xl pr-10 pl-4 py-2.5 font-body-md focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors appearance-none cursor-pointer"
+                                                            className="w-full bg-surface-container-lowest border border-border-color rounded-2xl pr-12 pl-10 py-3 font-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
                                                         >
                                                             <option value="">{t('ads.all_governorates')}</option>
                                                             {govList.map(g => <option key={g.gov_id} value={g.gov_id}>{g.name}</option>)}
                                                         </select>
-                                                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[16px]">expand_more</span>
+                                                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
                                                     </div>
 
                                                     {/* المنطقة */}
                                                     <div className="relative">
-                                                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">location_city</span>
+                                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/70 pointer-events-none text-[20px]">location_city</span>
                                                         <select
                                                             value={filterRegion}
                                                             onChange={e => handleFilterRegionChange(e.target.value)}
                                                             disabled={!filterGov || geoFilterLoading}
-                                                            className="w-full bg-white border border-border-color rounded-xl pr-10 pl-4 py-2.5 font-body-md focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            className="w-full bg-surface-container-lowest border border-border-color rounded-2xl pr-12 pl-10 py-3 font-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                                         >
                                                             <option value="">{geoFilterLoading ? t('common.loading') : t('ads.all_regions')}</option>
                                                             {regionList.map(r => <option key={r.region_id} value={r.region_id}>{r.name}</option>)}
                                                         </select>
-                                                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[16px]">expand_more</span>
+                                                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
                                                     </div>
 
                                                     {/* الشارع */}
                                                     <div className="relative">
-                                                        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">fork_right</span>
+                                                        <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/70 pointer-events-none text-[20px]">fork_right</span>
                                                         <select
                                                             value={filterStreet}
                                                             onChange={e => setFilterStreet(e.target.value)}
                                                             disabled={!filterRegion || geoFilterLoading}
-                                                            className="w-full bg-white border border-border-color rounded-xl pr-10 pl-4 py-2.5 font-body-md focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            className="w-full bg-surface-container-lowest border border-border-color rounded-2xl pr-12 pl-10 py-3 font-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                                         >
                                                             <option value="">{geoFilterLoading ? t('common.loading') : t('ads.all_streets')}</option>
                                                             {streetList.map(s => <option key={s.street_id} value={s.street_id}>{s.name}</option>)}
                                                         </select>
-                                                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[16px]">expand_more</span>
+                                                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[18px]">expand_more</span>
                                                     </div>
                                                 </div>
-
-                                                {/* Clear filters */}
-                                                {(screenSearch || filterGov || filterRegion || filterStreet) && (
-                                                    <button type="button" onClick={clearGeoFilters}
-                                                        className="self-start flex items-center gap-1.5 text-error font-label-md text-label-md hover:bg-error-container/20 px-3 py-1.5 rounded-lg transition-colors">
-                                                        <span className="material-symbols-outlined text-[16px]">filter_alt_off</span>
-                                                        {t('ads.clear_all_filters')}
-                                                    </button>
-                                                )}
                                             </div>
 
                                             {/* ── Screens Layout (Map + Cards) ── */}
                                             <div className="flex flex-col gap-6">
 
                                                 {/* Map View */}
-                                                <div className="w-full h-[350px] bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden shadow-sm relative z-0">
+                                                <div className="w-full h-[450px] bg-white border border-border-color rounded-3xl overflow-hidden shadow-sm relative z-0 group">
                                                     <ScreenMapView
                                                         screens={screens}
                                                         selectedGov={filterGov}
@@ -779,86 +843,118 @@ const CreateAdPage = () => {
                                                         regions={regionList}
                                                         streets={streetList}
                                                     />
+                                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20 shadow-sm pointer-events-none flex items-center gap-2 font-bold text-on-surface">
+                                                        <span className="material-symbols-outlined text-primary text-[20px]">map</span>
+                                                        <span>{filteredScreensForAd.length} {t('common.screens')}</span>
+                                                    </div>
                                                 </div>
 
                                                 {/* Screen Cards Grid */}
-                                                <div className="bg-surface-container-lowest border border-border-color rounded-xl overflow-hidden p-4 shadow-sm flex flex-col">
-                                                    <div className="max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                                                <div className="bg-surface-container-lowest border border-border-color rounded-3xl overflow-hidden p-6 shadow-sm flex flex-col min-h-[400px]">
+                                                    <div className="flex items-center justify-between mb-6">
+                                                        <h4 className="font-title-lg text-title-lg text-on-background flex items-center gap-2">
+                                                            <span className="material-symbols-outlined text-primary">format_list_bulleted</span>
+                                                            {t('ads.available_screens', { defaultValue: 'قائمة الشاشات' })}
+                                                        </h4>
+                                                    </div>
+                                                    
+                                                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 -mr-2">
                                                         {screens.length === 0 ? (
-                                                            <div className="text-center py-16">
-                                                                <span className="material-symbols-outlined text-6xl text-outline-variant mb-4">desktop_windows</span>
+                                                            <div className="flex flex-col items-center justify-center h-full py-16">
+                                                                <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6">
+                                                                    <span className="material-symbols-outlined text-5xl text-outline-variant">desktop_windows</span>
+                                                                </div>
                                                                 <p className="font-title-lg text-title-lg text-on-surface-variant mb-2">{t('ads.no_screens_available')}</p>
                                                                 <p className="font-body-md text-body-md text-outline">{t('ads.please_add_screens')}</p>
                                                             </div>
                                                         ) : filteredScreensForAd.length === 0 ? (
-                                                            <div className="text-center py-16">
-                                                                <span className="material-symbols-outlined text-5xl text-outline-variant mb-3">search_off</span>
-                                                                <p className="font-title-md text-title-md text-on-surface-variant mb-1">{t('ads.no_matching_screens')}</p>
+                                                            <div className="flex flex-col items-center justify-center h-full py-16">
+                                                                <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6">
+                                                                    <span className="material-symbols-outlined text-5xl text-outline-variant">search_off</span>
+                                                                </div>
+                                                                <p className="font-title-lg text-title-lg text-on-surface-variant mb-2">{t('ads.no_matching_screens')}</p>
                                                                 <p className="font-body-md text-body-md text-outline">{t('ads.try_adjusting_filters')}</p>
                                                             </div>
                                                         ) : (
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-2">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 pb-4">
                                                                 {filteredScreensForAd.map(screen => {
                                                                     const isSelected = selectedScreens.includes(screen.screen_id);
                                                                     const currentStatus = screen.computed_status || screen.status;
-                                                                    const statusColorClass = currentStatus === 'Online' ? 'bg-green-500' : currentStatus === 'Offline' ? 'bg-red-500' : currentStatus === 'Maintenance' ? 'bg-yellow-500' : 'bg-gray-400';
+                                                                    
+                                                                    // Colors mapping
+                                                                    let statusBg = 'bg-gray-100', statusText = 'text-gray-700', statusDot = 'bg-gray-500';
+                                                                    if (currentStatus === 'Online') { statusBg = 'bg-green-100'; statusText = 'text-green-800'; statusDot = 'bg-green-500'; }
+                                                                    else if (currentStatus === 'Offline') { statusBg = 'bg-red-100'; statusText = 'text-red-800'; statusDot = 'bg-red-500'; }
+                                                                    else if (currentStatus === 'Maintenance') { statusBg = 'bg-yellow-100'; statusText = 'text-yellow-800'; statusDot = 'bg-yellow-500'; }
+                                                                    
                                                                     const statusLabel = currentStatus === 'Online' ? t('common.online') : currentStatus === 'Offline' ? t('common.offline') : currentStatus === 'Maintenance' ? t('common.maintenance') : currentStatus === 'pending_activation' ? t('screens.tab_pending_activation', { defaultValue: 'بانتظار التفعيل' }) : currentStatus;
 
                                                                     return (
                                                                         <div key={screen.screen_id}
                                                                             onClick={() => toggleScreen(screen.screen_id)}
-                                                                            className={`flex flex-col p-4 rounded-xl border transition-all cursor-pointer relative
-                                                                    ${isSelected ? 'border-primary-container bg-primary-container/5 shadow-md ring-1 ring-primary-container' : 'border-border-color bg-white hover:border-primary-container/40 hover:shadow-md'}`}>
+                                                                            className={`relative flex flex-col p-5 rounded-3xl transition-all duration-300 cursor-pointer overflow-hidden group
+                                                                    ${isSelected ? 'bg-primary/5 border-2 border-primary shadow-md' : 'bg-white border-2 border-border-color hover:shadow-xl hover:border-primary/40 hover:-translate-y-1'}`}>
 
-                                                                            {/* Status Dot & Info Icon */}
-                                                                            <div className="flex justify-between items-start mb-3">
-                                                                                <span className="flex items-center gap-1.5 bg-surface-container-low px-2 py-1 rounded-full border border-border-color/50">
-                                                                                    <span className={`w-2 h-2 rounded-full ${statusColorClass}`}></span>
-                                                                                    <span className="text-xs text-on-surface-variant font-bold truncate">{statusLabel}</span>
+                                                                            {/* Status Badge & Checkmark */}
+                                                                            <div className="flex justify-between items-start mb-4">
+                                                                                <span className={`px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1.5 ${statusBg} ${statusText}`}>
+                                                                                    <span className={`w-2 h-2 rounded-full ${statusDot} animate-pulse`}></span>
+                                                                                    {statusLabel}
                                                                                 </span>
-                                                                                <span title={t('ads.targeted_screen')}>
-                                                                                    {isSelected && <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>}
-                                                                                </span>
+                                                                                {isSelected && (
+                                                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                                                                                        <span className="material-symbols-outlined text-white text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
+                                                                                    </motion.div>
+                                                                                )}
                                                                             </div>
 
                                                                             {/* Main Info */}
-                                                                            <div className="flex-1 min-w-0 flex flex-col justify-center mb-4 gap-2">
-                                                                                <h5 className={`font-bold text-base leading-snug mb-1 ${isSelected ? 'text-primary' : 'text-on-background'}`} title={screen.screen_name}>
+                                                                            <div className="flex-1 mb-5">
+                                                                                <h5 className={`font-bold text-lg mb-4 line-clamp-2 leading-tight ${isSelected ? 'text-primary' : 'text-on-background group-hover:text-primary transition-colors'}`} title={screen.screen_name}>
                                                                                     {screen.screen_name}
                                                                                 </h5>
-                                                                                <div className="flex flex-col gap-1">
-                                                                                    <p className="font-caption text-xs text-on-surface-variant flex items-start gap-1.5">
-                                                                                        <span className="material-symbols-outlined text-[14px] text-outline mt-0.5">map</span>
-                                                                                        <span className="leading-tight">{screen.street?.region?.name || t('ads.region_not_specified')}</span>
-                                                                                    </p>
-                                                                                    <p className="font-caption text-xs text-on-surface-variant flex items-start gap-1.5">
-                                                                                        <span className="material-symbols-outlined text-[14px] text-outline mt-0.5">fork_right</span>
-                                                                                        <span className="leading-tight">{screen.street?.name || t('ads.location_not_specified')}</span>
-                                                                                    </p>
+                                                                                <div className="space-y-3">
+                                                                                    <div className="flex items-start gap-2 text-on-surface-variant text-sm">
+                                                                                        <span className="material-symbols-outlined text-[18px] text-outline mt-0.5">location_city</span>
+                                                                                        <span className="truncate leading-relaxed">{screen.street?.region?.name || t('ads.region_not_specified')}</span>
+                                                                                    </div>
+                                                                                    <div className="flex items-start gap-2 text-on-surface-variant text-sm">
+                                                                                        <span className="material-symbols-outlined text-[18px] text-outline mt-0.5">add_road</span>
+                                                                                        <span className="truncate leading-relaxed">{screen.street?.name || t('ads.location_not_specified')}</span>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
 
-                                                                            {/* Footer (Price & Selection state) */}
-                                                                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-border-color">
-                                                                                <div className="flex items-center gap-3">
-                                                                                    <span className="text-sm font-bold text-on-surface">
-                                                                                        {screen.price ? `$${screen.price}/${t('common.day')}` : t('ads.offer')}
+                                                                            {/* Footer */}
+                                                                            <div className={`mt-auto pt-4 border-t flex items-center justify-between transition-colors ${isSelected ? 'border-primary/20' : 'border-border-color group-hover:border-primary/20'}`}>
+                                                                                <div className="flex items-baseline gap-1">
+                                                                                    <span className={`text-xl font-black ${isSelected ? 'text-primary' : 'text-on-background'}`}>
+                                                                                        {screen.price ? `$${screen.price}` : t('ads.custom', { defaultValue: 'مخصص' })}
                                                                                     </span>
+                                                                                    {screen.price && <span className="text-xs font-medium text-outline">/{t('common.day')}</span>}
+                                                                                </div>
+                                                                                
+                                                                                <div className="flex items-center gap-2">
                                                                                     <button
                                                                                         type="button"
                                                                                         onClick={(e) => { e.stopPropagation(); setAvailabilityScreen(screen); }}
-                                                                                        className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container text-primary hover:bg-primary/10 transition-colors"
+                                                                                        className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-colors"
                                                                                         title={t('ads.peak_hours')}
                                                                                     >
-                                                                                        <span className="material-symbols-outlined text-[18px]">analytics</span>
+                                                                                        <span className="material-symbols-outlined text-[20px]">insights</span>
                                                                                     </button>
+                                                                                    {!isSelected ? (
+                                                                                        <div className="px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-bold group-hover:bg-primary group-hover:text-white transition-all flex items-center gap-1.5 shadow-sm">
+                                                                                            <span className="material-symbols-outlined text-[18px]">add</span>
+                                                                                            {t('common.select')}
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <div className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-bold flex items-center gap-1.5">
+                                                                                            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                                                                                            {t('common.selected', { defaultValue: 'محدد' })}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </div>
-                                                                                {!isSelected && (
-                                                                                    <span className="font-bold text-xs text-primary flex items-center gap-1 bg-primary/10 px-2.5 py-1.5 rounded-lg">
-                                                                                        <span className="material-symbols-outlined text-[16px]">add</span>
-                                                                                        {t('common.select')}
-                                                                                    </span>
-                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                     );

@@ -28,6 +28,7 @@ const getStatusCfg = (t) => ({
   Online: { label: t('screens.status_online'), dot: 'bg-[#166534]', text: 'text-[#166534]', ring: 'border-[#166534]', bg: 'bg-[#dcfce7]', icon: Wifi },
   Offline: { label: t('screens.status_offline'), dot: 'bg-[#ba1a1a]', text: 'text-[#ba1a1a]', ring: 'border-[#ba1a1a]', bg: 'bg-[#ffdad6]', icon: WifiOff },
   Maintenance: { label: t('screens.status_maintenance'), dot: 'bg-[#eab308]', text: 'text-[#854d0e]', ring: 'border-[#eab308]', bg: 'bg-[#fef9c3]', icon: Wrench },
+  pending_activation: { label: t('screens.tab_pending_activation'), dot: 'bg-[#9ca3af]', text: 'text-[#4b5563]', ring: 'border-[#9ca3af]', bg: 'bg-[#f3f4f6]', icon: Clock },
 });
 
 const CascadingSelect = ({ label, value, onChange, options, placeholder, disabled, icon: Icon = null }) => (

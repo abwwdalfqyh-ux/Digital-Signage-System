@@ -110,7 +110,23 @@
         "role advertiser": "معلن",
         "role screen owner": "مالك شاشة",
         "role secretary": "سكرتير",
-        "role maintenance": "فريق الصيانة"
+        "role maintenance": "فريق الصيانة",
+        "loading_wait": "الرجاء الانتظار قليلاً...",
+        "no_data_to_export": "لا توجد بيانات متاحة للتصدير",
+        "no_data_to_display": "لا توجد بيانات لعرضها",
+        "new notification": "إشعار جديد",
+        "quick_access": "الوصول السريع",
+        "all interfaces added": "تمت إضافة جميع الواجهات",
+        "switch role preview": "تغيير صلاحية المعاينة",
+        "system admin": "مدير النظام",
+        "pending_review": "قيد المراجعة",
+        "paused": "متوقف مؤقتاً",
+        "waiting_payment": "بانتظار الدفع",
+        "paid": "مدفوع",
+        "unpaid": "غير مدفوع",
+        "suspended": "موقوف",
+        "unavailable": "غير متوفر",
+        "maintenance": "صيانة"
     },
     "auth": {
         "login_title": "تسجيل الدخول",
@@ -1990,5 +2006,24 @@
         "switch_lang": "تغيير اللغة",
         "notifications": "الإشعارات",
         "profile": "الملف الشخصي"
+    },
+    "packages": {
+        "title": "إدارة الباقات",
+        "description": "إدارة باقات التكرار الخاصة بالإعلانات ومضاعفات الأسعار",
+        "add_new": "إضافة باقة جديدة",
+        "edit": "تعديل الباقة",
+        "name_ar": "الاسم (عربي)",
+        "name_en": "الاسم (إنجليزي)",
+        "interval_minutes": "معدل التكرار (بالدقائق)",
+        "price_multiplier": "مضاعف السعر (مثال: 1.5)",
+        "status": "الحالة",
+        "active": "مفعلة",
+        "inactive": "معطلة",
+        "delete_confirm": "هل أنت متأكد من حذف هذه الباقة؟",
+        "success_add": "تمت إضافة الباقة بنجاح",
+        "success_update": "تم تحديث الباقة بنجاح",
+        "success_delete": "تم حذف الباقة بنجاح",
+        "select_package": "اختر باقة التكرار",
+        "package_info": "تحديد مدى تكرار ظهور إعلانك على الشاشات"
     }
 }

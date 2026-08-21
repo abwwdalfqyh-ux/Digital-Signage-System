@@ -48,6 +48,13 @@ export const ENDPOINTS = {
         STATUS: (id) => `/ads/${id}/status`,
         DELETE: (id) => `/ads/${id}`
     },
+    PACKAGES: {
+        ALL: '/ad-packages',
+        ACTIVE: '/ad-packages/active',
+        CREATE: '/ad-packages',
+        UPDATE: (id) => `/ad-packages/${id}`,
+        DELETE: (id) => `/ad-packages/${id}`
+    },
     DURATION_DISCOUNTS: {
         ALL: '/duration-discounts',
         CREATE: '/duration-discounts',
