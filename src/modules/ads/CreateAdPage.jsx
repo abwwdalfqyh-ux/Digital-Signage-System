@@ -890,67 +890,67 @@ const CreateAdPage = () => {
                                                                     const statusLabel = currentStatus === 'Online' ? t('common.online') : currentStatus === 'Offline' ? t('common.offline') : currentStatus === 'Maintenance' ? t('common.maintenance') : currentStatus === 'pending_activation' ? t('screens.tab_pending_activation', { defaultValue: 'بانتظار التفعيل' }) : currentStatus;
 
                                                                     return (
-                                                                        <div key={screen.screen_id}
+                                                                            <div key={screen.screen_id}
                                                                             onClick={() => toggleScreen(screen.screen_id)}
-                                                                            className={`relative flex flex-col p-5 rounded-3xl transition-all duration-300 cursor-pointer overflow-hidden group
-                                                                    ${isSelected ? 'bg-primary/5 border-2 border-primary shadow-md' : 'bg-white border-2 border-border-color hover:shadow-xl hover:border-primary/40 hover:-translate-y-1'}`}>
+                                                                            className={`relative flex flex-col p-4 rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden group
+                                                                    ${isSelected ? 'bg-primary/5 border-2 border-primary shadow-sm' : 'bg-white border border-border-color hover:shadow-md hover:border-primary/40'}`}>
 
                                                                             {/* Status Badge & Checkmark */}
-                                                                            <div className="flex justify-between items-start mb-4">
-                                                                                <span className={`px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1.5 ${statusBg} ${statusText}`}>
-                                                                                    <span className={`w-2 h-2 rounded-full ${statusDot} animate-pulse`}></span>
+                                                                            <div className="flex justify-between items-start mb-3">
+                                                                                <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full flex items-center gap-1.5 ${statusBg} ${statusText}`}>
+                                                                                    <span className={`w-1.5 h-1.5 rounded-full ${statusDot} animate-pulse`}></span>
                                                                                     {statusLabel}
                                                                                 </span>
                                                                                 {isSelected && (
-                                                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
-                                                                                        <span className="material-symbols-outlined text-white text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
+                                                                                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                                                                                        <span className="material-symbols-outlined text-white text-[14px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
                                                                                     </motion.div>
                                                                                 )}
                                                                             </div>
 
                                                                             {/* Main Info */}
-                                                                            <div className="flex-1 mb-5">
-                                                                                <h5 className={`font-bold text-lg mb-4 line-clamp-2 leading-tight ${isSelected ? 'text-primary' : 'text-on-background group-hover:text-primary transition-colors'}`} title={screen.screen_name}>
+                                                                            <div className="flex-1 mb-4">
+                                                                                <h5 className={`font-bold text-base mb-2 line-clamp-2 leading-tight ${isSelected ? 'text-primary' : 'text-on-background group-hover:text-primary transition-colors'}`} title={screen.screen_name}>
                                                                                     {screen.screen_name}
                                                                                 </h5>
-                                                                                <div className="space-y-3">
-                                                                                    <div className="flex items-start gap-2 text-on-surface-variant text-sm">
-                                                                                        <span className="material-symbols-outlined text-[18px] text-outline mt-0.5">location_city</span>
-                                                                                        <span className="truncate leading-relaxed">{screen.street?.region?.name || t('ads.region_not_specified')}</span>
+                                                                                <div className="space-y-1.5">
+                                                                                    <div className="flex items-center gap-1.5 text-on-surface-variant text-xs">
+                                                                                        <span className="material-symbols-outlined text-[14px] text-outline">location_city</span>
+                                                                                        <span className="truncate">{screen.street?.region?.name || t('ads.region_not_specified')}</span>
                                                                                     </div>
-                                                                                    <div className="flex items-start gap-2 text-on-surface-variant text-sm">
-                                                                                        <span className="material-symbols-outlined text-[18px] text-outline mt-0.5">add_road</span>
-                                                                                        <span className="truncate leading-relaxed">{screen.street?.name || t('ads.location_not_specified')}</span>
+                                                                                    <div className="flex items-center gap-1.5 text-on-surface-variant text-xs">
+                                                                                        <span className="material-symbols-outlined text-[14px] text-outline">add_road</span>
+                                                                                        <span className="truncate">{screen.street?.name || t('ads.location_not_specified')}</span>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
 
                                                                             {/* Footer */}
-                                                                            <div className={`mt-auto pt-4 border-t flex items-center justify-between transition-colors ${isSelected ? 'border-primary/20' : 'border-border-color group-hover:border-primary/20'}`}>
+                                                                            <div className={`mt-auto pt-3 border-t flex items-center justify-between transition-colors ${isSelected ? 'border-primary/20' : 'border-border-color group-hover:border-primary/20'}`}>
                                                                                 <div className="flex items-baseline gap-1">
-                                                                                    <span className={`text-xl font-black ${isSelected ? 'text-primary' : 'text-on-background'}`}>
+                                                                                    <span className={`text-base font-bold ${isSelected ? 'text-primary' : 'text-on-background'}`}>
                                                                                         {screen.price ? `$${screen.price}` : t('ads.custom', { defaultValue: 'مخصص' })}
                                                                                     </span>
-                                                                                    {screen.price && <span className="text-xs font-medium text-outline">/{t('common.day')}</span>}
+                                                                                    {screen.price && <span className="text-[10px] text-outline">/{t('common.day')}</span>}
                                                                                 </div>
                                                                                 
-                                                                                <div className="flex items-center gap-2">
+                                                                                <div className="flex items-center gap-1.5">
                                                                                     <button
                                                                                         type="button"
                                                                                         onClick={(e) => { e.stopPropagation(); setAvailabilityScreen(screen); }}
-                                                                                        className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-colors"
+                                                                                        className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-colors"
                                                                                         title={t('ads.peak_hours')}
                                                                                     >
-                                                                                        <span className="material-symbols-outlined text-[20px]">insights</span>
+                                                                                        <span className="material-symbols-outlined text-[16px]">insights</span>
                                                                                     </button>
                                                                                     {!isSelected ? (
-                                                                                        <div className="px-4 py-2.5 rounded-xl bg-surface-container-high text-on-surface text-sm font-bold group-hover:bg-primary group-hover:text-white transition-all flex items-center gap-1.5 shadow-sm">
-                                                                                            <span className="material-symbols-outlined text-[18px]">add</span>
+                                                                                        <div className="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface text-xs font-bold group-hover:bg-primary group-hover:text-white transition-all flex items-center gap-1 shadow-sm">
+                                                                                            <span className="material-symbols-outlined text-[14px]">add</span>
                                                                                             {t('common.select')}
                                                                                         </div>
                                                                                     ) : (
-                                                                                        <div className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-bold flex items-center gap-1.5">
-                                                                                            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                                                                                        <div className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-bold flex items-center gap-1">
+                                                                                            <span className="material-symbols-outlined text-[14px]">check_circle</span>
                                                                                             {t('common.selected', { defaultValue: 'محدد' })}
                                                                                         </div>
                                                                                     )}
