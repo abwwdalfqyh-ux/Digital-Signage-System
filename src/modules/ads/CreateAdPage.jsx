@@ -884,10 +884,10 @@ const CreateAdPage = () => {
                                             </div>
 
                                             {/* ── Screens Layout (Map + Cards) ── */}
-                                            <div className="flex flex-col gap-6">
+                                            <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-[550px]">
 
                                                 {/* Map View */}
-                                                <div className="w-full h-[450px] bg-white border border-border-color rounded-3xl overflow-hidden shadow-sm relative z-0 group">
+                                                <div className="w-full lg:w-[40%] h-[350px] lg:h-full bg-white border border-border-color rounded-3xl overflow-hidden shadow-sm relative z-0 group flex-shrink-0">
                                                     <ScreenMapView
                                                         screens={screens}
                                                         selectedGov={filterGov}
@@ -904,7 +904,7 @@ const CreateAdPage = () => {
                                                 </div>
 
                                                 {/* Screen Cards Grid */}
-                                                <div className="bg-surface-container-lowest border border-border-color rounded-3xl overflow-hidden p-6 shadow-sm flex flex-col min-h-[400px]">
+                                                <div className="w-full lg:w-[60%] bg-surface-container-lowest border border-border-color rounded-3xl overflow-hidden p-6 shadow-sm flex flex-col h-[500px] lg:h-full">
                                                     <div className="flex items-center justify-between mb-6">
                                                         <h4 className="font-title-lg text-title-lg text-on-background flex items-center gap-2">
                                                             <span className="material-symbols-outlined text-primary">format_list_bulleted</span>
@@ -930,7 +930,7 @@ const CreateAdPage = () => {
                                                                 <p className="font-body-md text-body-md text-outline">{t('ads.try_adjusting_filters')}</p>
                                                             </div>
                                                         ) : (
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 pb-4">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 pb-4">
                                                                 {filteredScreensForAd.map(screen => {
                                                                     const isSelected = selectedScreens.includes(screen.screen_id);
                                                                     const currentStatus = screen.computed_status || screen.status;
