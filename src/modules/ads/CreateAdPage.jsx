@@ -61,7 +61,7 @@ const CreateAdPage = () => {
         const fetchAdvertisers = async () => {
             if (!can('manage_all')) return;
             try {
-                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.USERS_BY_ROLE('Advertiser'));
+                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.USERS_BY_ROLE(2));
                 setAdvertisers(res.data || []);
             } catch (e) { console.error(e); }
         };

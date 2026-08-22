@@ -21,31 +21,38 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
         if (!stripe || !elements) return;
 
         setIsProcessing(true);
-        const { error, paymentIntent } = await stripe.confirmPayment({
-            elements,
-            redirect: 'if required' // لمنع إعادة توجيه الصفحة بالكامل
-        });
+        try {
+            const { error, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                redirect: 'if required' // لمنع إعادة توجيه الصفحة بالكامل
+            });
 
-        if (error) {
-            addToast(error.message || t('ads.card processing error'), 'error');
-            setIsProcessing(false);
-        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-            // إخبار السيرفر بنجاح العملية لتحديث حالة الإعلان
-            try {
-                const res = await axiosClient.post(ENDPOINTS.PAYMENTS.STRIPE_CONFIRM, {
-                    ad_id: advertisement.ad_id,
-                    payment_intent_id: paymentIntent.id
-                });
-                if (res.data.success) {
-                    addToast(t('ads.payment success toast'), 'success');
-                    onSuccess();
+            if (error) {
+                addToast(error.message || t('ads.card_processing_error'), 'error');
+                setIsProcessing(false);
+            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+                // إخبار السيرفر بنجاح العملية لتحديث حالة الإعلان
+                try {
+                    const res = await axiosClient.post(ENDPOINTS.PAYMENTS.STRIPE_CONFIRM, {
+                        ad_id: advertisement.ad_id,
+                        payment_intent_id: paymentIntent.id
+                    });
+                    if (res.data.success) {
+                        addToast(t('ads.payment_success_toast'), 'success');
+                        onSuccess();
+                    }
+                } catch (err) {
+                    addToast(t('ads.payment_deducted_status_error'), 'error');
+                } finally {
+                    setIsProcessing(false);
                 }
-            } catch (err) {
-                addToast(t('ads.payment deducted status error'), 'error');
-            } finally {
+            } else {
+                // Fallback for other statuses like 'requires_action', 'processing'
+                addToast(t('ads.card_processing_error'), 'error');
                 setIsProcessing(false);
             }
-        } else {
+        } catch (err) {
+            addToast(t('ads.card_processing_error'), 'error');
             setIsProcessing(false);
         }
     };
@@ -59,7 +66,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                     disabled={!stripe || isProcessing}
                     className="flex-1 bg-[#2E7D32] hover:bg-[#1B5E20] text-white font-black py-3.5 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center"
                 >
-                    {isProcessing ? t('ads.confirming and deducting') : t('ads.confirm payment')}
+                    {isProcessing ? t('ads.confirming_and_deducting') : t('ads.confirm_payment')}
                 </button>
                 <button
                     type="button"
@@ -102,7 +109,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                         }
                     }
                 })
-                .catch(() => addToast(t('ads.fetch gateways failed'), 'error'))
+                .catch(() => addToast(t('ads.fetch_gateways_failed'), 'error'))
                 .finally(() => setIsFetchingMethods(false));
         }
     }, [isOpen, addToast]);
@@ -124,7 +131,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
         if (!isStripe) {
             // Manual Transfer Logic
             if (!receiptFile) {
-                addToast(t('ads.please attach receipt'), 'warning');
+                addToast(t('ads.please_attach_receipt'), 'warning');
                 return;
             }
 
@@ -138,12 +145,12 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                 const res = await axiosClient.post('/payments/manual', formData);
                 
                 if (res.data.success) {
-                    addToast(t('ads.receipt uploaded success'), 'success');
+                    addToast(t('ads.receipt_uploaded_success'), 'success');
                     onSuccess();
                     onClose();
                 }
             } catch (error) {
-                addToast(error.response?.data?.message || t('ads.receipt_upload_    failed'), 'error');
+                addToast(error.response?.data?.message || t('ads.receipt_upload_failed'), 'error');
             } finally {
                 setIsLoading(false);
             }
