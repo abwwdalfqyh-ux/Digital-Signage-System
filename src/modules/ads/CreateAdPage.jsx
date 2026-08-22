@@ -455,9 +455,87 @@ const CreateAdPage = () => {
                     </button>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-4 items-start">
-                    {/* MAIN FORM CARD - Left side */}
-                    <div className="flex-1 flex flex-col gap-4 order-2 lg:order-2 min-w-0">
+                <div className="flex flex-col gap-4 items-stretch">
+                    {/* CAMPAIGN STEPPER - Top (Horizontal) */}
+                    <div className="w-full bg-surface-container-low/50 backdrop-blur-2xl rounded-3xl border border-border-color shadow-sm p-4 md:p-6 overflow-hidden relative">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-border-color pb-4 mb-6 gap-4">
+                            <h3 className="font-title-lg text-title-lg font-bold text-on-surface flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-container to-primary/20 flex items-center justify-center border border-primary/20 text-primary shadow-sm">
+                                    <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>flag</span>
+                                </div>
+                                <span>{t('ads.campaign_path')}</span>
+                            </h3>
+
+                            {/* Summary stats */}
+                            <div className="flex items-center gap-3">
+                                <div className="bg-surface-container-lowest rounded-xl px-3 py-1.5 flex items-center gap-2 border border-border-color">
+                                    <span className="material-symbols-outlined text-[16px] text-primary block">desktop_windows</span>
+                                    <div>
+                                        <span className="text-[13px] font-extrabold text-on-background block leading-none">{selectedScreens.length}</span>
+                                        <span className="text-[10px] text-on-surface-variant block leading-none">{t('ads.screens_selected')}</span>
+                                    </div>
+                                </div>
+                                <div className="bg-surface-container-lowest rounded-xl px-3 py-1.5 flex items-center gap-2 border border-border-color">
+                                    <span className="material-symbols-outlined text-[16px] text-secondary block">payments</span>
+                                    <div>
+                                        <span className="text-[13px] font-extrabold text-on-background block leading-none" dir="ltr">{calculatedCost ? `$${(calculatedCost ? Number(calculatedCost).toFixed(2) : "0.00")}` : '—'}</span>
+                                        <span className="text-[10px] text-on-surface-variant block leading-none">{t('ads.cost')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="relative z-10 w-full pt-2 pb-2">
+                            {/* Connector Lines container */}
+                            <div className="absolute top-6 left-[10%] right-[10%] h-[2px] bg-outline-variant/40 rounded-full -z-10 hidden sm:block"></div>
+                            
+                            {/* Progress Fill */}
+                            <div className={`absolute top-6 h-[2px] -z-10 rounded-full transition-all duration-500 ease-in-out bg-gradient-to-r from-primary to-secondary hidden sm:block ${dir === 'rtl' ? 'right-[10%]' : 'left-[10%]'}`} style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 80}%` }}></div>
+
+                            <ul className="flex justify-between items-start w-full relative gap-1 md:gap-4">
+                                {steps.map((step) => {
+                                    const current = isStepCurrent(step.id);
+                                    const done = isStepDone(step.id);
+                                    return (
+                                        <li
+                                            key={step.id}
+                                            onClick={() => { if (step.id < currentStep || done) setCurrentStep(step.id); }}
+                                            className={`flex flex-col items-center gap-2 cursor-pointer transition-all duration-300 group flex-1
+                                                ${!current && !done ? 'opacity-55 hover:opacity-100' : ''}`}
+                                        >
+                                            <div className="flex-shrink-0 relative">
+                                                {done ? (
+                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md transform group-hover:scale-110 transition-transform text-white">
+                                                        <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
+                                                    </div>
+                                                ) : current ? (
+                                                    <>
+                                                        <div className="absolute inset-0 bg-primary/25 rounded-full animate-ping"></div>
+                                                        <div className="w-10 h-10 rounded-full border-[2.5px] border-primary bg-surface flex items-center justify-center shadow-lg relative z-10 text-primary scale-110">
+                                                            <span className="text-[16px] font-extrabold">{step.id}</span>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-full border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-colors bg-white">
+                                                        <span className="text-[15px] font-bold">{step.id}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="text-center w-full px-1">
+                                                <h4 className={`text-[11px] md:text-[14px] font-bold truncate transition-colors leading-tight ${current ? 'text-primary' : done ? 'text-on-surface' : 'text-outline group-hover:text-on-surface'}`}>
+                                                    {step.title}
+                                                </h4>
+                                                <p className="text-[10px] md:text-[12px] text-on-surface-variant mt-1 hidden md:block line-clamp-1">{step.subtitle}</p>
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* MAIN FORM CARD - Bottom */}
+                    <div className="flex-1 flex flex-col gap-4 min-w-0 w-full">
                         <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant p-5 md:p-7 flex flex-col gap-6 flex-1 shadow-sm">
                             <form onSubmit={handleSubmit} className="relative">
                                 <AnimatePresence mode="wait">
@@ -1202,96 +1280,7 @@ const CreateAdPage = () => {
                         </div>
                     </div>
 
-                    {/* CAMPAIGN STEPPER - Right side (glued to sidebar) */}
-                    <aside className="w-full lg:w-[340px] xl:w-[360px] flex-shrink-0 order-1 lg:order-1">
-                        <div className="bg-surface/70 backdrop-blur-2xl rounded-3xl border border-white/50 shadow-lg sticky top-[62px] p-7 relative overflow-hidden">
-                            {/* Decorative glows */}
-                            <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary/8 rounded-full blur-3xl pointer-events-none"></div>
-                            <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-secondary/6 rounded-full blur-2xl pointer-events-none"></div>
 
-                            <h3 className="font-title-xl text-[18px] font-bold text-on-surface border-b-2 border-border-color pb-5 mb-7 flex items-center gap-3 relative z-10">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-container to-primary/20 flex items-center justify-center border border-primary/20 text-primary shadow-sm">
-                                    <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>flag</span>
-                                </div>
-                                <span>{t('ads.campaign_path')}</span>
-                            </h3>
-
-                            <div className="relative z-10">
-                                {/* Static connector line */}
-                                <div className="absolute right-[19px] top-5 bottom-5 w-[2px] bg-outline-variant/40 rounded-full -z-10"></div>
-
-                                {/* Animated progress fill */}
-                                <div className="absolute right-[19px] top-5 w-[2px] -z-10 overflow-hidden rounded-full" style={{ height: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}>
-                                    <motion.div
-                                        className="w-full h-full bg-gradient-to-b from-primary via-primary/80 to-secondary"
-                                        initial={{ scaleY: 0 }}
-                                        animate={{ scaleY: 1 }}
-                                        style={{ transformOrigin: 'top' }}
-                                        transition={{ duration: 0.5, ease: 'easeInOut' }}
-                                    />
-                                </div>
-
-                                <ul className="space-y-6">
-                                    {steps.map((step) => {
-                                        const current = isStepCurrent(step.id);
-                                        const done = isStepDone(step.id);
-                                        return (
-                                            <li
-                                                key={step.id}
-                                                onClick={() => { if (step.id < currentStep || done) setCurrentStep(step.id); }}
-                                                className={`flex items-center gap-5 cursor-pointer transition-all duration-300 group rounded-2xl px-3 py-3
-                                                    ${current ? 'bg-surface shadow-md border border-border-color scale-[1.02]' : 'hover:bg-surface-container/60'}
-                                                    ${!current && !done ? 'opacity-55 hover:opacity-100' : ''}`}
-                                            >
-                                                <div className="flex-shrink-0 relative">
-                                                    {done ? (
-                                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md transform group-hover:scale-110 transition-transform text-white">
-                                                            <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
-                                                        </div>
-                                                    ) : current ? (
-                                                        <>
-                                                            <div className="absolute inset-0 bg-primary/25 rounded-full animate-ping"></div>
-                                                            <div className="w-10 h-10 rounded-full border-[2.5px] border-primary bg-surface flex items-center justify-center shadow-lg relative z-10 text-primary">
-                                                                <span className="text-[16px] font-extrabold">{step.id}</span>
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-full border-2 border-outline-variant bg-surface-container-lowest flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-colors">
-                                                            <span className="text-[15px] font-bold">{step.id}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className={`text-${dir === 'rtl' ? 'right' : 'left'} flex-1 min-w-0`}>
-                                                    <h4 className={`text-[15px] font-bold truncate transition-colors leading-tight ${current ? 'text-primary' : done ? 'text-on-surface' : 'text-outline group-hover:text-on-surface'
-                                                        }`}>
-                                                        {step.title}
-                                                    </h4>
-                                                    <p className="text-[13px] text-on-surface-variant mt-0.5 truncate leading-snug">{step.subtitle}</p>
-                                                </div>
-                                                {current && (
-                                                    <span className={`material-symbols-outlined text-primary text-[18px] shrink-0 ${dir === 'ltr' ? 'rotate-180' : ''}`} style={{ fontVariationSettings: '"FILL" 1' }}>play_arrow</span>
-                                                )}
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-
-                                {/* Summary stats at bottom */}
-                                <div className="mt-8 pt-6 border-t border-border-color grid grid-cols-2 gap-3">
-                                    <div className="bg-surface-container-low rounded-xl p-3 text-center border border-border-color">
-                                        <span className="material-symbols-outlined text-primary text-[18px] mb-1 block">desktop_windows</span>
-                                        <span className="text-[18px] font-extrabold text-on-background block">{selectedScreens.length}</span>
-                                        <span className="text-[11px] text-on-surface-variant">{t('ads.screens_selected')}</span>
-                                    </div>
-                                    <div className="bg-surface-container-low rounded-xl p-3 text-center border border-border-color">
-                                        <span className="material-symbols-outlined text-primary text-[18px] mb-1 block">payments</span>
-                                        <span className="text-[15px] font-extrabold text-on-background block" dir="ltr">{calculatedCost ? `$${(calculatedCost ? Number(calculatedCost).toFixed(2) : "0.00")}` : '—'}</span>
-                                        <span className="text-[11px] text-on-surface-variant">{t('ads.cost')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
                 </div>
 
                 <ScreenAvailabilityModal
