@@ -542,43 +542,41 @@ const CreateAdPage = () => {
                                                 <p className="font-body-md text-body-md text-on-surface-variant">{t('ads.basic_info_desc')}</p>
                                             </div>
 
-                                            <div className="space-y-6">
+                                            <div className="flex flex-col lg:flex-row gap-6">
                                                 {can('manage_all') && (
-                                                    <div className="bg-surface-container-low p-6 rounded-xl border border-border-color">
-                                                        <label className="font-label-md text-label-md text-primary mb-3 flex items-center gap-1.5">
-                                                            <span className="material-symbols-outlined">admin_panel_settings</span> {t('ads.assign_to_advertiser')}
+                                                    <div className="flex-1 flex flex-col justify-start">
+                                                        <label className="block font-label-md text-label-md text-primary mb-2 flex items-center gap-1.5">
+                                                            <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span> {t('ads.assign_to_advertiser')}
                                                         </label>
                                                         <div className="relative">
                                                             <select value={form.advertiser_id} onChange={(e) => setForm(p => ({ ...p, advertiser_id: e.target.value }))} className="w-full bg-white border border-border-color rounded-lg py-3 px-4 text-on-background focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors cursor-pointer shadow-sm appearance-none font-body-md">
                                                                 <option value="">-- {t('ads.issue_under_admin')} --</option>
                                                                 {advertisers.map(adv => <option key={adv.user_id} value={adv.user_id}>{adv.full_name}</option>)}
                                                             </select>
-
                                                             <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-outline pointer-events-none`}>expand_content</span>
                                                         </div>
                                                         <p className="font-caption text-caption text-on-surface-variant mt-2 px-1">{t('ads.assign to advertiser note')}</p>
                                                     </div>
                                                 )}
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                    <div>
-                                                        <label className={labelClass}>{t('ads.campaign_title_label')} <span className="text-error">*</span></label>
-                                                        <input type="text" value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('ads.campaign_title_placeholder')} className={inputClass} />
-                                                        <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.campaign_title_note')}</p>
+                                                <div className="flex-1 flex flex-col justify-start">
+                                                    <label className={labelClass}>{t('ads.campaign_title_label')} <span className="text-error">*</span></label>
+                                                    <input type="text" value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('ads.campaign_title_placeholder')} className={inputClass} />
+                                                    <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.campaign_title_note')}</p>
+                                                </div>
+                                                
+                                                <div className="flex-1 flex flex-col justify-start">
+                                                    <label className={labelClass}>{t('ads.category_label', { defaultValue: 'تصنيف الحملة' })} <span className="text-error">*</span></label>
+                                                    <div className="relative">
+                                                        <select value={form.category_id} onChange={(e) => setForm(p => ({ ...p, category_id: e.target.value }))} className={`${inputClass} appearance-none cursor-pointer bg-white`}>
+                                                            <option value="">-- {t('ads.select_category', { defaultValue: 'اختر تصنيف الإعلان' })} --</option>
+                                                            {categories.map(cat => (
+                                                                <option key={cat.category_id} value={cat.category_id}>{cat.category_name}</option>
+                                                            ))}
+                                                        </select>
+                                                        <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-outline pointer-events-none`}>expand_content</span>
                                                     </div>
-                                                    <div>
-                                                        <label className={labelClass}>{t('ads.category_label', { defaultValue: 'تصنيف الحملة' })} <span className="text-error">*</span></label>
-                                                        <div className="relative">
-                                                            <select value={form.category_id} onChange={(e) => setForm(p => ({ ...p, category_id: e.target.value }))} className={`${inputClass} appearance-none cursor-pointer bg-white`}>
-                                                                <option value="">-- {t('ads.select_category', { defaultValue: 'اختر تصنيف الإعلان' })} --</option>
-                                                                {categories.map(cat => (
-                                                                    <option key={cat.category_id} value={cat.category_id}>{cat.category_name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-outline pointer-events-none`}>expand_content</span>
-                                                        </div>
-                                                        <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.category_note', { defaultValue: 'يساعد في تصنيف إعلانك وعرضه للجمهور المستهدف' })}</p>
-                                                    </div>
+                                                    <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.category_note', { defaultValue: 'يساعد في تصنيف إعلانك وعرضه للجمهور المستهدف' })}</p>
                                                 </div>
                                             </div>
                                         </motion.div>
