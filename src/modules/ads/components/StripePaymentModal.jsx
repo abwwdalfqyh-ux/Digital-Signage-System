@@ -24,6 +24,9 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
         try {
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements,
+                confirmParams: {
+                    return_url: window.location.href,
+                },
                 redirect: 'if required' // لمنع إعادة توجيه الصفحة بالكامل
             });
 
@@ -48,11 +51,11 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                 }
             } else {
                 // Fallback for other statuses like 'requires_action', 'processing'
-                addToast(t('ads.card_processing_error'), 'error');
+                addToast(t('ads.card_processing_error') + " - Status: " + (paymentIntent?.status || 'unknown'), 'error');
                 setIsProcessing(false);
             }
         } catch (err) {
-            addToast(t('ads.card_processing_error'), 'error');
+            addToast(t('ads.card_processing_error') + " - Catch: " + err.message, 'error');
             setIsProcessing(false);
         }
     };
