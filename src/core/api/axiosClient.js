@@ -60,10 +60,12 @@ axiosClient.interceptors.response.use(
         const { response } = error;
 
         const addToast = useToastStore.getState().addToast;
+        const lang = useAuthStore.getState().language || (localStorage.getItem('app-language') || 'ar'); // Read from localStorage since it's global
+        const isAr = lang === 'ar';
 
         // 1. Handle Network Errors
         if (!response) {
-            addToast("مشكلة في الاتصال بالإنترنت، يرجى التحقق من الشبكة.", 'error');
+            addToast(isAr ? "مشكلة في الاتصال بالإنترنت، يرجى التحقق من الشبكة." : "Network connection issue, please check your internet.", 'error');
             return Promise.reject(error);
         }
 
@@ -71,30 +73,36 @@ axiosClient.interceptors.response.use(
         if (response.status === 401) {
             // Do not force logout if the 401 came from the login attempt itself
             if (error.config?.url?.includes('/login')) {
-                addToast(response.data?.message || "بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى.", 'error');
+                addToast(response.data?.message || (isAr ? "بيانات الدخول غير صحيحة، يرجى المحاولة مرة أخرى." : "Invalid login credentials, please try again."), 'error');
                 return Promise.reject(error);
             }
             
             useAuthStore.getState().logout();
-            addToast("انتهت صلاحية الجلسة أو تم تحديث صلاحياتك، يرجى تسجيل الدخول مرة أخرى.", 'error');
+            addToast(isAr ? "انتهت صلاحية الجلسة أو تم تحديث صلاحياتك، يرجى تسجيل الدخول مرة أخرى." : "Session expired or permissions updated, please log in again.", 'error');
             return Promise.reject(error);
         }
 
         // 3. Handle 422 Validation Errors
         if (response.status === 422) {
             const firstError = Object.values(response.data.errors || {})[0]?.[0];
-            addToast(firstError || "البيانات المدخلة غير صحيحة.", 'warning');
+            addToast(firstError || (isAr ? "البيانات المدخلة غير صحيحة." : "Invalid input data."), 'warning');
             return Promise.reject(error);
         }
 
         // 4. Handle 403 Forbidden
         if (response.status === 403) {
-            addToast("ليس لديك صلاحية للقيام بهذا الإجراء.", 'warning');
+            addToast(isAr ? "ليس لديك صلاحية للقيام بهذا الإجراء." : "You do not have permission to perform this action.", 'warning');
             return Promise.reject(error);
         }
 
         // 5. Generic Server Errors
-        addToast(response.data?.message || "حدث خطأ غير متوقع في السيرفر.", 'error');
+        // Sometimes response.data.message has SQL errors in English. 
+        // We can optionally hide raw SQL errors in production.
+        let msg = response.data?.message;
+        if (msg && msg.includes('SQLSTATE')) {
+            msg = isAr ? "حدث خطأ في قاعدة البيانات، يرجى مراجعة الدعم الفني." : "A database error occurred, please contact support.";
+        }
+        addToast(msg || (isAr ? "حدث خطأ غير متوقع في السيرفر." : "An unexpected server error occurred."), 'error');
         return Promise.reject(error);
     }
 );
