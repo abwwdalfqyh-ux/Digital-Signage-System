@@ -29,7 +29,7 @@ const DefaultContentPage = () => {
     const fetchContents = async () => {
         try {
             const res = await axiosClient.get('/default-contents');
-            setContents(res.data.data);
+            setContents(res.data?.data || []);
         } catch (error) {
             console.error('Error fetching default contents', error);
         } finally {
@@ -40,7 +40,7 @@ const DefaultContentPage = () => {
     const fetchScreens = async () => {
         try {
             const res = await axiosClient.get('/screens');
-            setScreens(res.data.data);
+            setScreens(res.data?.data || []);
         } catch (error) {
             console.error('Error fetching screens', error);
         }
