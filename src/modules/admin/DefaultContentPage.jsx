@@ -101,6 +101,19 @@ const DefaultContentPage = () => {
         }
     };
 
+    const getMediaUrl = (url) => {
+        if (!url) return '';
+        if (url.includes('localhost') || url.includes('127.0.0.1')) {
+            const baseUrl = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+            return url.replace(/http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, baseUrl);
+        }
+        if (url.startsWith('/')) {
+            const baseUrl = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+            return baseUrl + url;
+        }
+        return url;
+    };
+
     return (
         <div className="p-6" dir={dir}>
             <div className="flex justify-between items-center mb-6">
@@ -120,9 +133,9 @@ const DefaultContentPage = () => {
                     {contents.map(content => (
                         <div key={content.content_id} className={`bg-white dark:bg-gray-800 rounded-xl shadow p-4 border-2 ${content.is_active ? 'border-green-500' : 'border-transparent'}`}>
                             {content.file_type === 'video' ? (
-                                <video src={content.file_path} className="w-full h-48 object-cover rounded-lg mb-4" controls muted />
+                                <video src={getMediaUrl(content.file_path)} className="w-full h-48 object-cover rounded-lg mb-4" controls muted />
                             ) : (
-                                <img src={content.file_path} className="w-full h-48 object-cover rounded-lg mb-4" alt="default content" />
+                                <img src={getMediaUrl(content.file_path)} className="w-full h-48 object-cover rounded-lg mb-4" alt="default content" />
                             )}
                             
                             <h3 className="text-lg font-bold mb-2">{content.title}</h3>
