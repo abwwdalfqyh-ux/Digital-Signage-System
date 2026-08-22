@@ -223,7 +223,7 @@ export default function ScreenMapView({
               icon={createCustomIcon(screen.computed_status, false)}
             >
               <Popup className="screen-map-popup" maxWidth={260}>
-                <div style={{ fontFamily: "'Cairo', sans-serif", direction: 'rtl', padding: '4px', textAlign: 'right' }}>
+                <div style={{ fontFamily: "'Cairo', sans-serif",  padding: '4px', textAlign: 'right' }}>
                   <div style={{ fontSize: '14px', fontWeight: 800, color: '#1a1a2e', marginBottom: '4px' }}>
                     {screen.screen_name}
                   </div>
@@ -249,7 +249,7 @@ export default function ScreenMapView({
         {visibleScreens.length > 0 && screensWithCoords.length === 0 && !selectedStreet && (
           <Marker position={mapView.center} icon={FallbackIcon}>
             <Popup>
-              <div style={{ direction: 'rtl', fontFamily: 'Cairo,sans-serif', fontSize: '13px', fontWeight: 700, textAlign: 'right' }}>
+              <div style={{  fontFamily: 'Cairo,sans-serif', fontSize: '13px', fontWeight: 700, textAlign: 'right' }}>
                 {t('screens.screens_in_this_region').replace('{count}', visibleScreens.length)}
                 <br />
                 <span style={{ fontSize: '11px', color: '#6b7280' }}>{t('screens.gps_coordinates_undefined')}</span>
@@ -263,7 +263,7 @@ export default function ScreenMapView({
       <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200 shadow-lg z-[400]">
         <p className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1.5 text-right">حالة الشاشات</p>
         {Object.entries(STATUS_LABELS).map(([status, label]) => (
-          <div key={status} className="flex items-center gap-1.5 mb-1" style={{direction: "rtl"}}>
+          <div key={status} className="flex items-center gap-1.5 mb-1" style={{}}>
             <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: STATUS_COLORS[status] }}></span>
             <span className="text-[10px] font-bold text-gray-700">{label}</span>
           </div>

@@ -175,7 +175,7 @@ const MaintKpiCard = ({ icon: Icon, label, value, sub, color, bgColor, borderCol
             transition: 'all 0.2s ease',
             position: 'relative',
             overflow: 'hidden',
-            direction: 'rtl',
+            
         }}
     >
         {/* subtle bg circle */}
@@ -406,7 +406,7 @@ const YemenStatusMap = ({ screenData }) => {
                                     }}
                                 >
                                     <Popup>
-                                        <div style={{ minWidth: '200px', padding: '14px 16px', direction: 'rtl' }}>
+                                        <div style={{ minWidth: '200px', padding: '14px 16px', }}>
                                             {/* Popup header */}
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                                                 <div style={{
@@ -684,7 +684,7 @@ const MaintenanceDashboard = () => {
     const mockUptime       = uptimePct;
 
     return (
-        <div style={{ direction: 'rtl', paddingBottom: '48px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <div style={{  paddingBottom: '48px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
 
             {/* ── Pulse animation keyframe ── */}
             <style>{`

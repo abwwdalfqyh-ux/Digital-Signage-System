@@ -90,7 +90,7 @@ const KpiCard = ({
             position: 'relative',
             overflow: 'hidden',
             borderRight: borderAccent ? `4px solid ${borderAccent}` : `1px solid ${S.outlineVariant}`,
-            direction: 'rtl',
+            
         }}
     >
         {/* header row */}
@@ -123,7 +123,7 @@ const KpiCard = ({
 
         {/* value */}
         <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', direction: 'ltr' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', }}>
                 <span style={{
                     fontSize: '36px', fontWeight: 700, lineHeight: 1,
                     color: accentColor || S.onBackground,
@@ -206,7 +206,7 @@ const WeeklyChart = ({ weeklyRevenue = [] }) => {
     };
 
     return (
-        <div style={{ direction: 'ltr', width: '100%' }}>
+        <div style={{  width: '100%' }}>
             <svg
                 ref={svgRef}
                 viewBox={`0 0 ${W} ${H}`}
@@ -317,7 +317,7 @@ const DonutChart = ({ data = [] }) => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ position: 'relative', width: '180px', height: '180px' }}>
-                <svg viewBox="0 0 180 180" style={{ width: '100%', height: '100%', direction: 'ltr' }}>
+                <svg viewBox="0 0 180 180" style={{ width: '100%', height: '100%', }}>
                     <defs>
                         <filter id="dsStitch">
                             <feDropShadow dx="0" dy="2" stdDeviation="3"
@@ -391,7 +391,7 @@ const DonutChart = ({ data = [] }) => {
    SKELETON
 ══════════════════════════════════════════════════════ */
 const DashboardSkeleton = () => (
-    <div style={{ direction: 'rtl', padding: '8px' }}>
+    <div style={{  padding: '8px' }}>
         <style>{`
             @keyframes stitchPulse {
               0%, 100% { opacity: 1; }
@@ -537,7 +537,7 @@ const Dashboard = () => {
 
     return (
         <div style={{
-            direction: 'rtl',
+            
             paddingBottom: '40px',
             fontFamily: "'IBM Plex Sans Arabic', sans-serif",
         }}>
@@ -606,7 +606,7 @@ const Dashboard = () => {
                                 fontSize: '13px', fontWeight: 600,
                                 color: S.onSurface,
                                 cursor: 'pointer',
-                                direction: 'rtl',
+                                
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                 minWidth: '110px',
                             }}

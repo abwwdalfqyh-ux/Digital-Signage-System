@@ -47,7 +47,7 @@ const KpiCard = ({ label, sublabel, value, note, noteIcon: NoteIcon, noteColor, 
             padding: '22px 22px 18px',
             minHeight: '130px',
             borderRight: borderAccent ? `4px solid ${borderAccent}` : `1px solid ${S.outlineVariant}`,
-            direction: 'rtl',
+            
         }}
     >
         <div className="flex justify-between items-start mb-4">
@@ -125,7 +125,7 @@ const WeeklyChart = ({ data = [] }) => {
     };
 
     return (
-        <div style={{ direction: 'ltr', width: '100%' }}>
+        <div style={{  width: '100%' }}>
             <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', overflow: 'visible' }} onMouseMove={onMove} onMouseLeave={() => setTip(null)}>
                 <defs>
                     <linearGradient id="ownerChartGradient" x1="0" y1="0" x2="0" y2="1">
@@ -202,7 +202,7 @@ const StatusDonutChart = ({ data = [], t }) => {
     return (
         <div className="flex flex-col items-center gap-6">
             <div style={{ position: 'relative', width: '180px', height: '180px' }}>
-                <svg viewBox="0 0 180 180" style={{ width: '100%', height: '100%', direction: 'ltr' }}>
+                <svg viewBox="0 0 180 180" style={{ width: '100%', height: '100%', }}>
                     {slices.map((s, i) => (
                         <motion.path 
                             key={i} d={s.path} fill={s.color}

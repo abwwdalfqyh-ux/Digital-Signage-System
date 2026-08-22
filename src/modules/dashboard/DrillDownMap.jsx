@@ -459,7 +459,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
             borderRadius: '16px',
             overflow: 'hidden',
             marginBottom: '24px',
-            direction: 'rtl',
+            
             fontFamily: "'IBM Plex Sans Arabic', sans-serif",
         }}>
             {/* Leaflet popup & Route animation CSS override */}
@@ -559,7 +559,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                                     pathOptions={{ color: T.primary, weight: 5, dashArray: '12, 12', className: 'route-path-animated' }} 
                                 />
                                 <Marker position={routeState.userLoc} icon={makeUserIcon()}>
-                                    <Popup><div style={{ direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '12px', fontWeight: 700, padding: '4px' }}>موقعك (المهندس)</div></Popup>
+                                    <Popup><div style={{  fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '12px', fontWeight: 700, padding: '4px' }}>موقعك (المهندس)</div></Popup>
                                 </Marker>
                             </>
                         )}
@@ -570,7 +570,7 @@ const DrillDownMap = ({ allScreens = [], onStartMaintenance }) => {
                                     icon={makeScreenIcon(deriveStatus(scr))}
                                 >
                                     <Popup>
-                                        <div style={{ padding: '14px 16px', minWidth: '190px', direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                        <div style={{ padding: '14px 16px', minWidth: '190px',  fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                                 <div style={{ width: 34, height: 34, borderRadius: '9px', background: STATUS[deriveStatus(scr)]?.light, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                     <Monitor style={{ width: 16, height: 16, color: STATUS[deriveStatus(scr)]?.color }} />

@@ -568,7 +568,7 @@ const DashboardLayout = () => {
                     </div>
 
                     {/* ── Left side: action buttons ── */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', direction: 'ltr' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', }}>
 
                         {/* 🌙 Dark / Light mode toggle */}
                         <button
@@ -651,7 +651,7 @@ const DashboardLayout = () => {
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     cursor: language === 'ar' ? 'default' : 'pointer',
                                     transition: 'all 0.2s ease',
-                                    direction: 'rtl',
+                                    
                                 }}
                                 onMouseEnter={e => {
                                     if (language !== 'ar') {

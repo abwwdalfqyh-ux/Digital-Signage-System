@@ -56,7 +56,7 @@ const KpiCard = ({
                 padding: '22px 22px 18px',
                 minHeight: '138px',
                 borderRight: borderAccent ? `4px solid ${borderAccent}` : `1px solid ${S.outlineVariant}`,
-                direction: 'rtl',
+                
                 position: 'relative',
                 overflow: 'hidden',
                 cursor: 'default',
@@ -193,7 +193,7 @@ const FillRateGauge = ({ value = 0 }) => {
 
     return (
         <div className="flex flex-col items-center">
-            <svg viewBox="0 0 220 130" style={{ width: '100%', maxWidth: 280, direction: 'ltr', overflow: 'visible' }}>
+            <svg viewBox="0 0 220 130" style={{ width: '100%', maxWidth: 280,  overflow: 'visible' }}>
                 <defs>
                     <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stopColor={pct >= 40 ? S.success : S.error} />
@@ -263,7 +263,7 @@ const ImpressionsBarChart = ({ data = [] }) => {
     }));
 
     return (
-        <div style={{ direction: 'ltr', width: '100%' }}>
+        <div style={{  width: '100%' }}>
             <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', overflow: 'visible' }}>
                 <defs>
                     <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
@@ -532,7 +532,7 @@ const OwnerAnalyticsPage = () => {
     }
 
     return (
-        <div className="p-6 md:p-8 max-w-[1600px] mx-auto w-full space-y-6" style={{ direction: 'rtl', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <div className="p-6 md:p-8 max-w-[1600px] mx-auto w-full space-y-6" style={{  fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
 
             {/* ── Print Styles ── */}
             <style>{`

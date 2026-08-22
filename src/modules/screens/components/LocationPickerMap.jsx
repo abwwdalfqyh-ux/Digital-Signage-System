@@ -52,8 +52,7 @@ const LocationPickerMap = ({ onSelect, initialLat, initialLng, onClose }) => {
       {/* Overlay UI */}
       <div style={{
         position: 'absolute', bottom: 20, left: 20, right: 20, zIndex: 1000,
-        display: 'flex', flexDirection: 'column', gap: '12px', direction: 'rtl'
-      }}>
+        display: 'flex', flexDirection: 'column', gap: '12px', }}>
         {/* Info Box */}
         <div style={{
           background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)',

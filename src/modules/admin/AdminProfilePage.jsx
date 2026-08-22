@@ -150,7 +150,7 @@ const AdminProfilePage = () => {
                 <div className="bg-surface border border-outline-variant rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow flex justify-between items-start">
                     <div>
                         <p className="text-xs text-on-surface-variant mb-1.5">{t('admin.phone_number')}</p>
-                        <p className="text-sm font-semibold text-on-surface" style={{ direction: 'ltr', textAlign: 'right' }}>{phone}</p>
+                        <p className="text-sm font-semibold text-on-surface" style={{  textAlign: 'right' }}>{phone}</p>
                     </div>
                     <div className="w-9 h-9 rounded-full bg-secondary/10 flex items-center justify-center text-secondary flex-shrink-0">
                         <span className="material-symbols-outlined text-lg">call</span>
