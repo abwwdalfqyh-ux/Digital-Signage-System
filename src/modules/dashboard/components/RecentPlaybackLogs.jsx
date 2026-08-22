@@ -111,7 +111,7 @@ const RecentPlaybackLogs = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <h3 style={{
                         margin: 0, fontSize: '18px', fontWeight: 700,
-                        color: S.onBackground, direction: 'rtl',
+                        color: S.onBackground,
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                     }}>
                         {t('dashboard.live_playback_logs')}
@@ -126,7 +126,7 @@ const RecentPlaybackLogs = () => {
                     </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', direction: 'ltr', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                     
                     {/* Cleanup Section */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: S.surfaceContainerLow, borderRadius: '8px', padding: '4px' }}>
@@ -137,7 +137,7 @@ const RecentPlaybackLogs = () => {
                                 background: 'transparent', border: 'none', outline: 'none',
                                 color: S.onSurface, padding: '4px 8px',
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px',
-                                direction: 'rtl', cursor: 'pointer'
+                                cursor: 'pointer'
                             }}
                         >
                             <option value="30">{t('dashboard.older_than_month')}</option>
@@ -172,7 +172,7 @@ const RecentPlaybackLogs = () => {
                                 background: 'transparent', border: 'none', outline: 'none',
                                 color: S.onSurface, padding: '4px 8px',
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px',
-                                direction: 'rtl', cursor: 'pointer'
+                                cursor: 'pointer'
                             }}
                         >
                             <option value="csv">Excel (CSV)</option>
@@ -258,7 +258,7 @@ const RecentPlaybackLogs = () => {
                             ].map((label, i) => (
                                 <th key={i} style={{
                                     padding: '16px 20px',
-                                    textAlign: 'right', direction: 'rtl',
+                                    textAlign: dir === 'rtl' ? 'right' : 'left',
                                     fontSize: '14px', fontWeight: 600,
                                     color: S.onSurface,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
@@ -295,10 +295,10 @@ const RecentPlaybackLogs = () => {
                                     onMouseEnter={e => e.currentTarget.style.background = S.surfaceContainerLow}
                                     onMouseLeave={e => e.currentTarget.style.background = S.surfaceContainerLowest}
                                 >
-                                    <td style={{ padding: '16px 20px', direction: 'rtl', fontSize: '13px', fontWeight: 'bold', color: S.onSurfaceVariant }}>
+                                    <td style={{ padding: '16px 20px', fontSize: '13px', fontWeight: 'bold', color: S.onSurfaceVariant }}>
                                         #{log.log_id}
                                     </td>
-                                    <td style={{ padding: '16px 20px', direction: 'rtl' }}>
+                                    <td style={{ padding: '16px 20px' }}>
                                         <span style={{ 
                                             fontSize: '14px', fontWeight: 600, 
                                             color: S.onSurface, 
@@ -307,7 +307,7 @@ const RecentPlaybackLogs = () => {
                                             {log.ad_name}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 20px', direction: 'rtl' }}>
+                                    <td style={{ padding: '16px 20px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                             <div style={{
                                                 width: 28, height: 28, borderRadius: '50%',
@@ -326,7 +326,7 @@ const RecentPlaybackLogs = () => {
                                             </span>
                                         </div>
                                     </td>
-                                    <td style={{ padding: '16px 20px', direction: 'rtl' }}>
+                                    <td style={{ padding: '16px 20px' }}>
                                         <span style={{
                                             fontSize: '13px', fontWeight: 500,
                                             color: S.onSurface,
@@ -335,7 +335,7 @@ const RecentPlaybackLogs = () => {
                                             {log.duration} {t('dashboard.seconds_unit')}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 20px', direction: 'rtl' }}>
+                                    <td style={{ padding: '16px 20px' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                                             <span style={{ fontSize: '13px', fontWeight: 600, color: S.onSurface }}>
                                                 {log.played_at}
@@ -345,7 +345,7 @@ const RecentPlaybackLogs = () => {
                                             </span>
                                         </div>
                                     </td>
-                                    <td style={{ padding: '16px 20px', direction: 'rtl' }}>
+                                    <td style={{ padding: '16px 20px' }}>
                                         <span style={{
                                             background: 'rgba(52, 211, 153, 0.1)', color: '#059669',
                                             padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold'
