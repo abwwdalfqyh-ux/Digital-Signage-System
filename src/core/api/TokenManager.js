@@ -8,23 +8,23 @@ const USER_KEY = 'sabapost_user_data';
 
 export const TokenManager = {
     setToken: (token) => {
-        localStorage.setItem(TOKEN_KEY, token);
+        sessionStorage.setItem(TOKEN_KEY, token);
     },
     getToken: () => {
-        return localStorage.getItem(TOKEN_KEY);
+        return sessionStorage.getItem(TOKEN_KEY);
     },
     removeToken: () => {
-        localStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
     },
     setUserData: (user) => {
-        localStorage.setItem(USER_KEY, JSON.stringify(user));
+        sessionStorage.setItem(USER_KEY, JSON.stringify(user));
     },
     getUserData: () => {
-        const user = localStorage.getItem(USER_KEY);
+        const user = sessionStorage.getItem(USER_KEY);
         return user ? JSON.parse(user) : null;
     },
     clearAll: () => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(USER_KEY);
     }
 };

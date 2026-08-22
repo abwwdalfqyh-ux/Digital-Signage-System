@@ -1,5 +1,6 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import { TokenManager } from './TokenManager';
 
 window.Pusher = Pusher;
 
@@ -15,7 +16,7 @@ if (pusherKey) {
         authorizer: (channel, options) => {
             return {
                 authorize: (socketId, callback) => {
-                    const token = localStorage.getItem('sabapost_auth_token');
+                    const token = TokenManager.getToken();
                     fetch(`${import.meta.env.VITE_API_URL}/broadcasting/auth`, {
                         method: 'POST',
                         headers: {
