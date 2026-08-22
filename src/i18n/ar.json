@@ -889,6 +889,7 @@
         "status_maintenance_long": "تحت الصيانة (Maintenance)"
     },
     "ads": {
+        "clear_all_filters": "مسح جميع الفلاتر",
         "available_screens": "الشاشات المتاحة",
         "custom": "مخصص",
         "choose_payment_method": "اختر طريقة الدفع",

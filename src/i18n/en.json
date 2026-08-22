@@ -888,6 +888,7 @@
         "status_maintenance_long": "Under Maintenance"
     },
     "ads": {
+        "clear_all_filters": "Clear all filters",
         "available_screens": "Available Screens",
         "custom": "Custom",
         "choose_payment_method": "Choose Payment Method",
