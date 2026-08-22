@@ -87,7 +87,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
 // --- Main Modal Component ---
 const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
     const addToast = useToastStore(state => state.addToast);
-    const { t, i18n, dir } = useTranslation();
+    const { t, lang, dir } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [clientSecret, setClientSecret] = useState(null);
     
@@ -283,7 +283,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                 ) : (
                     <div className="pt-2">
                         {stripePromise && clientSecret ? (
-                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' }, locale: i18n.language || 'ar' }}>
+                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' }, locale: lang || 'ar' }}>
                                 <StripeCheckoutForm 
                                     advertisement={advertisement}
                                     onSuccess={() => { onSuccess(); onClose(); }} 
