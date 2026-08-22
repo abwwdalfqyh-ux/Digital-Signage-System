@@ -29,7 +29,7 @@ const glassCard = {
 };
 
 const RecentPlaybackLogs = () => {
-    const { t } = useTranslation();
+    const { t, dir } = useTranslation();
     const addToast = useToastStore(state => state.addToast);
     const [page, setPage] = useState(1);
     const [isExporting, setIsExporting] = useState(false);
