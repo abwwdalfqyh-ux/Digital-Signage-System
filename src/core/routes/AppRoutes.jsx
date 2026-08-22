@@ -45,6 +45,7 @@ import RolesPage from '../../modules/admin/RolesPage';
 import PaymentOperationsPage from '../../modules/admin/PaymentOperationsPage';
 import AdminProfilePage from '../../modules/admin/AdminProfilePage';
 import AdPackageManagement from '../../modules/admin/AdPackageManagement';
+import DefaultContentPage from '../../modules/admin/DefaultContentPage';
 
 import SessionsPage from '../../modules/sessions/SessionsPage';
 /**
@@ -146,6 +147,11 @@ const AppRoutes = () => {
                 <Route path="packages" element={
                     <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
                         <AdPackageManagement />
+                    </RoleRoute>
+                } />
+                <Route path="default-content" element={
+                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
+                        <DefaultContentPage />
                     </RoleRoute>
                 } />
 

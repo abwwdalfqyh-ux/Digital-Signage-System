@@ -32,6 +32,7 @@ const NAV_LABELS = {
     roles:              { ar: 'الصلاحيات',       en: 'Roles' },
     locations:          { ar: 'المواقع',          en: 'Locations' },
     packages:           { ar: 'إدارة الباقات',      en: 'Packages' },
+    defaultContent:     { ar: 'المحتوى الافتراضي',  en: 'Default Content' },
 
     paymentMethods:     { ar: 'طرق الدفع',       en: 'Payment Methods' },
     paymentOps:         { ar: 'عمليات الدفع',    en: 'Payment Operations' },
@@ -71,6 +72,7 @@ export const getNavItems = (roleId, lang = 'ar') => {
                 { path: '/dashboard/roles', icon: Shield, label: t('roles', lang) },
                 { path: '/dashboard/locations', icon: MapPin, label: t('locations', lang) },
                 { path: '/dashboard/packages', icon: Layers, label: t('packages', lang) },
+                { path: '/dashboard/default-content', icon: Repeat, label: t('defaultContent', lang) },
 
                 { path: '/dashboard/payment-methods', icon: CreditCard, label: t('paymentMethods', lang) },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: t('paymentOps', lang) },
