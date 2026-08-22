@@ -27,7 +27,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                 confirmParams: {
                     return_url: window.location.href,
                 },
-                redirect: 'if required' // لمنع إعادة توجيه الصفحة بالكامل
+                redirect: 'if_required' // لمنع إعادة توجيه الصفحة بالكامل
             });
 
             if (error) {
@@ -51,11 +51,11 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
                 }
             } else {
                 // Fallback for other statuses like 'requires_action', 'processing'
-                addToast(t('ads.card_processing_error') + " - Status: " + (paymentIntent?.status || 'unknown'), 'error');
+                addToast(t('ads.card_processing_error'), 'error');
                 setIsProcessing(false);
             }
         } catch (err) {
-            addToast(t('ads.card_processing_error') + " - Catch: " + err.message, 'error');
+            addToast(t('ads.card_processing_error'), 'error');
             setIsProcessing(false);
         }
     };
@@ -87,6 +87,7 @@ const StripeCheckoutForm = ({ advertisement, onSuccess, onCancel }) => {
 // --- Main Modal Component ---
 const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
     const addToast = useToastStore(state => state.addToast);
+    const { t, i18n, dir } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
     const [clientSecret, setClientSecret] = useState(null);
     
@@ -96,7 +97,6 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
     const [isFetchingMethods, setIsFetchingMethods] = useState(true);
     const [receiptFile, setReceiptFile] = useState(null);
     const [stripePromise, setStripePromise] = useState(null);
-    const { t, dir } = useTranslation();
 
     useEffect(() => {
         if (isOpen) {
@@ -283,7 +283,7 @@ const StripePaymentModal = ({ isOpen, onClose, advertisement, onSuccess }) => {
                 ) : (
                     <div className="pt-2">
                         {stripePromise && clientSecret ? (
-                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
+                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' }, locale: i18n.language || 'ar' }}>
                                 <StripeCheckoutForm 
                                     advertisement={advertisement}
                                     onSuccess={() => { onSuccess(); onClose(); }} 
