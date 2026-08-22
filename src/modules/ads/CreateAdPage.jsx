@@ -612,51 +612,38 @@ const CreateAdPage = () => {
                                             {packages.length > 0 && (
                                                 <div className="bg-surface-container-low border border-border-color rounded-2xl p-6 mb-10 shadow-sm relative overflow-hidden">
                                                     <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
-                                                    <h4 className="font-title-sm text-title-sm text-on-background mb-2 flex items-center justify-center gap-2">
-                                                        <span className="material-symbols-outlined text-primary">layers</span>
-                                                        {t('packages.select_package', { defaultValue: 'باقة التكرار' })}
-                                                    </h4>
-                                                    <p className="text-center font-body-md text-body-md text-on-surface-variant mb-6">
-                                                        {t('packages.package_info', { defaultValue: 'تحديد مدى تكرار إعلانك على الشاشة' })}
-                                                    </p>
+                                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                        <div>
+                                                            <h4 className="font-title-sm text-title-sm text-on-background mb-1 flex items-center gap-2">
+                                                                <span className="material-symbols-outlined text-primary">layers</span>
+                                                                {t('packages.select_package', { defaultValue: 'باقة التكرار' })}
+                                                            </h4>
+                                                            <p className="font-body-sm text-body-sm text-on-surface-variant">
+                                                                {t('packages.package_info', { defaultValue: 'تحديد مدى تكرار إعلانك على الشاشة' })}
+                                                            </p>
+                                                        </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        {packages.map((pkg) => {
-                                                            const isSelected = form.interval_minutes == pkg.interval_minutes;
-                                                            return (
-                                                                <button
-                                                                    key={pkg.package_id}
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setForm(p => ({ ...p, interval_minutes: pkg.interval_minutes.toString() }));
-                                                                        if (calculatedCost) setCalculatedCost(null);
-                                                                    }}
-                                                                    className={`relative p-5 rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-3 ${isSelected ? 'border-primary bg-primary/5 shadow-md scale-[1.02]' : 'border-border-color bg-white hover:border-primary/40 hover:bg-surface-container-lowest'}`}
-                                                                >
-                                                                    {isSelected && (
-                                                                        <div className="absolute top-3 right-3 text-primary">
-                                                                            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check_circle</span>
-                                                                        </div>
-                                                                    )}
-                                                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isSelected ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>
-                                                                        <span className="material-symbols-outlined text-[24px]">repeat</span>
-                                                                    </div>
-                                                                    <div>
-                                                                        <h5 className="font-title-sm text-title-sm text-on-background mb-1">
-                                                                            {dir === 'rtl' ? pkg.name_ar : pkg.name_en}
-                                                                        </h5>
-                                                                        <div className="text-sm font-bold text-primary mb-1">
-                                                                            {pkg.interval_minutes} {t('common.minutes_short', { defaultValue: 'دقيقة' })}
-                                                                        </div>
-                                                                        {pkg.price_multiplier != 1 && (
-                                                                            <span className="text-xs px-2 py-0.5 rounded-md bg-primary-container text-on-primary-container font-medium">
-                                                                                x{pkg.price_multiplier}
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                </button>
-                                                            );
-                                                        })}
+                                                        <div className="w-full md:w-1/2 lg:w-1/3 relative">
+                                                            <select
+                                                                value={form.interval_minutes}
+                                                                onChange={(e) => {
+                                                                    setForm(p => ({ ...p, interval_minutes: e.target.value }));
+                                                                    if (calculatedCost) setCalculatedCost(null);
+                                                                }}
+                                                                className="w-full appearance-none bg-white border-2 border-border-color hover:border-primary/40 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl px-4 py-3 text-on-background font-bold text-sm transition-all outline-none"
+                                                                dir={dir}
+                                                            >
+                                                                <option value="" disabled>{t('packages.select_package', { defaultValue: 'اختر باقة التكرار' })}</option>
+                                                                {packages.map(pkg => (
+                                                                    <option key={pkg.package_id} value={pkg.interval_minutes.toString()}>
+                                                                        {dir === 'rtl' ? pkg.name_ar : pkg.name_en} ({pkg.interval_minutes} {t('common.minutes_short', { defaultValue: 'دقيقة' })}) {pkg.price_multiplier != 1 ? `x${pkg.price_multiplier}` : ''}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                            <div className={`absolute top-1/2 -translate-y-1/2 pointer-events-none flex items-center ${dir === 'rtl' ? 'left-4' : 'right-4'}`}>
+                                                                <span className="material-symbols-outlined text-outline-variant">expand_more</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
