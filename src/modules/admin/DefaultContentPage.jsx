@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../core/api/axiosClient';
 import useToastStore from '../../store/useToastStore';
-import { useTranslation } from 'react-i18next'; // We use custom hook or i18next depending on the project.
-// Wait, in this project useTranslation is a custom hook.
 import useTranslationCustom from '../../i18n/useTranslation';
 
 const DefaultContentPage = () => {
