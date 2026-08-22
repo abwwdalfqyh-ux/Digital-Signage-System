@@ -596,180 +596,191 @@ const CreateAdPage = () => {
                                                 <p className="font-body-md text-body-md text-on-surface-variant">{t('ads.scheduling_density_desc')}</p>
                                             </div>
 
-                                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10 bg-surface-container-low/50 p-6 rounded-2xl border border-border-color">
-                                                <div>
-                                                    <label className="block font-title-sm text-title-sm text-on-background mb-3">
-                                                        {t('ads.start date')} <span className="text-error">*</span>
-                                                    </label>
-                                                    <div className="relative">
-                                                        <input
-                                                            type="date"
-                                                            value={form.start_date}
-                                                            onChange={(e) => { setForm(p => ({ ...p, start_date: e.target.value })); if (calculatedCost) setCalculatedCost(null); }}
-                                                            className="w-full border border-border-color bg-white rounded-xl px-5 py-4 font-title-sm text-[16px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pr-14 text-left shadow-sm"
-                                                            dir="ltr"
-                                                            min={new Date().toISOString().split('T')[0]}
-                                                        />
-                                                        <span className={`material-symbols-outlined text-[26px] absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-primary pointer-events-none`}>calendar_month</span>
-                                                    </div>
-                                                    <p className="font-caption text-caption text-on-surface-variant mt-2 px-1">{t('ads.start_date_desc')}</p>
-                                                </div>
-                                                <div>
-                                                    <label className="block font-title-sm text-title-sm text-on-background mb-3 flex items-center justify-between">
-                                                        <span>{t('ads.end_date')} <span className="text-error">*</span></span>
-                                                        {form.start_date && (
-                                                            <span className="font-caption text-caption text-primary bg-primary/10 px-2 py-0.5 rounded-md">{t('ads.quick_option_available')}</span>
-                                                        )}
-                                                    </label>
-                                                    <div className="relative">
-                                                        <input
-                                                            type="date"
-                                                            value={form.end_date}
-                                                            onChange={(e) => { setForm(p => ({ ...p, end_date: e.target.value })); if (calculatedCost) setCalculatedCost(null); }}
-                                                            className="w-full border border-border-color bg-white rounded-xl px-5 py-4 font-title-sm text-[16px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pr-14 text-left shadow-sm"
-                                                            dir="ltr"
-                                                            min={form.start_date || new Date().toISOString().split('T')[0]}
-                                                        />
-                                                        <span className={`material-symbols-outlined text-[26px] absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-error pointer-events-none`}>event_busy</span>
-                                                    </div>
-                                                    
-                                                    {/* Duration Visual Summary */}
-                                                    {form.start_date && form.end_date && (
-                                                        <div className="mt-4 p-3 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-between transition-all">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="material-symbols-outlined text-primary">timelapse</span>
-                                                                <span className="font-label-md text-on-background">{t('common.duration')}:</span>
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                                                {/* Column 1: Date Selection */}
+                                                <div className="bg-surface-container-low/50 p-5 md:p-6 rounded-2xl border border-border-color flex flex-col justify-between h-full">
+                                                    <div>
+                                                        <h4 className="font-title-sm text-title-sm text-on-background mb-4 flex items-center gap-2">
+                                                            <span className="material-symbols-outlined text-primary text-[20px]">date_range</span>
+                                                            {t('ads.campaign_dates', { defaultValue: 'فترة الحملة' })}
+                                                        </h4>
+                                                        <div className="flex flex-col xl:flex-row gap-4 mb-6">
+                                                            <div className="flex-1">
+                                                                <label className="block font-title-sm text-title-sm text-on-background mb-2">
+                                                                    {t('ads.start date')} <span className="text-error">*</span>
+                                                                </label>
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={form.start_date}
+                                                                        onChange={(e) => { setForm(p => ({ ...p, start_date: e.target.value })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                        className="w-full border border-border-color bg-white rounded-xl px-4 py-3 font-title-sm text-[15px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pr-12 text-left shadow-sm"
+                                                                        dir="ltr"
+                                                                        min={new Date().toISOString().split('T')[0]}
+                                                                    />
+                                                                    <span className={`material-symbols-outlined text-[22px] absolute ${dir === 'rtl' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-primary pointer-events-none`}>calendar_month</span>
+                                                                </div>
                                                             </div>
-                                                            <div className="font-bold text-primary">
-                                                                {Math.max(1, Math.ceil((new Date(form.end_date) - new Date(form.start_date)) / (1000 * 60 * 60 * 24)))} {t('common.days')}
+                                                            <div className="flex-1">
+                                                                <label className="block font-title-sm text-title-sm text-on-background mb-2 flex items-center justify-between">
+                                                                    <span>{t('ads.end_date')} <span className="text-error">*</span></span>
+                                                                    {form.start_date && (
+                                                                        <span className="font-caption text-caption text-primary bg-primary/10 px-2 py-0.5 rounded-md">{t('ads.quick_option_available')}</span>
+                                                                    )}
+                                                                </label>
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={form.end_date}
+                                                                        onChange={(e) => { setForm(p => ({ ...p, end_date: e.target.value })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                        className="w-full border border-border-color bg-white rounded-xl px-4 py-3 font-title-sm text-[15px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all pr-12 text-left shadow-sm"
+                                                                        dir="ltr"
+                                                                        min={form.start_date || new Date().toISOString().split('T')[0]}
+                                                                    />
+                                                                    <span className={`material-symbols-outlined text-[22px] absolute ${dir === 'rtl' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-error pointer-events-none`}>event_busy</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* Duration Visual Summary */}
+                                                        {form.start_date && form.end_date && (
+                                                            <div className="mb-6 p-2.5 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-between transition-all">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="material-symbols-outlined text-primary text-[18px]">timelapse</span>
+                                                                    <span className="font-label-md text-on-background">{t('common.duration')}:</span>
+                                                                </div>
+                                                                <div className="font-bold text-primary">
+                                                                    {Math.max(1, Math.ceil((new Date(form.end_date) - new Date(form.start_date)) / (1000 * 60 * 60 * 24)))} {t('common.days')}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                        <button type="button" onClick={() => addDays(7)}
+                                                            className="group relative py-3 px-2 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[14px] font-bold rounded-xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-sm hover:shadow-primary/30 hover:shadow-md hover:-translate-y-0.5 flex flex-col items-center gap-1">
+                                                            <span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">date_range</span>
+                                                            {t('common.week')}
+                                                            <span className="text-[10px] font-normal opacity-70">7 {t('common.days')}</span>
+                                                        </button>
+                                                        <button type="button" onClick={() => addDays(14)}
+                                                            className="group relative py-3 px-2 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[14px] font-bold rounded-xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-sm hover:shadow-primary/30 hover:shadow-md hover:-translate-y-0.5 flex flex-col items-center gap-1">
+                                                            <span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">view_week</span>
+                                                            {t('common.two_weeks')}
+                                                            <span className="text-[10px] font-normal opacity-70">14 {t('common.day')}</span>
+                                                        </button>
+                                                        <button type="button" onClick={() => addDays(30)}
+                                                            className="group relative py-3 px-2 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[14px] font-bold rounded-xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-sm hover:shadow-primary/30 hover:shadow-md hover:-translate-y-0.5 flex flex-col items-center gap-1">
+                                                            <span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">calendar_month</span>
+                                                            {t('common.month')}
+                                                            <span className="text-[10px] font-normal opacity-70">30 {t('common.day')}</span>
+                                                        </button>
+                                                        <button type="button" onClick={() => addDays(60)}
+                                                            className="group relative py-3 px-2 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[14px] font-bold rounded-xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-sm hover:shadow-primary/30 hover:shadow-md hover:-translate-y-0.5 flex flex-col items-center gap-1">
+                                                            <span className="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">event_note</span>
+                                                            {t('common.two_months')}
+                                                            <span className="text-[10px] font-normal opacity-70">60 {t('common.day')}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Column 2: Repetition & Timing */}
+                                                <div className="flex flex-col gap-6">
+                                                    {/* Repetition Packages */}
+                                                    {packages.length > 0 && (
+                                                        <div className="bg-surface-container-low border border-border-color rounded-2xl p-5 md:p-6 shadow-sm relative overflow-hidden flex-shrink-0">
+                                                            <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+                                                            <div className="flex flex-col gap-3">
+                                                                <div>
+                                                                    <h4 className="font-title-sm text-title-sm text-on-background mb-1 flex items-center gap-2">
+                                                                        <span className="material-symbols-outlined text-primary text-[20px]">layers</span>
+                                                                        {t('packages.select_package', { defaultValue: 'باقة التكرار' })}
+                                                                    </h4>
+                                                                    <p className="font-body-sm text-body-sm text-on-surface-variant text-[13px]">
+                                                                        {t('packages.package_info', { defaultValue: 'تحديد مدى تكرار إعلانك على الشاشة' })}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div className="relative">
+                                                                    <select
+                                                                        value={form.interval_minutes}
+                                                                        onChange={(e) => {
+                                                                            setForm(p => ({ ...p, interval_minutes: e.target.value }));
+                                                                            if (calculatedCost) setCalculatedCost(null);
+                                                                        }}
+                                                                        className="w-full appearance-none bg-white border-2 border-border-color hover:border-primary/40 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl px-4 py-2.5 text-on-background font-bold text-sm transition-all outline-none"
+                                                                        dir={dir}
+                                                                    >
+                                                                        <option value="" disabled>{t('packages.select_package', { defaultValue: 'اختر باقة التكرار' })}</option>
+                                                                        {packages.map(pkg => (
+                                                                            <option key={pkg.package_id} value={pkg.interval_minutes.toString()}>
+                                                                                {dir === 'rtl' ? pkg.name_ar : pkg.name_en} ({pkg.interval_minutes} {t('common.minutes_short', { defaultValue: 'دقيقة' })}) {pkg.price_multiplier != 1 ? `x${pkg.price_multiplier}` : ''}
+                                                                            </option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <div className={`absolute top-1/2 -translate-y-1/2 pointer-events-none flex items-center ${dir === 'rtl' ? 'left-4' : 'right-4'}`}>
+                                                                        <span className="material-symbols-outlined text-outline-variant">expand_more</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     )}
 
-                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-                                                        <button type="button" onClick={() => addDays(7)}
-                                                            className="group relative py-4 px-5 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[15px] font-extrabold rounded-2xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-md hover:shadow-primary/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">date_range</span>
-                                                            {t('common.week')}
-                                                            <span className="text-[11px] font-normal opacity-70">7 {t('common.days')}</span>
-                                                        </button>
-                                                        <button type="button" onClick={() => addDays(14)}
-                                                            className="group relative py-4 px-5 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[15px] font-extrabold rounded-2xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-md hover:shadow-primary/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">view_week</span>
-                                                            {t('common.two_weeks')}
-                                                            <span className="text-[11px] font-normal opacity-70">14 {t('common.day')}</span>
-                                                        </button>
-                                                        <button type="button" onClick={() => addDays(30)}
-                                                            className="group relative py-4 px-5 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[15px] font-extrabold rounded-2xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-md hover:shadow-primary/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">calendar_month</span>
-                                                            {t('common.month')}
-                                                            <span className="text-[11px] font-normal opacity-70">30 {t('common.day')}</span>
-                                                        </button>
-                                                        <button type="button" onClick={() => addDays(60)}
-                                                            className="group relative py-4 px-5 bg-gradient-to-br from-primary-container/40 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white text-[15px] font-extrabold rounded-2xl transition-all duration-200 border-2 border-primary/25 hover:border-primary shadow-md hover:shadow-primary/30 hover:shadow-lg hover:-translate-y-0.5 flex flex-col items-center gap-1">
-                                                            <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">event_note</span>
-                                                            {t('common.two_months')}
-                                                            <span className="text-[11px] font-normal opacity-70">60 {t('common.day')}</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                    {/* Target Timing */}
+                                                    <div className="bg-surface-container-low border border-border-color rounded-2xl p-5 md:p-6 text-center shadow-sm relative overflow-hidden flex-1">
+                                                        <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+                                                        <h4 className="font-title-sm text-title-sm text-on-background mb-2 flex items-center justify-center gap-2">
+                                                            <span className="material-symbols-outlined text-primary text-[20px]">schedule</span>
+                                                            {t('ads.target_timing_daily')}
+                                                        </h4>
+                                                        <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 text-[13px]">
+                                                            {t('ads.target_timing_desc')}
+                                                        </p>
 
-                                            {/* Repetition Packages */}
-                                            {packages.length > 0 && (
-                                                <div className="bg-surface-container-low border border-border-color rounded-2xl p-6 mb-10 shadow-sm relative overflow-hidden">
-                                                    <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
-                                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                        <div>
-                                                            <h4 className="font-title-sm text-title-sm text-on-background mb-1 flex items-center gap-2">
-                                                                <span className="material-symbols-outlined text-primary">layers</span>
-                                                                {t('packages.select_package', { defaultValue: 'باقة التكرار' })}
-                                                            </h4>
-                                                            <p className="font-body-sm text-body-sm text-on-surface-variant">
-                                                                {t('packages.package_info', { defaultValue: 'تحديد مدى تكرار إعلانك على الشاشة' })}
-                                                            </p>
+                                                        <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
+                                                            <button type="button"
+                                                                onClick={() => { setForm(p => ({ ...p, target_start_time: '00:00', target_end_time: '23:59', daily_shift: 'all' })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all shadow-sm ${form.daily_shift === 'all' || (form.target_start_time === '00:00' && form.target_end_time === '23:59') ? 'bg-primary text-white border-primary ring-2 ring-primary/20' : 'bg-white text-on-surface-variant border-border-color hover:bg-primary-container/20 hover:text-primary hover:border-primary/40'}`}>
+                                                                <span className="material-symbols-outlined text-[18px]">all_inclusive</span>
+                                                                <span className="font-bold text-[13px]">{t('ads.all_day_24h')}</span>
+                                                            </button>
+                                                            <button type="button"
+                                                                onClick={() => { setForm(p => ({ ...p, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                className={`px-4 py-2 rounded-xl border flex items-center gap-2 transition-all shadow-sm ${form.daily_shift !== 'all' && (form.target_start_time !== '00:00' || form.target_end_time !== '23:59') ? 'bg-primary text-white border-primary ring-2 ring-primary/20' : 'bg-white text-on-surface-variant border-border-color hover:bg-primary-container/20 hover:text-primary hover:border-primary/40'}`}>
+                                                                <span className="material-symbols-outlined text-[18px]">tune</span>
+                                                                <span className="font-bold text-[13px]">{t('ads.custom_times')}</span>
+                                                            </button>
                                                         </div>
 
-                                                        <div className="w-full md:w-1/2 lg:w-1/3 relative">
-                                                            <select
-                                                                value={form.interval_minutes}
-                                                                onChange={(e) => {
-                                                                    setForm(p => ({ ...p, interval_minutes: e.target.value }));
-                                                                    if (calculatedCost) setCalculatedCost(null);
-                                                                }}
-                                                                className="w-full appearance-none bg-white border-2 border-border-color hover:border-primary/40 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-xl px-4 py-3 text-on-background font-bold text-sm transition-all outline-none"
-                                                                dir={dir}
-                                                            >
-                                                                <option value="" disabled>{t('packages.select_package', { defaultValue: 'اختر باقة التكرار' })}</option>
-                                                                {packages.map(pkg => (
-                                                                    <option key={pkg.package_id} value={pkg.interval_minutes.toString()}>
-                                                                        {dir === 'rtl' ? pkg.name_ar : pkg.name_en} ({pkg.interval_minutes} {t('common.minutes_short', { defaultValue: 'دقيقة' })}) {pkg.price_multiplier != 1 ? `x${pkg.price_multiplier}` : ''}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                            <div className={`absolute top-1/2 -translate-y-1/2 pointer-events-none flex items-center ${dir === 'rtl' ? 'left-4' : 'right-4'}`}>
-                                                                <span className="material-symbols-outlined text-outline-variant">expand_more</span>
+                                                        <div className="flex flex-col xl:flex-row gap-4 pt-4 border-t border-border-color/50">
+                                                            <div className="flex-1">
+                                                                <label className={`block font-title-sm text-title-sm text-on-background mb-2 text-${dir === 'rtl' ? 'right' : 'left'}`}>{t('ads.start_time')} <span className="text-error">*</span></label>
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="time"
+                                                                        value={form.target_start_time}
+                                                                        onChange={(e) => { setForm(p => ({ ...p, target_start_time: e.target.value, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                        className="w-full border border-border-color bg-white rounded-xl px-3 py-2.5 font-title-sm text-[15px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-left shadow-sm"
+                                                                        style={{ paddingRight: dir === 'rtl' ? '36px' : '12px', paddingLeft: dir === 'ltr' ? '36px' : '12px' }}
+                                                                        dir="ltr"
+                                                                    />
+                                                                    <span className={`material-symbols-outlined text-[20px] absolute ${dir === 'rtl' ? 'right-2' : 'left-2'} top-1/2 -translate-y-1/2 text-primary pointer-events-none`}>schedule</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Target Timing (Replaces rigid shift packages) */}
-                                            <div className="bg-surface-container-low border border-border-color rounded-2xl p-6 mb-10 text-center shadow-sm relative overflow-hidden">
-                                                <div className="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
-                                                <h4 className="font-title-sm text-title-sm text-on-background mb-2 flex items-center justify-center gap-2">
-                                                    <span className="material-symbols-outlined text-primary">schedule</span>
-                                                    {t('ads.target_timing_daily')}
-                                                </h4>
-                                                <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-                                                    {t('ads.target_timing_desc')}
-                                                    <br />
-                                                    <span className="text-primary text-[13px] font-bold mt-1 inline-block">{t('ads.peak_hours_note')}</span>
-                                                </p>
-
-                                                <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-                                                    <button type="button"
-                                                        onClick={() => { setForm(p => ({ ...p, target_start_time: '00:00', target_end_time: '23:59', daily_shift: 'all' })); if (calculatedCost) setCalculatedCost(null); }}
-                                                        className={`px-5 py-3 rounded-xl border flex items-center gap-2 transition-all shadow-sm ${form.daily_shift === 'all' || (form.target_start_time === '00:00' && form.target_end_time === '23:59') ? 'bg-primary text-white border-primary ring-2 ring-primary/20' : 'bg-white text-on-surface-variant border-border-color hover:bg-primary-container/20 hover:text-primary hover:border-primary/40'}`}>
-                                                        <span className="material-symbols-outlined text-[20px]">all_inclusive</span>
-                                                        <span className="font-bold text-[14px]">{t('ads.all_day_24h')}</span>
-                                                    </button>
-                                                    <button type="button"
-                                                        onClick={() => { setForm(p => ({ ...p, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
-                                                        className={`px-5 py-3 rounded-xl border flex items-center gap-2 transition-all shadow-sm ${form.daily_shift !== 'all' && (form.target_start_time !== '00:00' || form.target_end_time !== '23:59') ? 'bg-primary text-white border-primary ring-2 ring-primary/20' : 'bg-white text-on-surface-variant border-border-color hover:bg-primary-container/20 hover:text-primary hover:border-primary/40'}`}>
-                                                        <span className="material-symbols-outlined text-[20px]">tune</span>
-                                                        <span className="font-bold text-[14px]">{t('ads.custom_times')}</span>
-                                                    </button>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-2xl mx-auto pt-4 border-t border-border-color/50">
-                                                    <div>
-                                                        <label className={`block font-title-sm text-title-sm text-on-background mb-3 text-${dir === 'rtl' ? 'right' : 'left'}`}>{t('ads.start_time')} <span className="text-error">*</span></label>
-                                                        <div className="relative">
-                                                            <input
-                                                                type="time"
-                                                                value={form.target_start_time}
-                                                                onChange={(e) => { setForm(p => ({ ...p, target_start_time: e.target.value, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
-                                                                className="w-full border border-border-color bg-white rounded-xl px-4 py-3.5 font-title-sm text-[16px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-left shadow-sm"
-                                                                style={{ paddingRight: dir === 'rtl' ? '48px' : '16px', paddingLeft: dir === 'ltr' ? '48px' : '16px' }}
-                                                                dir="ltr"
-                                                            />
-                                                            <span className={`material-symbols-outlined text-[24px] absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-primary pointer-events-none`}>schedule</span>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className={`block font-title-sm text-title-sm text-on-background mb-3 text-${dir === 'rtl' ? 'right' : 'left'}`}>{t('ads.end_time')} <span className="text-error">*</span></label>
-                                                        <div className="relative">
-                                                            <input
-                                                                type="time"
-                                                                value={form.target_end_time}
-                                                                onChange={(e) => { setForm(p => ({ ...p, target_end_time: e.target.value, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
-                                                                className="w-full border border-border-color bg-white rounded-xl px-4 py-3.5 font-title-sm text-[16px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-left shadow-sm"
-                                                                style={{ paddingRight: dir === 'rtl' ? '48px' : '16px', paddingLeft: dir === 'ltr' ? '48px' : '16px' }}
-                                                                dir="ltr"
-                                                            />
-                                                            <span className={`material-symbols-outlined text-[24px] absolute ${dir === 'rtl' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-error pointer-events-none`}>schedule</span>
+                                                            <div className="flex-1">
+                                                                <label className={`block font-title-sm text-title-sm text-on-background mb-2 text-${dir === 'rtl' ? 'right' : 'left'}`}>{t('ads.end_time')} <span className="text-error">*</span></label>
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="time"
+                                                                        value={form.target_end_time}
+                                                                        onChange={(e) => { setForm(p => ({ ...p, target_end_time: e.target.value, daily_shift: 'custom' })); if (calculatedCost) setCalculatedCost(null); }}
+                                                                        className="w-full border border-border-color bg-white rounded-xl px-3 py-2.5 font-title-sm text-[15px] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-left shadow-sm"
+                                                                        style={{ paddingRight: dir === 'rtl' ? '36px' : '12px', paddingLeft: dir === 'ltr' ? '36px' : '12px' }}
+                                                                        dir="ltr"
+                                                                    />
+                                                                    <span className={`material-symbols-outlined text-[20px] absolute ${dir === 'rtl' ? 'right-2' : 'left-2'} top-1/2 -translate-y-1/2 text-error pointer-events-none`}>schedule</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
