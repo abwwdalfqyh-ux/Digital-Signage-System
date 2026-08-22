@@ -160,8 +160,8 @@ const DefaultContentPage = () => {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl w-full min-w-[350px] max-w-lg overflow-hidden shadow-2xl my-auto">
                         <div className="p-6">
                             <h2 className="text-xl font-bold mb-4">{t('defaultContent.add_title')}</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">

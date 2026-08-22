@@ -29,7 +29,7 @@ class GlobalErrorBoundaryInner extends React.Component {
             const { t } = this.props;
             return (
                 <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center p-4">
-                    <div className="bg-[#121215]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-10 max-w-md text-center">
+                    <div className="bg-[#121215]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-10 w-full min-w-[320px] max-w-md text-center">
                         <div className="bg-red-500/10 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6">
                             <AlertTriangle className="w-10 h-10 text-red-400" />
                         </div>
