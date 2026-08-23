@@ -127,7 +127,8 @@
     "suspended": "موقوف",
     "unavailable": "غير متوفر",
     "maintenance": "صيانة",
-    "save_changes": "حفظ التغييرات"
+    "save_changes": "حفظ التغييرات",
+    "revert": "تراجع"
   },
   "auth": {
     "login_title": "تسجيل الدخول",

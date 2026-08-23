@@ -126,7 +126,8 @@
     "suspended": "Suspended",
     "unavailable": "Unavailable",
     "maintenance": "Maintenance",
-    "save_changes": "Save Changes"
+    "save_changes": "Save Changes",
+    "revert": "Revert"
   },
   "auth": {
     "login_title": "Login",

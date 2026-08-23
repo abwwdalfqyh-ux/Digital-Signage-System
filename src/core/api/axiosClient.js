@@ -84,7 +84,27 @@ axiosClient.interceptors.response.use(
 
         // 3. Handle 422 Validation Errors
         if (response.status === 422) {
-            const firstError = Object.values(response.data.errors || {})[0]?.[0];
+            let firstError = Object.values(response.data.errors || {})[0]?.[0];
+            
+            if (isAr && typeof firstError === 'string') {
+                const lowerError = firstError.toLowerCase();
+                if (lowerError.includes('after or equal to today')) {
+                    firstError = 'يجب أن يكون التاريخ اليوم أو في المستقبل.';
+                } else if (lowerError.includes('after or equal to start_date') || lowerError.includes('after or equal to start date')) {
+                    firstError = 'يجب أن يكون تاريخ النهاية بعد أو يساوي تاريخ البداية.';
+                } else if (lowerError.includes('required')) {
+                    firstError = 'يوجد حقل مطلوب مفقود.';
+                }
+                
+                // Override the message so components that catch this error show the Arabic text
+                if (error.response.data) {
+                    error.response.data.message = firstError;
+                }
+            }
+
+            // We don't add toast here if the calling function handles it, but since this is global, we add it.
+            // Note: If the component catches and adds a toast too, we might get duplicate toasts.
+            // To prevent this, components should check if the error is 422 and ignore it if handled globally.
             addToast(firstError || (isAr ? "البيانات المدخلة غير صحيحة." : "Invalid input data."), 'warning');
             return Promise.reject(error);
         }
