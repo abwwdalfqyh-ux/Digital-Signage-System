@@ -47,6 +47,7 @@ const SettingsPage = () => {
         smtp_pass: '',
         backup_disk: 'local',
         auto_backup_schedule: 'daily',
+        max_ad_size_mb: 50,
     });
 
     const [originalData, setOriginalData] = useState({ ...formData });
@@ -204,6 +205,7 @@ const SettingsPage = () => {
                                     <div className="md:col-span-2"><label className="block text-sm font-bold mb-2">{t('settings.platform_name')}</label><input type="text" name="platform_name" value={sysSettings.platform_name} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
                                     <div><label className="block text-sm font-bold mb-2">{t('settings.support_email')}</label><input type="email" dir="ltr" name="support_email" value={sysSettings.support_email} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
                                     <div><label className="block text-sm font-bold mb-2">{t('settings.support_phone')}</label><input type="text" dir="ltr" name="support_phone" value={sysSettings.support_phone} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
+                                    <div className="md:col-span-2"><label className="block text-sm font-bold mb-2">الحد الأقصى لحجم الإعلان (ميجابايت)</label><input type="number" name="max_ad_size_mb" value={sysSettings.max_ad_size_mb} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
                                 </div>
                                 <div className="mt-6 pt-6 border-t border-outline-variant/40">
                                     <div className="flex items-center justify-between bg-error-container/20 p-5 rounded-2xl border border-error/20">

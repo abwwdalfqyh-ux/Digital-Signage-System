@@ -14,6 +14,7 @@ import ScreenAvailabilityModal from './components/ScreenAvailabilityModal';
 import usePermission from '../../hooks/usePermission';
 import ScreenMapView from '../screens/components/ScreenMapView';
 import useTranslation from '../../i18n/useTranslation';
+import { useSettings } from '../../hooks/api/useSettings';
 
 const CreateAdPage = () => {
     const navigate = useNavigate();
@@ -38,6 +39,9 @@ const CreateAdPage = () => {
     const [previewUrl, setPreviewUrl] = useState(null);
     const { can } = usePermission();
     const { t, dir } = useTranslation();
+
+    const { data: systemSettings } = useSettings();
+    const maxAdSizeMb = systemSettings?.max_ad_size_mb ? parseInt(systemSettings.max_ad_size_mb) : 50;
 
     // ── Step-3 search & geo filter state ─────────────────────────────────
     const [screenSearch, setScreenSearch] = useState('');
@@ -159,8 +163,8 @@ const CreateAdPage = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
 
-        if (file && file.size > 50 * 1024 * 1024) {
-            addToast(t('ads.file_size_exceeds_50mb'), 'error');
+        if (file && file.size > maxAdSizeMb * 1024 * 1024) {
+            addToast(t('ads.file_size_exceeded').replace('{size}', maxAdSizeMb), 'error');
             e.target.value = null;
             return;
         }
@@ -1040,7 +1044,11 @@ const CreateAdPage = () => {
                                                     <span className="material-symbols-outlined text-primary text-xl">image</span>
                                                     <h3 className="font-title-lg text-title-lg text-on-background">{t('ads.ad_production')}</h3>
                                                 </div>
-                                                <p className="font-body-md text-body-md text-on-surface-variant">{t('ads.ad_production_desc')}</p>
+                                                <p className="font-body-md text-body-md text-on-surface-variant mb-4">{t('ads.ad_production_desc')}</p>
+                                                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-start gap-3">
+                                                    <span className="material-symbols-outlined text-primary mt-0.5">info</span>
+                                                    <p className="text-sm text-primary-container font-medium">{t('ads.ad_size_instruction').replace('{size}', maxAdSizeMb)}</p>
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1089,7 +1097,7 @@ const CreateAdPage = () => {
                                                                     <p className="font-title-md text-title-md text-on-background mb-1 font-bold">
                                                                         {t('ads.click_or_drag_file')}
                                                                     </p>
-                                                                    <p className="font-caption text-caption text-outline">MP4, MOV, JPEG, PNG ({t('ads.max_size_50mb')})</p>
+                                                                    <p className="font-caption text-caption text-outline">MP4, MOV, JPEG, PNG ({t('ads.max_ad_size').replace('{size}', maxAdSizeMb)})</p>
                                                                 </div>
                                                             </div>
                                                         )}
