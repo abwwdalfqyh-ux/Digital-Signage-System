@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, Plus, CheckCircle, XCircle, Trash2, Eye, PauseCircle, PlayCircle, CreditCard, Activity, Clock, Ban, DollarSign, Calendar, Info, Layers, User, Server, RefreshCw } from 'lucide-react';
+import { Megaphone, Plus, CheckCircle, XCircle, Trash2, Eye, PauseCircle, PlayCircle, CreditCard, Activity, Clock, Ban, DollarSign, Calendar, Info, Layers, User, Server, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
@@ -173,7 +173,7 @@ const AdsPage = () => {
                     </div>
                     <p className="text-base text-[#434655]">{t('ads.live_ad_desc')}</p>
                 </div>
-                {can('create_campaigns') && (
+                {(can('create_campaigns') || can('review_ads')) && (
                     <div className="flex items-center gap-[12px]">
                         <button
                             onClick={handleRefresh}
@@ -183,11 +183,22 @@ const AdsPage = () => {
                         >
                             <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
                         </button>
-                        <button onClick={() => navigate('/dashboard/ads/create')}
-                            className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
-                            <Plus className="w-5 h-5" />
-                            {t('ads.start_new_campaign')}
-                        </button>
+                        
+                        {can('review_ads') && (
+                            <button onClick={() => navigate('/dashboard/ads/approval')}
+                                className="bg-white hover:bg-[#f3f4f6] text-[#141b2b] border border-[#E5E7EB] px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
+                                <ShieldCheck className="w-5 h-5 text-[#004ac6]" />
+                                {t('ads.review_ads')}
+                            </button>
+                        )}
+
+                        {can('create_campaigns') && (
+                            <button onClick={() => navigate('/dashboard/ads/create')}
+                                className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
+                                <Plus className="w-5 h-5" />
+                                {t('ads.start_new_campaign')}
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

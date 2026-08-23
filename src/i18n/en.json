@@ -125,7 +125,8 @@
     "unpaid": "Unpaid",
     "suspended": "Suspended",
     "unavailable": "Unavailable",
-    "maintenance": "Maintenance"
+    "maintenance": "Maintenance",
+    "save_changes": "Save Changes"
   },
   "auth": {
     "login_title": "Login",
@@ -1137,7 +1138,8 @@
     "max_ad_size": "Max file size: {size}MB",
     "file_size_exceeded": "File size exceeds the allowed {size} MB",
     "ad_size_instruction": "Please ensure the uploaded ad size does not exceed the limit set by the administration ({size} MB) to ensure fast processing.",
-    "create": "Create Ad"
+    "create": "Create Ad",
+    "review_ads": "Review Ads"
   },
   "financial": {
     "sav_transaction": "Save Transaction",
@@ -2037,7 +2039,8 @@
     "schedule_daily": "Daily",
     "schedule_weekly": "Weekly",
     "download_data_now": "Download Data Now",
-    "restore_from_file": "Restore from File"
+    "restore_from_file": "Restore from File",
+    "max_ad_size_mb": "Max Ad Size (MB)"
   },
   "layout": {
     "brand_sub": "Ad Management",

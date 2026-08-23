@@ -126,7 +126,8 @@
     "unpaid": "غير مدفوع",
     "suspended": "موقوف",
     "unavailable": "غير متوفر",
-    "maintenance": "صيانة"
+    "maintenance": "صيانة",
+    "save_changes": "حفظ التغييرات"
   },
   "auth": {
     "login_title": "تسجيل الدخول",
@@ -1140,7 +1141,8 @@
     "max_ad_size": "الحد الأقصى للملف: {size}MB",
     "file_size_exceeded": "حجم الملف يتجاوز {size} ميجابايت المسموح بها",
     "ad_size_instruction": "يرجى التأكد من أن حجم الإعلان المرفوع لا يتجاوز السعة المحددة من قبل الإدارة ({size} ميجابايت) لضمان سرعة المعالجة.",
-    "create": "إنشاء إعلان"
+    "create": "إنشاء إعلان",
+    "review_ads": "مراجعة الإعلانات"
   },
   "financial": {
     "sav_transaction": "حفظ العملية",
@@ -2040,7 +2042,8 @@
     "schedule_daily": "يومياً",
     "schedule_weekly": "أسبوعياً",
     "download_data_now": "تحميل البيانات الآن",
-    "restore_from_file": "استعادة من ملف"
+    "restore_from_file": "استعادة من ملف",
+    "max_ad_size_mb": "الحد الأقصى لحجم الإعلان (ميجابايت)"
   },
   "layout": {
     "brand_sub": "إدارة الإعلانات",

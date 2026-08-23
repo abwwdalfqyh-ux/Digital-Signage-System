@@ -282,7 +282,7 @@ const CreateAdPage = () => {
             if (val !== '' && val !== null && !['start_date', 'end_date', 'target_start_time', 'target_end_time'].includes(key)) {
                 if (['total_cost'].includes(key)) {
                     formData.append(key, Number(val));
-                } else if (key === 'video_duration_sec') {
+                } else if (key === 'duration') {
                     formData.append('duration', val === 0 ? 10 : val);
                 } else {
                     formData.append(key, val);
@@ -385,142 +385,126 @@ const CreateAdPage = () => {
 
     return (
         <div className="flex-1 flex flex-col min-h-screen bg-background rounded-2xl overflow-hidden shadow-sm border border-border-color">
-            <header className="bg-surface/95 backdrop-blur-md border-b border-border-color sticky top-0 z-30">
-                <div className="flex items-center justify-between px-5 md:px-6 h-13 gap-3" style={{ height: '52px' }}>
-                    {/* Right: back + step dots */}
-                    <div className="flex items-center gap-2.5">
-                        <button onClick={() => navigate('/dashboard/ads')} className="group flex items-center gap-1.5 text-on-surface-variant hover:text-primary transition-colors">
-                            <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5" style={{ transform: dir === 'ltr' ? 'rotate(180deg)' : 'none' }}>arrow_forward</span>
-                            <span className="hidden md:block font-label-md text-label-md">{t('ads.title')}</span>
-                        </button>
-                        <div className="h-4 w-px bg-outline-variant hidden sm:block"></div>
-                        <div className="hidden sm:flex items-center gap-1">
-                            {steps.map(s => (
-                                <div key={s.id} className={`transition-all duration-300 rounded-full ${s.id < currentStep ? 'w-4 h-1.5 bg-secondary' :
-                                    s.id === currentStep ? 'w-6 h-1.5 bg-primary' :
-                                        'w-1.5 h-1.5 bg-outline-variant'
-                                    }`} />
-                            ))}
+            <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm transition-all">
+                <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between h-16 sm:h-20">
+                        {/* Left/Start: Title and Back */}
+                        <div className="flex items-center gap-4">
+                            <button 
+                                onClick={() => navigate('/dashboard/ads')} 
+                                className="w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-all border border-outline-variant/30 shadow-sm group"
+                            >
+                                <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1" style={{ transform: dir === 'ltr' ? 'rotate(180deg)' : 'none' }}>arrow_forward</span>
+                            </button>
+                            <div>
+                                <h1 className="text-lg sm:text-xl font-black text-on-surface flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: '"FILL" 1' }}>campaign</span>
+                                    <span className="hidden sm:inline">{t('ads.launch_new_campaign')}</span>
+                                    <span className="sm:hidden">{t('ads.title')}</span>
+                                </h1>
+                                <p className="text-xs font-bold text-primary/80 hidden sm:block">
+                                    {steps[currentStep - 1]?.title} · {t('ads.step')} {currentStep} {t('ads.of')} {steps.length}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    {/* Center: title */}
-                    <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-                        <span className="material-symbols-outlined text-primary text-[16px]" style={{ fontVariationSettings: '"FILL" 1' }}>campaign</span>
-                        <span className="font-label-lg text-label-lg text-on-surface font-bold hidden sm:block">{t('ads.launch_campaign')}</span>
-                        <span className="font-caption text-caption text-outline hidden md:block">· {steps[currentStep - 1]?.title}</span>
-                    </div>
-                    {/* Left: KPI badges */}
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1 rounded-lg border border-border-color">
-                            <span className="material-symbols-outlined text-[14px] text-outline">payments</span>
-                            <span className="font-label-md text-label-md text-on-surface font-bold" dir="ltr">{calculatedCost ? `$${(calculatedCost ? Number(calculatedCost).toFixed(2) : "0.00")}` : '—'}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1 rounded-lg border border-border-color">
-                            <span className="material-symbols-outlined text-[14px] text-outline">desktop_windows</span>
-                            <span className="font-label-md text-label-md text-on-surface font-bold">{selectedScreens.length}</span>
+
+                        {/* Right/End: Stats & Actions */}
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            {/* KPI Badges */}
+                            <div className="hidden md:flex items-center gap-4 bg-surface-container-lowest px-4 py-2 rounded-2xl border border-outline-variant/30 shadow-sm">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] text-outline font-bold uppercase tracking-wider">{t('ads.screens')}</span>
+                                    <span className="text-on-surface font-black text-sm leading-none flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-[14px] text-primary">desktop_windows</span>
+                                        {selectedScreens.length}
+                                    </span>
+                                </div>
+                                <div className="w-px h-6 bg-outline-variant/50"></div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] text-outline font-bold uppercase tracking-wider">{t('ads.total_cost')}</span>
+                                    <span className="text-secondary font-black text-sm leading-none flex items-center gap-1" dir="ltr">
+                                        <span className="material-symbols-outlined text-[14px]">payments</span>
+                                        {calculatedCost ? `$${Number(calculatedCost).toFixed(2)}` : '$0.00'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={() => navigate('/dashboard/ads')}
+                                className="group flex items-center gap-2 px-4 py-2 sm:py-2.5 bg-error/10 hover:bg-error/20 border border-error/20 text-error rounded-xl transition-all font-bold shadow-sm"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">close</span>
+                                <span className="hidden sm:block text-sm">{t('common.cancel')}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
-                {/* Animated gradient progress bar */}
-                <div className="h-[2px] w-full bg-outline-variant/20 relative overflow-hidden">
+
+                {/* Progress bar directly under header */}
+                <div className="h-1 w-full bg-outline-variant/20 relative">
                     <motion.div
-                        className="absolute top-0 right-0 h-full bg-gradient-to-l from-primary via-primary/80 to-secondary rounded-full"
-                        animate={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
-                        transition={{ duration: 0.45, ease: 'easeInOut' }}
+                        className="absolute top-0 h-full bg-gradient-to-r from-primary to-secondary rounded-full"
+                        style={{ [dir === 'rtl' ? 'right' : 'left']: 0 }}
+                        animate={{ width: `${(currentStep / steps.length) * 100}%` }}
+                        transition={{ duration: 0.5, ease: 'easeInOut' }}
                     />
                 </div>
             </header>
 
-            <main className="flex-1 p-3 md:p-5 w-full font-sans" dir={dir}>
-                {/* Slim compact title row */}
-                <div className="mb-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-container to-primary/20 text-primary flex items-center justify-center border border-primary/10 shadow-sm flex-shrink-0">
-                            <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: '"FILL" 1' }}>campaign</span>
-                        </div>
-                        <div>
-                            <h2 className="font-title-md text-title-md text-on-background font-bold leading-snug">{t('ads.launch_new_campaign')}</h2>
-                            <p className="font-caption text-caption text-on-surface-variant">{steps[currentStep - 1]?.title} · {t('ads.step')} {currentStep} {t('ads.of')} {steps.length}</p>
+            <main className="flex-1 p-4 md:p-6 w-full font-sans max-w-7xl mx-auto" dir={dir}>
+                {/* Modern Stepper Banner */}
+                <div className="mb-8 w-full bg-surface-container-lowest border border-outline-variant/30 shadow-sm rounded-3xl p-6 relative overflow-hidden hidden sm:block">
+                    {/* Glowing Orbs for Aesthetics */}
+                    <div className="absolute top-[-50%] right-[-10%] w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute bottom-[-50%] left-[-10%] w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div className="relative z-10 px-4 md:px-12 mt-2">
+                        {/* Connecting Line */}
+                        <div className="absolute top-5 left-12 right-12 h-1 bg-outline-variant/30 rounded-full -z-10"></div>
+                        <div 
+                            className="absolute top-5 h-1 bg-gradient-to-r from-primary to-secondary rounded-full -z-10 transition-all duration-500 ease-out"
+                            style={{ 
+                                width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - ${((currentStep - 1) / (steps.length - 1)) * 3}rem)`,
+                                [dir === 'rtl' ? 'right' : 'left']: '3rem'
+                            }}
+                        ></div>
+
+                        <div className="flex justify-between items-start relative">
+                            {steps.map((step) => {
+                                const current = isStepCurrent(step.id);
+                                const done = isStepDone(step.id);
+                                return (
+                                    <div 
+                                        key={step.id}
+                                        onClick={() => { if (step.id < currentStep || done) setCurrentStep(step.id); }}
+                                        className={`flex flex-col items-center gap-3 cursor-pointer group ${!current && !done ? 'opacity-40 hover:opacity-80' : ''} transition-all duration-300 w-28`}
+                                    >
+                                        <div className="relative flex justify-center">
+                                            {current && <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse scale-150"></div>}
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm z-10 transition-all duration-500 ${
+                                                done ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-100 group-hover:scale-110' :
+                                                current ? 'bg-surface border-4 border-primary text-primary shadow-xl scale-125' :
+                                                'bg-surface-container-highest border-2 border-outline-variant/50 text-outline group-hover:border-primary/50 group-hover:text-primary/70'
+                                            }`}>
+                                                {done ? <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span> : step.id}
+                                            </div>
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <span className={`text-xs font-black block transition-colors tracking-wide ${current ? 'text-primary' : done ? 'text-on-surface' : 'text-outline group-hover:text-on-surface-variant'}`}>
+                                                {step.title}
+                                            </span>
+                                            <span className="text-[10px] font-medium text-outline hidden md:block mt-0.5">
+                                                {step.subtitle}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
-                    <button
-                        onClick={() => navigate('/dashboard/ads')}
-                        className="group flex items-center gap-2 px-4 py-2 bg-surface-container-lowest hover:bg-error-container/20 border border-border-color hover:border-error/30 text-error rounded-xl transition-all font-label-md shadow-sm flex-shrink-0"
-                    >
-                        <span className="material-symbols-outlined text-[17px] transition-transform group-hover:translate-x-0.5" style={{ transform: dir === 'ltr' ? 'rotate(180deg)' : 'none' }}>arrow_forward</span>
-                        <span className="hidden sm:block">{t('common.cancel')}</span>
-                    </button>
                 </div>
 
                 <div className="flex flex-col gap-4 items-stretch">
-                    {/* CAMPAIGN STEPPER - Top (Horizontal) */}
-                    <div className="w-full bg-surface-container-low/50 backdrop-blur-2xl rounded-2xl border border-border-color shadow-sm p-3 overflow-hidden relative">
-                        <div className="flex items-center justify-between border-b border-border-color pb-2 mb-3">
-                            <h3 className="font-title-sm text-[14px] font-bold text-on-surface flex items-center gap-1.5">
-                                <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: '"FILL" 1' }}>flag</span>
-                                <span className="hidden sm:inline">{t('ads.campaign_path')}</span>
-                            </h3>
-
-                            {/* Summary stats */}
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-1.5 bg-surface-container-lowest rounded-lg px-2 py-1 border border-border-color">
-                                    <span className="material-symbols-outlined text-[14px] text-primary block">desktop_windows</span>
-                                    <span className="text-[12px] font-extrabold text-on-background leading-none">{selectedScreens.length}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 bg-surface-container-lowest rounded-lg px-2 py-1 border border-border-color">
-                                    <span className="material-symbols-outlined text-[14px] text-secondary block">payments</span>
-                                    <span className="text-[12px] font-extrabold text-on-background leading-none" dir="ltr">{calculatedCost ? `$${(calculatedCost ? Number(calculatedCost).toFixed(2) : "0.00")}` : '—'}</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="relative z-10 w-full">
-                            {/* Connector Lines container */}
-                            <div className="absolute top-4 left-[10%] right-[10%] h-[2px] bg-outline-variant/40 rounded-full -z-10 hidden sm:block"></div>
-                            
-                            {/* Progress Fill */}
-                            <div className={`absolute top-4 h-[2px] -z-10 rounded-full transition-all duration-500 ease-in-out bg-gradient-to-r from-primary to-secondary hidden sm:block ${dir === 'rtl' ? 'right-[10%]' : 'left-[10%]'}`} style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 80}%` }}></div>
-
-                            <ul className="flex justify-between items-start w-full relative gap-1">
-                                {steps.map((step) => {
-                                    const current = isStepCurrent(step.id);
-                                    const done = isStepDone(step.id);
-                                    return (
-                                        <li
-                                            key={step.id}
-                                            onClick={() => { if (step.id < currentStep || done) setCurrentStep(step.id); }}
-                                            className={`flex flex-col items-center gap-1.5 cursor-pointer transition-all duration-300 group flex-1
-                                                ${!current && !done ? 'opacity-55 hover:opacity-100' : ''}`}
-                                        >
-                                            <div className="flex-shrink-0 relative">
-                                                {done ? (
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-sm transform group-hover:scale-110 transition-transform text-white">
-                                                        <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span>
-                                                    </div>
-                                                ) : current ? (
-                                                    <>
-                                                        <div className="absolute inset-0 bg-primary/25 rounded-full animate-ping"></div>
-                                                        <div className="w-8 h-8 rounded-full border-[2px] border-primary bg-surface flex items-center justify-center shadow-sm relative z-10 text-primary scale-110">
-                                                            <span className="text-[13px] font-extrabold">{step.id}</span>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <div className="w-8 h-8 rounded-full border border-outline-variant bg-surface-container-lowest flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-colors bg-white">
-                                                        <span className="text-[13px] font-bold">{step.id}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="text-center w-full px-1">
-                                                <h4 className={`text-[10px] sm:text-[11px] font-bold truncate transition-colors leading-tight ${current ? 'text-primary' : done ? 'text-on-surface' : 'text-outline group-hover:text-on-surface'}`}>
-                                                    {step.title}
-                                                </h4>
-                                            </div>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    </div>
 
                     {/* MAIN FORM CARD - Bottom */}
                     <div className="flex-1 flex flex-col gap-4 min-w-0 w-full">

@@ -66,7 +66,6 @@ export const getNavItems = (roleId, lang = 'ar') => {
             return [
                 { path: '/dashboard', icon: LayoutDashboard, label: t('dashboard', lang) },
                 { path: '/dashboard/ads', icon: Megaphone, label: t('ads', lang) },
-                { path: '/dashboard/ads/approval', icon: ShieldCheck, label: t('adsApproval', lang) },
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
                 { path: '/dashboard/financial', icon: Wallet, label: t('financial', lang) },
                 { path: '/dashboard/reports', icon: FileText, label: t('reports', lang) },
@@ -103,7 +102,6 @@ export const getNavItems = (roleId, lang = 'ar') => {
             return [
                 { path: '/dashboard', icon: LayoutDashboard, label: t('dashboard', lang) },
                 { path: '/dashboard/ads', icon: Megaphone, label: t('ads', lang) },
-                { path: '/dashboard/ads/approval', icon: ShieldCheck, label: t('adsApproval', lang) },
                 { path: '/dashboard/payment-ops', icon: DollarSign, label: t('paymentOps', lang) },
                 { path: '/dashboard/screens', icon: Monitor, label: t('screens', lang) },
                 { path: '/dashboard/reports', icon: FileText, label: t('reports', lang) },
