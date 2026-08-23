@@ -1136,7 +1136,8 @@
     "delete_campaign_msg": "Are you sure you want to permanently delete this campaign? This action cannot be undone.",
     "max_ad_size": "Max file size: {size}MB",
     "file_size_exceeded": "File size exceeds the allowed {size} MB",
-    "ad_size_instruction": "Please ensure the uploaded ad size does not exceed the limit set by the administration ({size} MB) to ensure fast processing."
+    "ad_size_instruction": "Please ensure the uploaded ad size does not exceed the limit set by the administration ({size} MB) to ensure fast processing.",
+    "create": "Create Ad"
   },
   "financial": {
     "sav_transaction": "Save Transaction",

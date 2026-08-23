@@ -279,9 +279,11 @@ const CreateAdPage = () => {
         setUploadProgress(0);
         const formData = new FormData();
         Object.entries(form).forEach(([key, val]) => {
-            if (val !== '' && val !== null && !['start_date', 'end_date'].includes(key)) {
+            if (val !== '' && val !== null && !['start_date', 'end_date', 'target_start_time', 'target_end_time'].includes(key)) {
                 if (['total_cost'].includes(key)) {
                     formData.append(key, Number(val));
+                } else if (key === 'video_duration_sec') {
+                    formData.append('duration', val === 0 ? 10 : val);
                 } else {
                     formData.append(key, val);
                 }
@@ -312,19 +314,10 @@ const CreateAdPage = () => {
             navigate('/dashboard/ads');
         } catch (e) {
             console.error('API Error:', e.response?.data);
-            const detailedErrors = e.response?.data?.errors;
-            if (detailedErrors && typeof detailedErrors === 'object') {
-                const firstError = Object.values(detailedErrors)[0]?.[0];
-                if (firstError) {
-                    addToast(firstError, 'error');
-                    setLoading(false);
-                    setUploadProgress(0);
-                    return;
-                }
-            }
-            addToast(e.response?.data?.message || t('ads.campaign_upload_failed'), 'error');
+            // Notifications are already handled globally by axiosClient
         } finally {
             setLoading(false);
+            setUploadProgress(0);
         }
     };
 

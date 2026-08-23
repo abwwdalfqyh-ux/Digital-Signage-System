@@ -96,12 +96,22 @@ axiosClient.interceptors.response.use(
         }
 
         // 5. Generic Server Errors
-        // Sometimes response.data.message has SQL errors in English. 
-        // We can optionally hide raw SQL errors in production.
+        // Translate common backend English messages to Arabic
         let msg = response.data?.message;
-        if (msg && msg.includes('SQLSTATE')) {
-            msg = isAr ? "حدث خطأ في قاعدة البيانات، يرجى مراجعة الدعم الفني." : "A database error occurred, please contact support.";
+        if (isAr && typeof msg === 'string') {
+            if (msg.includes('SQLSTATE')) {
+                msg = "حدث خطأ في قاعدة البيانات، يرجى مراجعة الدعم الفني.";
+            } else if (msg.toLowerCase().includes('failed to upload') || msg.toLowerCase().includes('the file failed to upload')) {
+                msg = "حجم الملف يتجاوز الحد الأقصى المسموح به في السيرفر.";
+            } else if (msg.includes('format is invalid')) {
+                msg = "صيغة البيانات المدخلة غير صالحة.";
+            } else if (msg.includes('must be a file of type')) {
+                msg = "نوع الملف المرفق غير مدعوم.";
+            }
+        } else if (msg && msg.includes('SQLSTATE')) {
+            msg = "A database error occurred, please contact support.";
         }
+
         addToast(msg || (isAr ? "حدث خطأ غير متوقع في السيرفر." : "An unexpected server error occurred."), 'error');
         return Promise.reject(error);
     }
