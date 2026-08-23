@@ -183,14 +183,6 @@ const AdsPage = () => {
                         >
                             <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
                         </button>
-                        
-                        {can('review_ads') && (
-                            <button onClick={() => navigate('/dashboard/ads/approval')}
-                                className="bg-white hover:bg-[#f3f4f6] text-[#141b2b] border border-[#E5E7EB] px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
-                                <ShieldCheck className="w-5 h-5 text-[#004ac6]" />
-                                {t('ads.review_ads')}
-                            </button>
-                        )}
 
                         {can('create_campaigns') && (
                             <button onClick={() => navigate('/dashboard/ads/create')}

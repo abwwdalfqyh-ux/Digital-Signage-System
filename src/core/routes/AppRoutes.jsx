@@ -46,7 +46,7 @@ import PaymentOperationsPage from '../../modules/admin/PaymentOperationsPage';
 import AdminProfilePage from '../../modules/admin/AdminProfilePage';
 import FrequencyPackagesPage from '../../modules/admin/FrequencyPackagesPage';
 import DefaultContentPage from '../../modules/admin/DefaultContentPage';
-import AdsApprovalPage from '../../modules/ads/AdsApprovalPage';
+
 import AdDetailPage from '../../modules/ads/AdDetailPage';
 
 import SessionsPage from '../../modules/sessions/SessionsPage';
@@ -113,11 +113,7 @@ const AppRoutes = () => {
                         <CreateAdPage />
                     </RoleRoute>
                 } />
-                <Route path="ads/approval" element={
-                    <RoleRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.SECRETARY]}>
-                        <AdsApprovalPage />
-                    </RoleRoute>
-                } />
+
                 <Route path="ads/:id" element={<AdDetailPage />} />
 
                 {/* Users Module (Admin Only) */}
