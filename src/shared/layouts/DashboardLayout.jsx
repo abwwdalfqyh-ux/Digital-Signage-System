@@ -133,13 +133,28 @@ const DashboardLayout = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    /* WebSockets Real-time Notifications & Settings */
+    /* WebSockets Real-time Notifications & Settings + Fallback Polling */
     useEffect(() => {
         if (!user) return;
-        
-        // Notification Channel
+        let isMounted = true;
+
+        // ─── Initial load of unread count ───────────────────────────
+        const fetchUnread = async () => {
+            try {
+                const res = await axiosClient.get(ENDPOINTS.NOTIFICATIONS.ALL);
+                if (isMounted && res.data?.success) {
+                    setUnreadCount(res.data.unread_count || 0);
+                }
+            } catch (error) {
+                // Silent — not critical
+            }
+        };
+        fetchUnread();
+
+        // ─── WebSocket: Real-time notification updates ───────────────
         const userChannel = echo.private(`user.${user.user_id}`);
         userChannel.listen('NotificationSent', (e) => {
+            // WebSocket يُحدِّث العداد فوراً دون أي polling
             setUnreadCount(prev => prev + 1);
             let title = t('common.new notification');
             try {
@@ -150,14 +165,12 @@ const DashboardLayout = () => {
                     else if (parsed.key === 'notif title payout rejected') title = t('notifications.payout_rejected');
                 }
             } catch (err) {}
-            
             addToast(`🔔 ${title}`, 'info');
         });
 
-        // Global System Channel
+        // ─── WebSocket: System settings updates ──────────────────────
         const systemChannel = echo.channel('system.settings');
         systemChannel.listen('SettingsUpdated', (e) => {
-            // Update the React Query cache immediately with the new settings
             if (e.settings) {
                 queryClient.setQueryData(SETTINGS_QUERY_KEY, e.settings);
             } else {
@@ -165,34 +178,17 @@ const DashboardLayout = () => {
             }
         });
 
-        return () => {
-            echo.leave(`user.${user.user_id}`);
-            echo.leave('system.settings');
-        };
-    }, [user, addToast, queryClient, t]);
-
-    /* Fetch unread notifications count */
-    useEffect(() => {
-        let isMounted = true;
-        const fetchUnread = async () => {
-            try {
-                const res = await axiosClient.get(ENDPOINTS.NOTIFICATIONS.ALL);
-                if (isMounted && res.data?.success) {
-                    setUnreadCount(res.data.unread_count || 0);
-                }
-            } catch (error) {
-                console.error("Failed to fetch unread count:", error);
-            }
-        };
-
-        fetchUnread();
-        const intervalId = setInterval(fetchUnread, 60000); // Poll every minute
+        // ─── Fallback Polling (5 دقائق) — يعمل فقط إذا كان WebSocket معطَّلاً ───
+        // خُفِّض من polling كل دقيقة إلى كل 5 دقائق لتخفيف الحمل على السيرفر
+        const intervalId = setInterval(fetchUnread, 5 * 60 * 1000);
 
         return () => {
             isMounted = false;
             clearInterval(intervalId);
+            echo.leave(`user.${user.user_id}`);
+            echo.leave('system.settings');
         };
-    }, []);
+    }, [user, addToast, queryClient, t]);
 
     const canImpersonate = roleId === 1 || roleId === 7; // SuperAdmin or Admin
 

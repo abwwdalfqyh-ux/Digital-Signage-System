@@ -9,6 +9,8 @@ export const useAdminDashboard = () => {
       const res = await axiosClient.get(ENDPOINTS.DASHBOARD.OVERVIEW);
       return res.data?.data || res.data;
     },
+    staleTime: 60 * 1000,        // 1 دقيقة — لوحة التحكم تتحدّث بشكل معقول
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -19,6 +21,8 @@ export const useOwnerDashboard = () => {
       const res = await axiosClient.get(ENDPOINTS.OWNER.DASHBOARD);
       return res.data?.data || res.data;
     },
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -29,5 +33,7 @@ export const useAdvertiserDashboard = () => {
       const res = await axiosClient.get(ENDPOINTS.ADVERTISER.DASHBOARD);
       return res.data?.data || res.data;
     },
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };

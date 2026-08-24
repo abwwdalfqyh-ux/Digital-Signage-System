@@ -34,13 +34,7 @@ export const ENDPOINTS = {
         AVAILABILITY: (id) => `/screens/${id}/availability`,
         COMMAND: '/screens/command',
     },
-    SUPPORT: {
-        ALL: '/support/tickets',
-        CREATE: '/support/tickets',
-        GET: (id) => `/support/tickets/${id}`,
-        UPDATE: (id) => `/support/tickets/${id}`,
-        DELETE: (id) => `/support/tickets/${id}`,
-    },
+
     ADS: {
         ALL: '/ads',
         CREATE: '/ads',

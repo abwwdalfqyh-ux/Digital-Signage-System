@@ -15,13 +15,14 @@ import usePermission from '../../hooks/usePermission';
 import ScreenMapView from '../screens/components/ScreenMapView';
 import useTranslation from '../../i18n/useTranslation';
 import { useSettings } from '../../hooks/api/useSettings';
+import { useCategories, useAllScreens, useGovernorates, useRegionsByGov, useStreetsByRegion, useUsersByRole } from '../../hooks/api/useLookups';
+import { usePackages } from '../../hooks/api/usePackages';
 
 const CreateAdPage = () => {
     const navigate = useNavigate();
     const addToast = useToastStore(state => state.addToast);
     const [loading, setLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [screens, setScreens] = useState([]);
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [availabilityScreen, setAvailabilityScreen] = useState(null);
     const [currentStep, setCurrentStep] = useState(1);
@@ -31,11 +32,9 @@ const CreateAdPage = () => {
         total_cost: '', file: null,
         advertiser_id: '', video_duration_sec: 0
     });
-    const [categories, setCategories] = useState([]);
     const [calculatedCost, setCalculatedCost] = useState(null);
     const [costDetails, setCostDetails] = useState(null);
     const [costLoading, setCostLoading] = useState(false);
-    const [advertisers, setAdvertisers] = useState([]);
     const [previewUrl, setPreviewUrl] = useState(null);
     const { can } = usePermission();
     const { t, dir } = useTranslation();
@@ -43,92 +42,34 @@ const CreateAdPage = () => {
     const { data: systemSettings } = useSettings();
     const maxAdSizeMb = systemSettings?.max_ad_size_mb ? parseInt(systemSettings.max_ad_size_mb) : 50;
 
-    // ── Step-3 search & geo filter state ─────────────────────────────────
+    // ── React Query hooks بدلاً من axiosClient المباشر ── بيانات مخزّنة ولا تجلب من جديد عند كل زيارة
+    const { data: screens = [] } = useAllScreens();
+    const { data: categories = [] } = useCategories();
+    const { data: govList = [] } = useGovernorates();
+    const { data: advertisers = [] } = useUsersByRole(can('manage_all') ? 2 : null);
+    const { data: packagesData } = usePackages();
+    const packages = packagesData?.data || packagesData || [];
+
+    // ── Step-3 search & geo filter state ─────────────────────────────
     const [screenSearch, setScreenSearch] = useState('');
     const [filterGov, setFilterGov] = useState('');
     const [filterRegion, setFilterRegion] = useState('');
     const [filterStreet, setFilterStreet] = useState('');
-    const [geoFilterLoading, setGeoFilterLoading] = useState(false);
-    const [packages, setPackages] = useState([]);
-    const [govList, setGovList] = useState([]);
-    const [regionList, setRegionList] = useState([]);
-    const [streetList, setStreetList] = useState([]);
 
-    useEffect(() => {
-        const fetchScreens = async () => {
-            try {
-                const res = await axiosClient.get(ENDPOINTS.SCREENS.ALL);
-                setScreens(res.data || []);
-            } catch (e) { console.error(e); }
-        };
+    // ── Geo-filter cascade handlers using React Query ────────────────────
+    // المناطق والشوارع تُجلب تلقائياً بعد تحديد filterGov / filterRegion
+    const { data: regionList = [], isFetching: geoFilterLoading } = useRegionsByGov(filterGov);
+    const { data: streetList = [] } = useStreetsByRegion(filterRegion);
 
-        const fetchAdvertisers = async () => {
-            if (!can('manage_all')) return;
-            try {
-                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.USERS_BY_ROLE(2));
-                setAdvertisers(res.data || []);
-            } catch (e) { console.error(e); }
-        };
-
-        const fetchGovs = async () => {
-            try {
-                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.GOVERNORATES);
-                setGovList(res.data || []);
-            } catch (e) { console.error(e); }
-        };
-
-        const fetchCategories = async () => {
-            try {
-                const res = await axiosClient.get(ENDPOINTS.LOOKUPS.CATEGORIES);
-                setCategories(res.data || []);
-            } catch (e) { console.error(e); }
-        };
-
-        const fetchPackages = async () => {
-            try {
-                const res = await axiosClient.get(ENDPOINTS.PACKAGES.ACTIVE);
-                setPackages(res.data?.data || []);
-            } catch (e) { console.error(e); }
-        };
-
-        fetchScreens();
-        fetchAdvertisers();
-        fetchGovs();
-        fetchCategories();
-        fetchPackages();
-
-        return () => {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-        };
-    }, []);
-
-    // ── Geo-filter cascade handlers ───────────────────────────────────────
-    const handleFilterGovChange = async (govId) => {
+    const handleFilterGovChange = (govId) => {
         setFilterGov(govId);
         setFilterRegion('');
         setFilterStreet('');
-        setRegionList([]);
-        setStreetList([]);
-        if (!govId) return;
-        try {
-            setGeoFilterLoading(true);
-            const res = await axiosClient.get(ENDPOINTS.LOOKUPS.REGIONS_BY_GOV(govId));
-            setRegionList(res.data || []);
-        } catch (e) { console.error(e); }
-        finally { setGeoFilterLoading(false); }
     };
 
-    const handleFilterRegionChange = async (regionId) => {
+    const handleFilterRegionChange = (regionId) => {
         setFilterRegion(regionId);
         setFilterStreet('');
-        setStreetList([]);
-        if (!regionId) return;
-        try {
-            setGeoFilterLoading(true);
-            const res = await axiosClient.get(ENDPOINTS.LOOKUPS.STREETS_BY_REGION(regionId));
-            setStreetList(res.data || []);
-        } catch (e) { console.error(e); }
-        finally { setGeoFilterLoading(false); }
     };
 
     const clearGeoFilters = () => {
@@ -136,8 +77,6 @@ const CreateAdPage = () => {
         setFilterGov('');
         setFilterRegion('');
         setFilterStreet('');
-        setRegionList([]);
-        setStreetList([]);
     };
 
     // ── Derived: screens visible in Step 3 ───────────────────────────────

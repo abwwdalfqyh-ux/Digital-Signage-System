@@ -14,7 +14,9 @@ export const useAds = (page = 1, status = 'all', search = '') => {
       const res = await axiosClient.get(`${ENDPOINTS.ADS.ALL}?${params.toString()}`);
       return res.data;
     },
-    refetchInterval: 15000, // Live Polling every 15s
+    staleTime: 30 * 1000,        // البيانات "طازجة" لمدة 30 ثانية — لا تجلب من جديد
+    refetchOnWindowFocus: false, // لا تجلب عند التركيز على النافذة
+    // تم إزالة refetchInterval:15000 واستبداله بـ WebSocket invalidation
   });
 };
 

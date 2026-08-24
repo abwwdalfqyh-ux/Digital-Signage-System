@@ -10,9 +10,22 @@ export const useDurationDiscounts = () => {
       const res = await axiosClient.get(ENDPOINTS.DURATION_DISCOUNTS.ALL);
       return Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
     },
+    staleTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 };
 
+export const usePackages = () => {
+  return useQuery({
+    queryKey: ['packages'],
+    queryFn: async () => {
+      const res = await axiosClient.get(ENDPOINTS.PACKAGES.ACTIVE);
+      return res.data;
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes — الباقات تتغير نادراً
+    refetchOnWindowFocus: false,
+  });
+};
 
 
 export const useCreateDurationDiscount = () => {

@@ -64,3 +64,54 @@ export const useUsersByRole = (roleName) => {
     staleTime: 1000 * 60 * 10, // 10 minutes
   });
 };
+
+// ── بيانات نادراً ما تتغير — تُخزَّن 30 دقيقة في الذاكرة ──────────────────
+export const useCategories = () => {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const res = await axiosClient.get(ENDPOINTS.LOOKUPS.CATEGORIES);
+      return parseArray(res);
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes — التصنيفات تتغير نادراً
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useAllScreens = () => {
+  return useQuery({
+    queryKey: ['screens', 'all'],
+    queryFn: async () => {
+      const res = await axiosClient.get('/screens');
+      return Array.isArray(res.data) ? res.data : res.data?.data || [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useRegionsByGov = (govId) => {
+  return useQuery({
+    queryKey: ['regions', govId],
+    queryFn: async () => {
+      const res = await axiosClient.get(ENDPOINTS.LOOKUPS.REGIONS_BY_GOV(govId));
+      return parseArray(res);
+    },
+    enabled: !!govId,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useStreetsByRegion = (regionId) => {
+  return useQuery({
+    queryKey: ['streets', 'region', regionId],
+    queryFn: async () => {
+      const res = await axiosClient.get(ENDPOINTS.LOOKUPS.STREETS_BY_REGION(regionId));
+      return parseArray(res);
+    },
+    enabled: !!regionId,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: false,
+  });
+};

@@ -205,7 +205,7 @@ const SecretaryDashboard = () => {
     const handleApprove = async (ad) => {
         setActionLoading(ad.ad_id);
         try {
-            await axiosClient.put(ENDPOINTS.ADS.STATUS(ad.ad_id), { status: 'Active' });
+            await axiosClient.put(ENDPOINTS.ADS.STATUS(ad.ad_id), { status: 'waiting_payment' });
             addToast(t('secretary.approve_success'), 'success');
             fetchData(true);
         } catch (e) {
