@@ -175,6 +175,48 @@ const FinancialPage = () => {
                 </div>
             )
         },
+        {
+            key: 'transaction_type',
+            header: t('financial.transaction_type') || 'نوع العملية',
+            cell: (row) => {
+                let label = row.transaction_type;
+                let colorClass = "bg-gray-100 text-gray-700 border-gray-200";
+                
+                switch (row.transaction_type) {
+                    case 'payment':
+                    case 'payment_in':
+                        label = 'دفع إعلان';
+                        colorClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                        break;
+                    case 'payment_pending':
+                        label = 'مراجعة دفعة';
+                        colorClass = 'bg-orange-50 text-orange-700 border-orange-200';
+                        break;
+                    case 'platform_fee':
+                        label = 'عمولة منصة';
+                        colorClass = 'bg-purple-50 text-purple-700 border-purple-200';
+                        break;
+                    case 'payout_pending':
+                        label = 'أرباح مستحقة';
+                        colorClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                        break;
+                    case 'payout_requested':
+                        label = 'طلب سحب';
+                        colorClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
+                        break;
+                    case 'platform_payout_deduction':
+                        label = 'صرف أرباح';
+                        colorClass = 'bg-red-50 text-red-700 border-red-200';
+                        break;
+                }
+                
+                return (
+                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${colorClass} whitespace-nowrap`}>
+                        {label}
+                    </span>
+                );
+            }
+        },
         { 
             key: 'payment_method', 
             header: t('financial.payment_method'), 
