@@ -495,6 +495,7 @@ const FrequencyPackagesPage = () => {
                                 pkg={pkg}
                                 dir={dir}
                                 index={idx}
+                                t={t}
                                 onEdit={openModal}
                                 onDelete={id => setDeleteDialog({ open: true, id })}
                                 onToggle={handleToggle}
