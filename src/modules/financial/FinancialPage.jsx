@@ -211,9 +211,21 @@ const FinancialPage = () => {
                 }
                 
                 return (
-                    <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${colorClass} whitespace-nowrap`}>
-                        {label}
-                    </span>
+                    <div className="flex flex-col items-center gap-1">
+                        <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${colorClass} whitespace-nowrap`}>
+                            {label}
+                        </span>
+                        {row.advertisement?.title && (
+                            <span className="text-[10px] text-gray-500 max-w-[120px] truncate" title={row.advertisement.title}>
+                                إعلان: {row.advertisement.title}
+                            </span>
+                        )}
+                        {row.screen?.screen_name && (row.transaction_type === 'payout_pending' || row.transaction_type === 'platform_payout_deduction') && (
+                            <span className="text-[10px] text-gray-500 max-w-[120px] truncate" title={row.screen.screen_name}>
+                                شاشة: {row.screen.screen_name}
+                            </span>
+                        )}
+                    </div>
                 );
             }
         },
