@@ -68,6 +68,7 @@ export const ENDPOINTS = {
         APPROVE_PAYOUT: (id) => `/financial/approve-payout/${id}`,
         REJECT_PAYOUT: (id) => `/financial/reject-payout/${id}`,
         APPROVE: (id) => `/financial/approve-payment/${id}`,
+        REJECT: (id) => `/financial/reject-payment/${id}`,
         RECORD_PAYMENT: '/financial/payments',
     },
     PAYMENT: {

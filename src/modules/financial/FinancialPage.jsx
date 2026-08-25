@@ -7,7 +7,7 @@ import DynamicPageLoader from '../../shared/components/DynamicPageLoader';
 import Modal from '../../shared/components/Modal';
 import { useQueryClient } from '@tanstack/react-query';
 import echo from '../../core/api/echo';
-import { useLedger, useRecordPayment, useApprovePayout, useRejectPayout, useArchiveLedger } from '../../hooks/api/useFinancial';
+import { useLedger, useRecordPayment, useApprovePayout, useRejectPayout, useArchiveLedger, useApprovePayment, useRejectPayment } from '../../hooks/api/useFinancial';
 import useTranslation from '../../i18n/useTranslation';
 
 const FinancialPage = () => {
@@ -18,6 +18,8 @@ const FinancialPage = () => {
     const { mutateAsync: recordPayment } = useRecordPayment();
     const { mutateAsync: approvePayout, isPending: isApproving } = useApprovePayout();
     const { mutateAsync: rejectPayout, isPending: isRejecting } = useRejectPayout();
+    const { mutateAsync: approvePayment, isPending: isApprovingPayment } = useApprovePayment();
+    const { mutateAsync: rejectPayment, isPending: isRejectingPayment } = useRejectPayment();
 
     const data = ledgerData || { total_payments: 0, transactions: [] };
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -65,7 +67,11 @@ const FinancialPage = () => {
         e.preventDefault();
         if (!reviewForm.reference_number) return alert(t('financial.please_enter_ref_number'));
         try {
-            await approvePayout({ id: reviewModalData.ledger_id, reference_number: reviewForm.reference_number });
+            if (reviewModalData.transaction_type === 'payment_pending') {
+                await approvePayment({ id: reviewModalData.ledger_id, payload: { reference_number: reviewForm.reference_number } });
+            } else {
+                await approvePayout({ id: reviewModalData.ledger_id, reference_number: reviewForm.reference_number });
+            }
             setReviewModalData(null);
             setReviewForm({ reference_number: '', reason: '' });
         } catch (error) {}
@@ -75,7 +81,11 @@ const FinancialPage = () => {
         e.preventDefault();
         if (!reviewForm.reason) return alert(t('financial.please_enter_reject_reason'));
         try {
-            await rejectPayout({ id: reviewModalData.ledger_id, reason: reviewForm.reason });
+            if (reviewModalData.transaction_type === 'payment_pending') {
+                await rejectPayment({ id: reviewModalData.ledger_id, payload: { reason: reviewForm.reason } });
+            } else {
+                await rejectPayout({ id: reviewModalData.ledger_id, reason: reviewForm.reason });
+            }
             setReviewModalData(null);
             setReviewForm({ reference_number: '', reason: '' });
         } catch (error) {}
@@ -216,7 +226,7 @@ const FinancialPage = () => {
             key: 'actions',
             header: t('common.actions'),
             cell: (row) => {
-                if (row.transaction_type === 'payout_requested' && row.status === 'pending') {
+                if ((row.transaction_type === 'payout_requested' || row.transaction_type === 'payment_pending') && row.status === 'pending') {
                     return (
                         <button 
                             onClick={() => setReviewModalData(row)}

@@ -66,6 +66,25 @@ export const useApprovePayment = () => {
   });
 };
 
+export const useRejectPayment = () => {
+  const queryClient = useQueryClient();
+  const addToast = useToastStore(state => state.addToast);
+
+  return useMutation({
+    mutationFn: async ({ id, payload }) => {
+      const res = await axiosClient.post(ENDPOINTS.FINANCIAL.REJECT(id), payload);
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ledger'] });
+      addToast('تم اتخاذ الإجراء بنجاح', 'success');
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'تعذر إتمام الإجراء', 'error');
+    }
+  });
+};
+
 export const useRecordPayment = () => {
   const queryClient = useQueryClient();
   const addToast = useToastStore(state => state.addToast);

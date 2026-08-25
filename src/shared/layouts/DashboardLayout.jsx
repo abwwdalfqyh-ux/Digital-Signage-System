@@ -160,9 +160,9 @@ const DashboardLayout = () => {
             try {
                 const parsed = JSON.parse(e.notification.title);
                 if (parsed.key) {
-                    if (parsed.key === 'notif title payout requested') title = t('notifications.payout_requested');
-                    else if (parsed.key === 'notif title payout approved') title = t('notifications.payout_approved');
-                    else if (parsed.key === 'notif title payout rejected') title = t('notifications.payout_rejected');
+                    // Try to translate the key directly, replace spaces with underscores if needed
+                    const i18nKey = parsed.key.replace(/ /g, '_');
+                    title = t(`notifications.${i18nKey}`) || title;
                 }
             } catch (err) {}
             addToast(`🔔 ${title}`, 'info');
@@ -178,6 +178,19 @@ const DashboardLayout = () => {
             }
         });
 
+        // ─── WebSocket: Ledger Updates ────────────────────────────────
+        const ledgerChannel = echo.private('admin.ledger');
+        ledgerChannel.listen('LedgerUpdated', () => {
+            queryClient.invalidateQueries({ queryKey: ['ledger'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        });
+
+        const ownerChannel = echo.private(`owner.earnings.${user.user_id}`);
+        ownerChannel.listen('LedgerUpdated', () => {
+            queryClient.invalidateQueries({ queryKey: ['owner_earnings'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+        });
+
         // ─── Fallback Polling (5 دقائق) — يعمل فقط إذا كان WebSocket معطَّلاً ───
         // خُفِّض من polling كل دقيقة إلى كل 5 دقائق لتخفيف الحمل على السيرفر
         const intervalId = setInterval(fetchUnread, 5 * 60 * 1000);
@@ -187,6 +200,8 @@ const DashboardLayout = () => {
             clearInterval(intervalId);
             echo.leave(`user.${user.user_id}`);
             echo.leave('system.settings');
+            echo.leave('admin.ledger');
+            echo.leave(`owner.earnings.${user.user_id}`);
         };
     }, [user, addToast, queryClient, t]);
 
