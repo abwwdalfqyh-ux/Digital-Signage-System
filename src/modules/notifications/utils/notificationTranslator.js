@@ -122,6 +122,7 @@ export const getNotificationIconInfo = (titleKey) => {
         case 'notif_title_ad_scheduled':
             return { Icon: Calendar, colorClass: 'text-[var(--color-dark-turquoise)] bg-[var(--color-dark-turquoise)]/10' };
         case 'notif_title_ad_rejected':
+        case 'notif_title_payment_rejected':
         case 'notif_title_payout_rejected':
             return { Icon: AlertCircle, colorClass: 'text-red-600 bg-red-100' };
         case 'notif_title_payout_requested':
@@ -149,6 +150,7 @@ export const getNotificationLink = (titleKey) => {
         case 'notif_title_payout_requested':
         case 'notif_title_payout_approved':
         case 'notif_title_payout_rejected':
+        case 'notif_title_payment_rejected':
             if (roleId === 2) return '/dashboard/my-financials';
             if (roleId === 3) return '/dashboard/earnings';
             if (roleId === 6) return '/dashboard/payment-ops';
