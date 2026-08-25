@@ -1074,7 +1074,7 @@
     "review_approve_campaign": "مراجعة واعتماد الحملة",
     "campaign_title": "عنوان الحملة",
     "identity card": "بطاقة الهوية",
-    "no_media_file": "لا يوجد ملف وسائط",
+    "no_media_file": "لا يوجد ملف مرفق",
     "preview": "معاينة",
     "format": "الصيغة",
     "video": "فيديو",
@@ -1082,7 +1082,7 @@
     "size": "الحجم",
     "reject_reason": "سبب الرفض",
     "mandatory_if_rejected": "إلزامي في حال الرفض",
-    "reject_placeholder": "اكتب سبب الرفض هنا...",
+    "reject_placeholder": "اكتب سبب الرفض هنا ليتم إرساله للمعلن...",
     "reject_ad": "رفض الإعلان",
     "approve_and_request_payment": "اعتماد وطلب الدفع",
     "encoding_and_uploading": "جاري التجهيز والرفع...",
@@ -1168,7 +1168,11 @@
     "electronic_invoice_note_no_stamp": "هذه الفاتورة إلكترونية ولا تحتاج لختم.",
     "invoice_title_window": "فاتورة الإعلان",
     "final_total": "المجموع النهائي",
-    "electronic_invoice_note": "هذه فاتورة الكترونية معتمدة"
+    "electronic_invoice_note": "هذه فاتورة الكترونية معتمدة",
+    "tab_expired": "منتهية الصلاحية",
+    "status_expired": "منتهي",
+    "confirm_rejection_msg": "هل أنت متأكد من رفض هذا الإعلان؟ سيتم إشعار المعلن.",
+    "confirm_waiting_payment_msg": "سيتم الموافقة على الإعلان وتحويل حالته إلى 'بانتظار الدفع'."
   },
   "financial": {
     "sav_transaction": "حفظ العملية",

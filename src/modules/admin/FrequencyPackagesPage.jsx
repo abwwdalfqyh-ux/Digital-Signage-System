@@ -255,9 +255,11 @@ const FrequencyPackagesPage = () => {
         if (!silent) setIsLoading(true);
         try {
             const res = await axiosClient.get(ENDPOINTS.PACKAGES.ALL);
-            setPackages(res.data?.data || res.data || []);
+            const data = res.data?.data || res.data;
+            setPackages(Array.isArray(data) ? data : []);
         } catch (err) {
             if (!silent) addToast(err.response?.data?.message || 'فشل تحميل الباقات', 'error');
+            setPackages([]);
         } finally {
             if (!silent) setIsLoading(false);
         }

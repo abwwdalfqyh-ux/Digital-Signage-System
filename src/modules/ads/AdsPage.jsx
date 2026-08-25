@@ -107,6 +107,7 @@ const AdsPage = () => {
         { key: 'Pending', label: t('ads.tab_pending_approval') },
         { key: 'waiting_payment', label: t('ads.tab_waiting_payment') },
         { key: 'Paused', label: t('ads.tab_paused') },
+        { key: 'Expired', label: t('ads.tab_expired') },
         { key: 'Rejected', label: t('ads.tab_rejected') },
     ];
 
@@ -141,6 +142,13 @@ const AdsPage = () => {
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffdad6] text-[#ba1a1a] border border-[#ba1a1a]/20 text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]"></span>
                         {t('ads.status_rejected')}
+                    </span>
+                );
+            case 'Expired':
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-200 text-gray-700 border border-gray-300 text-xs">
+                        <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+                        {t('ads.status_expired')}
                     </span>
                 );
             default:
