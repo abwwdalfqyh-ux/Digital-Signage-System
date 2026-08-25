@@ -138,7 +138,8 @@ const FinancialPage = () => {
         : [];
     const totalPlatformProfit = data.platform_profit || 0;
 
-    const transactions = Array.isArray(data.transactions) ? data.transactions : Object.values(data.transactions || {});
+    const rawTransactions = Array.isArray(data.transactions) ? data.transactions : Object.values(data.transactions || {});
+    const transactions = rawTransactions.filter(t => t && typeof t === 'object' && Object.keys(t).length > 0 && t.created_at);
     const filteredTransactions = transactions.filter(t => activeFilter === 'all' || t.status === activeFilter);
     
     // Financial Metrics
