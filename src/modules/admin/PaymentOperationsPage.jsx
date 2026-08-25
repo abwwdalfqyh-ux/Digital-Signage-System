@@ -48,7 +48,9 @@ const PaymentOperationsPage = () => {
                 );
             }
         } catch (error) {
-            addToast(t('payment_ops.fetch_error'), 'error');
+            console.error('Fetch Payments Error:', error);
+            const errMsg = error.response?.data?.message || error.message || t('payment_ops.fetch_error');
+            addToast(`فشل: ${errMsg}`, 'error');
         } finally {
             setIsLoading(false);
         }
