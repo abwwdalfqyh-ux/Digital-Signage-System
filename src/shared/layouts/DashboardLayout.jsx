@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Bell, User as UserIcon, Menu, LogOut, Grid, Sun, Moon, Languages, Users, Plus, X } from 'lucide-react';
+import { Bell, User as UserIcon, Menu, LogOut, Grid, Sun, Moon, Languages, Users, Plus, X, ChevronDown } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 import usePermission from '../../hooks/usePermission';
 import useUIStore from '../../store/useUIStore';
-import { getNavItems } from '../../core/routes/navigation';
+import { getNavItems, getFlatNavItems } from '../../core/routes/navigation';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import echo from '../../core/api/echo';
@@ -74,28 +74,60 @@ const DashboardLayout = () => {
     const launcherRef = useRef(null);
     const [isAddingShortcut, setIsAddingShortcut] = useState(false);
     
-    // Pass roleId to getNavItems instead of roleName
+    // Structured nav items (may include groups)
     const navItems = getNavItems(roleId, language);
-    const launchableItems = navItems.filter(i => i.path !== '/dashboard');
+    // Flat list used for keyboard nav & quick access launcher
+    const flatNavItems = getFlatNavItems(roleId, language);
+    const launchableItems = flatNavItems.filter(i => i.path !== '/dashboard');
+
+    // Track which groups are open. Auto-open if a child is active.
+    const [openGroups, setOpenGroups] = useState(() => {
+        const initial = {};
+        navItems.forEach(item => {
+            if (item.type === 'group') {
+                const hasActive = item.children.some(c =>
+                    location.pathname === c.path || location.pathname.startsWith(c.path + '/')
+                );
+                initial[item.id] = hasActive;
+            }
+        });
+        return initial;
+    });
+
+    const toggleGroup = useCallback((id) => {
+        setOpenGroups(prev => ({ ...prev, [id]: !prev[id] }));
+    }, []);
+
+    // Auto-open group when navigating to a child path
+    useEffect(() => {
+        navItems.forEach(item => {
+            if (item.type === 'group') {
+                const hasActive = item.children.some(c =>
+                    location.pathname === c.path || location.pathname.startsWith(c.path + '/')
+                );
+                if (hasActive) {
+                    setOpenGroups(prev => prev[item.id] ? prev : { ...prev, [item.id]: true });
+                }
+            }
+        });
+    }, [location.pathname]);
 
     /* ── Keyboard Sidebar Navigation ── */
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (!isSidebarHoveredRef.current) return; // Only trigger if mouse is hovering the sidebar
+            if (!isSidebarHoveredRef.current) return;
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
             if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                 e.preventDefault();
-                const currentIndex = navItems.findIndex(item => 
+                const currentIndex = flatNavItems.findIndex(item =>
                     item.path === '/dashboard' ? location.pathname === '/dashboard' : location.pathname.startsWith(item.path)
                 );
                 if (currentIndex === -1) return;
                 let nextIndex = e.key === 'ArrowUp' ? currentIndex - 1 : currentIndex + 1;
-                if (nextIndex < 0) nextIndex = navItems.length - 1;
-                if (nextIndex >= navItems.length) nextIndex = 0;
-                const nextPath = navItems[nextIndex].path;
+                if (nextIndex < 0) nextIndex = flatNavItems.length - 1;
+                if (nextIndex >= flatNavItems.length) nextIndex = 0;
+                const nextPath = flatNavItems[nextIndex].path;
                 navigate(nextPath);
-                
-                // Scroll into view
                 setTimeout(() => {
                     const el = document.getElementById(`nav-link-${nextPath}`);
                     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -104,7 +136,7 @@ const DashboardLayout = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [navItems, location.pathname, navigate]);
+    }, [flatNavItems, location.pathname, navigate]);
 
     const [savedPaths, setSavedPaths] = useState(() => {
         try {
@@ -205,7 +237,9 @@ const DashboardLayout = () => {
         };
     }, [user, addToast, queryClient, t]);
 
-    const canImpersonate = roleId === 1 || roleId === 7; // SuperAdmin or Admin
+    // Use the REAL role (never the impersonated one) so the button stays visible
+    const realRoleId = user?.role_id ?? user?.role?.role_id;
+    const canImpersonate = realRoleId === 1 || realRoleId === 7; // SuperAdmin or Admin
 
     /* Derived */
     const isDark = theme === 'dark';
@@ -258,47 +292,24 @@ const DashboardLayout = () => {
     const SidebarInner = ({ mini = false }) => (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100svh', overflow: 'hidden' }}>
 
-            {/* ── Header: toggle + logo + brand ── */}
+            {/* ── Header: logo + brand + toggle ── */}
             <div style={{
-                padding: mini ? '18px 0' : '18px 14px 14px',
+                padding: mini ? '16px 0 12px' : '20px 14px 16px',
                 borderBottom: '1px solid rgba(220,226,247,0.12)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
             }}>
-                {/* Hamburger toggle */}
-                <button
-                    onClick={() => setIsSidebarCollapsed(p => !p)}
-                    title={mini ? lbl.expandSidebar : lbl.collapseSidebar}
-                    style={{
-                        alignSelf: mini ? 'center' : 'flex-end',
-                        background: 'rgba(220,226,247,0.08)',
-                        border: '1px solid rgba(220,226,247,0.15)',
-                        borderRadius: '8px',
-                        width: 34, height: 34,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'background 0.15s, transform 0.18s',
-                        color: 'rgba(220,226,247,0.75)',
-                        flexShrink: 0,
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,226,247,0.15)'; e.currentTarget.style.color = '#fff'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,226,247,0.08)'; e.currentTarget.style.color = 'rgba(220,226,247,0.75)'; }}
-                    onMouseDown={e => e.currentTarget.style.transform = 'scale(0.88)'}
-                    onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                    <Menu style={{ width: 17, height: 17 }} />
-                </button>
-
-                {/* Logo circle */}
+                {/* Logo circle — larger */}
                 <div style={{
-                    width: mini ? 40 : 54, height: mini ? 40 : 54,
+                    width: mini ? 48 : 68, height: mini ? 48 : 68,
                     borderRadius: '50%',
                     background: '#dce2f7',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     overflow: 'hidden', flexShrink: 0,
                     transition: 'width 0.3s, height 0.3s',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
                 }}>
                     <img
                         src="/Main_app_logo.png"
@@ -308,7 +319,7 @@ const DashboardLayout = () => {
                             e.target.onerror = null;
                             e.target.style.display = 'none';
                             e.target.parentNode.innerHTML =
-                                '<span style="color:#004ac6;font-size:18px;font-weight:800;font-family:sans-serif">SC</span>';
+                                '<span style="color:#004ac6;font-size:22px;font-weight:800;font-family:sans-serif">SC</span>';
                         }}
                     />
                 </div>
@@ -323,16 +334,39 @@ const DashboardLayout = () => {
                     width: '100%',
                 }}>
                     <h1 style={{
-                        margin: 0, fontSize: '19px', fontWeight: 700,
+                        margin: 0, fontSize: '20px', fontWeight: 700,
                         color: '#ffffff', whiteSpace: 'nowrap',
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                     }}>SabaControl</h1>
                     <p style={{
-                        margin: '2px 0 0', fontSize: '11px',
+                        margin: '3px 0 0', fontSize: '11.5px',
                         color: 'rgba(220,226,247,0.55)', whiteSpace: 'nowrap',
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                     }}>{lbl.brandSub}</p>
                 </div>
+
+                {/* Hamburger toggle — centered below brand */}
+                <button
+                    onClick={() => setIsSidebarCollapsed(p => !p)}
+                    title={mini ? lbl.expandSidebar : lbl.collapseSidebar}
+                    style={{
+                        background: 'rgba(220,226,247,0.08)',
+                        border: '1px solid rgba(220,226,247,0.15)',
+                        borderRadius: '8px',
+                        width: mini ? 34 : 38, height: 34,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'background 0.15s, transform 0.18s, width 0.3s',
+                        color: 'rgba(220,226,247,0.75)',
+                        flexShrink: 0,
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,226,247,0.15)'; e.currentTarget.style.color = '#fff'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(220,226,247,0.08)'; e.currentTarget.style.color = 'rgba(220,226,247,0.75)'; }}
+                    onMouseDown={e => e.currentTarget.style.transform = 'scale(0.88)'}
+                    onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <Menu style={{ width: 18, height: 18 }} />
+                </button>
             </div>
 
             {/* ── Nav links ── */}
@@ -341,80 +375,214 @@ const DashboardLayout = () => {
                 padding: '10px 0',
                 display: 'flex', flexDirection: 'column', gap: '2px',
             }}>
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        id={`nav-link-${item.path}`}
-                        to={item.path}
-                        end={item.path === '/dashboard'}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        title={mini ? item.label : ''}
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: mini ? 'center' : 'flex-start',
-                            gap: mini ? '0' : '13px',
-                            padding: mini ? '13px 0' : '11px 18px',
-                            fontSize: '15px',
-                            fontWeight: isActive ? 700 : 500,
-                            color: isActive ? '#ffffff' : 'rgba(220,226,247,0.75)',
-                            background: isActive ? 'rgba(220,226,247,0.10)' : 'transparent',
-                            textDecoration: 'none',
-                            transition: 'background 0.15s, color 0.15s',
-                            direction: isRTL ? 'rtl' : 'ltr',
-                            borderRight: (isActive && isRTL) ? '3px solid #2563eb' : '3px solid transparent',
-                            borderLeft: (isActive && !isRTL) ? '3px solid #2563eb' : '3px solid transparent',
-                            fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                        })}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.background = 'rgba(220,226,247,0.07)';
-                            e.currentTarget.style.color = '#fff';
-                        }}
-                        onMouseLeave={e => {
-                            // Only reset if not active
-                            if (e.currentTarget.style.fontWeight !== '700') {
-                                e.currentTarget.style.background = 'transparent';
-                                e.currentTarget.style.color = 'rgba(220,226,247,0.75)';
-                            }
-                        }}
-                    >
-                        <item.icon style={{ width: 21, height: 21, flexShrink: 0 }} />
-                        <span style={{
-                            overflow: 'hidden',
-                            whiteSpace: 'nowrap',
-                            maxWidth: mini ? '0px' : '140px',
-                            opacity: mini ? 0 : 1,
-                            transition: 'max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease',
-                            display: 'block',
-                            flex: 1,
-                        }}>
-                            {item.label}
-                        </span>
-                        {/* Badge indicator for items like offline screens count */}
-                        {item.badge && item.badge.value > 0 && (
-                            <span
-                                title={item.badge.title}
-                                style={{
-                                    fontSize: '10px', fontWeight: 800,
-                                    minWidth: 18, height: 18,
-                                    borderRadius: 99,
-                                    background: item.badge.color,
-                                    color: '#fff',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    padding: '0 5px',
-                                    flexShrink: 0,
-                                    opacity: mini ? 0 : 1,
-                                    maxWidth: mini ? '0px' : '40px',
+                {navItems.map((item) => {
+                    if (item.type === 'group') {
+                        const isOpen = openGroups[item.id] ?? false;
+                        const hasActiveChild = item.children.some(c =>
+                            location.pathname === c.path || location.pathname.startsWith(c.path + '/')
+                        );
+                        return (
+                            <div key={item.id}>
+                                {/* ── Group Header Button ── */}
+                                <button
+                                    onClick={() => mini ? null : toggleGroup(item.id)}
+                                    title={mini ? item.label : ''}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: mini ? 'center' : 'flex-start',
+                                        gap: mini ? '0' : '13px',
+                                        padding: mini ? '14px 0' : '12px 18px',
+                                        fontSize: '17px',
+                                        fontWeight: hasActiveChild ? 700 : 600,
+                                        color: hasActiveChild ? '#ffffff' : 'rgba(220,226,247,0.85)',
+                                        background: hasActiveChild
+                                            ? 'rgba(37,99,235,0.18)'
+                                            : isOpen
+                                            ? 'rgba(220,226,247,0.06)'
+                                            : 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s, color 0.2s',
+                                        direction: isRTL ? 'rtl' : 'ltr',
+                                        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                                        borderRight: (hasActiveChild && isRTL) ? '3px solid #3b82f6' : '3px solid transparent',
+                                        borderLeft: (hasActiveChild && !isRTL) ? '3px solid #3b82f6' : '3px solid transparent',
+                                        position: 'relative',
+                                    }}
+                                    onMouseEnter={e => {
+                                        if (!hasActiveChild) {
+                                            e.currentTarget.style.background = 'rgba(220,226,247,0.07)';
+                                            e.currentTarget.style.color = '#fff';
+                                        }
+                                    }}
+                                    onMouseLeave={e => {
+                                        if (!hasActiveChild) {
+                                            e.currentTarget.style.background = isOpen ? 'rgba(220,226,247,0.06)' : 'transparent';
+                                            e.currentTarget.style.color = 'rgba(220,226,247,0.85)';
+                                        }
+                                    }}
+                                >
+                                    <item.icon style={{ width: 20, height: 20, flexShrink: 0 }} />
+                                    <span style={{
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: mini ? '0px' : '130px',
+                                        opacity: mini ? 0 : 1,
+                                        transition: 'max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease',
+                                        flex: 1,
+                                        textAlign: isRTL ? 'right' : 'left',
+                                    }}>
+                                        {item.label}
+                                    </span>
+                                    {/* Animated chevron arrow */}
+                                    <ChevronDown
+                                        style={{
+                                            width: 15, height: 15,
+                                            flexShrink: 0,
+                                            opacity: mini ? 0 : 1,
+                                            maxWidth: mini ? '0px' : '20px',
+                                            transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, max-width 0.3s',
+                                            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                            color: hasActiveChild ? '#93c5fd' : 'rgba(220,226,247,0.5)',
+                                        }}
+                                    />
+                                </button>
+
+                                {/* ── Animated Children Container ── */}
+                                <div style={{
                                     overflow: 'hidden',
-                                    transition: 'opacity 0.2s ease, max-width 0.3s',
-                                    animation: 'badgePulse 2.5s ease-in-out infinite',
-                                }}
-                            >
-                                {item.badge.value}
+                                    maxHeight: mini ? '0px' : isOpen ? `${item.children.length * 52}px` : '0px',
+                                    transition: 'max-height 0.35s cubic-bezier(0.4,0,0.2,1)',
+                                    background: 'rgba(0,0,0,0.15)',
+                                    borderRadius: '0 0 6px 6px',
+                                }}>
+                                    {item.children.map((child) => (
+                                        <NavLink
+                                            key={child.path}
+                                            id={`nav-link-${child.path}`}
+                                            to={child.path}
+                                            end={child.path === '/dashboard'}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            style={({ isActive }) => ({
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '11px',
+                                                padding: isRTL ? '11px 38px 11px 16px' : '11px 16px 11px 38px',
+                                                fontSize: '16px',
+                                                fontWeight: isActive ? 700 : 400,
+                                                color: isActive ? '#ffffff' : 'rgba(180,197,255,0.7)',
+                                                background: isActive ? 'rgba(59,99,235,0.25)' : 'transparent',
+                                                textDecoration: 'none',
+                                                transition: 'background 0.15s, color 0.15s',
+                                                direction: isRTL ? 'rtl' : 'ltr',
+                                                fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                                                borderRight: (isActive && isRTL) ? '2px solid #60a5fa' : '2px solid transparent',
+                                                borderLeft: (isActive && !isRTL) ? '2px solid #60a5fa' : '2px solid transparent',
+                                                position: 'relative',
+                                            })}
+                                            onMouseEnter={e => {
+                                                e.currentTarget.style.background = 'rgba(220,226,247,0.06)';
+                                                e.currentTarget.style.color = '#fff';
+                                            }}
+                                            onMouseLeave={e => {
+                                                if (e.currentTarget.style.fontWeight !== '700') {
+                                                    e.currentTarget.style.background = 'transparent';
+                                                    e.currentTarget.style.color = 'rgba(180,197,255,0.7)';
+                                                }
+                                            }}
+                                        >
+                                            {/* Connector dot */}
+                                            <span style={{
+                                                width: 5, height: 5, borderRadius: '50%', flexShrink: 0,
+                                                background: 'rgba(180,197,255,0.35)',
+                                            }} />
+                                            <child.icon style={{ width: 17, height: 17, flexShrink: 0 }} />
+                                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {child.label}
+                                            </span>
+                                        </NavLink>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    // ── Regular link ──
+                    return (
+                        <NavLink
+                            key={item.path}
+                            id={`nav-link-${item.path}`}
+                            to={item.path}
+                            end={item.path === '/dashboard'}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            title={mini ? item.label : ''}
+                            style={({ isActive }) => ({
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: mini ? 'center' : 'flex-start',
+                                gap: mini ? '0' : '13px',
+                                padding: mini ? '14px 0' : '13px 18px',
+                                fontSize: '18px',
+                                fontWeight: isActive ? 700 : 500,
+                                color: isActive ? '#ffffff' : 'rgba(220,226,247,0.75)',
+                                background: isActive ? 'rgba(220,226,247,0.10)' : 'transparent',
+                                textDecoration: 'none',
+                                transition: 'background 0.15s, color 0.15s',
+                                direction: isRTL ? 'rtl' : 'ltr',
+                                borderRight: (isActive && isRTL) ? '3px solid #2563eb' : '3px solid transparent',
+                                borderLeft: (isActive && !isRTL) ? '3px solid #2563eb' : '3px solid transparent',
+                                fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                            })}
+                            onMouseEnter={e => {
+                                e.currentTarget.style.background = 'rgba(220,226,247,0.07)';
+                                e.currentTarget.style.color = '#fff';
+                            }}
+                            onMouseLeave={e => {
+                                if (e.currentTarget.style.fontWeight !== '700') {
+                                    e.currentTarget.style.background = 'transparent';
+                                    e.currentTarget.style.color = 'rgba(220,226,247,0.75)';
+                                }
+                            }}
+                        >
+                            <item.icon style={{ width: 21, height: 21, flexShrink: 0 }} />
+                            <span style={{
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                maxWidth: mini ? '0px' : '140px',
+                                opacity: mini ? 0 : 1,
+                                transition: 'max-width 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease',
+                                display: 'block',
+                                flex: 1,
+                            }}>
+                                {item.label}
                             </span>
-                        )}
-                    </NavLink>
-                ))}
+                            {item.badge && item.badge.value > 0 && (
+                                <span
+                                    title={item.badge.title}
+                                    style={{
+                                        fontSize: '10px', fontWeight: 800,
+                                        minWidth: 18, height: 18,
+                                        borderRadius: 99,
+                                        background: item.badge.color,
+                                        color: '#fff',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        padding: '0 5px',
+                                        flexShrink: 0,
+                                        opacity: mini ? 0 : 1,
+                                        maxWidth: mini ? '0px' : '40px',
+                                        overflow: 'hidden',
+                                        transition: 'opacity 0.2s ease, max-width 0.3s',
+                                        animation: 'badgePulse 2.5s ease-in-out infinite',
+                                    }}
+                                >
+                                    {item.badge.value}
+                                </span>
+                            )}
+                        </NavLink>
+                    );
+                })}
             </nav>
 
             {/* ── Logout ── */}
@@ -508,17 +676,17 @@ const DashboardLayout = () => {
 
                 {/* ── Top Header ── */}
                 <header style={{
-                    height: '64px',
+                    height: '74px',
                     background: S.surfaceContainerLowest,
                     borderBottom: `1px solid ${S.outlineVariant}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '0 20px',
+                    padding: '0 24px',
                     position: 'sticky',
                     top: 0,
                     zIndex: 40,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                    boxShadow: '0 1px 5px rgba(0,0,0,0.07)',
                     direction: isRTL ? 'rtl' : 'ltr',
                     transition: 'background 0.3s ease, border-color 0.3s ease',
                 }}>
@@ -589,7 +757,7 @@ const DashboardLayout = () => {
                                 background: isDark ? 'rgba(180,197,255,0.12)' : S.surfaceContainerLow,
                                 border: `1px solid ${isDark ? 'rgba(180,197,255,0.22)' : S.outlineVariant}`,
                                 borderRadius: '10px',
-                                width: 38, height: 38,
+                                width: 44, height: 44,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',

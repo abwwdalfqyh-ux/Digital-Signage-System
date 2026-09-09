@@ -66,20 +66,20 @@ const ReviewAdModal = ({
                         <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-outline-variant/30">
                             <div className="flex items-center gap-6 flex-wrap">
                                 <div>
-                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">{t('ads.campaign_title')}</span>
-                                    <span className="text-lg font-bold text-on-surface">{ad.title}</span>
+                                    <span className="text-base font-bold text-on-surface-variant block mb-1">{t('ads.campaign_title')}</span>
+                                    <span className="text-2xl font-black text-on-surface">{ad.title}</span>
                                 </div>
                                 <div className="w-[1px] h-8 bg-outline-variant/50 hidden sm:block"></div>
                                 <div>
-                                    <span className="text-sm font-medium text-on-surface-variant block mb-1">{t('ads.advertiser')}</span>
-                                    <span className="text-lg font-bold text-on-surface">{ad.advertiser?.full_name || t('common.unspecified')}</span>
+                                    <span className="text-base font-bold text-on-surface-variant block mb-1">{t('ads.advertiser')}</span>
+                                    <span className="text-sm font-medium text-on-surface-variant">{ad.advertiser?.full_name || t('common.unspecified')}</span>
                                 </div>
                             </div>
                             
                             <div className="flex items-center gap-3">
                                 {/* Status Badge */}
-                                <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-sm font-bold shadow-sm">
-                                    <span className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse"></span>
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEF3C7] text-[#D97706] border border-[#FDE68A] text-xs font-semibold shadow-sm">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-pulse"></span>
                                     {t('ads.status_pending')}
                                 </span>
 

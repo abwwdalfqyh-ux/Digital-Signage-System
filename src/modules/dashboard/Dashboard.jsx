@@ -97,8 +97,8 @@ const KpiCard = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
             <div>
                 <p style={{
-                    margin: 0, fontSize: '13px', fontWeight: 500,
-                    color: S.outline,
+                    margin: 0, fontSize: '18px', fontWeight: 700,
+                    color: '#111111',
                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                 }}>
                     {label}
@@ -125,10 +125,10 @@ const KpiCard = ({
         <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', }}>
                 <span style={{
-                    fontSize: '36px', fontWeight: 700, lineHeight: 1,
-                    color: accentColor || S.onBackground,
+                    fontSize: '30px', fontWeight: 500, lineHeight: 1,
+                    color: '#555555',
                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                    letterSpacing: '-0.02em',
+                    letterSpacing: '-0.01em',
                 }}>
                     {value}
                 </span>
@@ -569,13 +569,6 @@ const Dashboard = () => {
                     }}>
                         {t('dashboard.overview_title')}
                     </h1>
-                    <p style={{
-                        margin: '4px 0 0', fontSize: '13px',
-                        color: S.outline,
-                        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                    }}>
-                        Dashboard Overview
-                    </p>
                 </div>
 
                 {/* action buttons */}
@@ -639,24 +632,19 @@ const Dashboard = () => {
                 <KpiCard
                     label={t('dashboard.active_users_label')}
                     value={activeUsers}
-                    note={t('dashboard.active_users_note')}
-                    noteIcon={TrendingUp}
-                    noteColor={S.primaryContainer}
                     Icon={Users}
                     iconBg={S.surfaceContainer}
                     iconColor={S.primaryContainer}
+                    index={0}
                 />
                 {/* Pending Ads */}
                 <KpiCard
                     label={t('dashboard.secretary_pending_ads')}
                     value={pendingAds}
-                    note={t('dashboard.pending_ads_note')}
-                    noteIcon={AlertCircle}
-                    noteColor={S.error}
                     Icon={Monitor}
                     iconBg={S.errorContainer}
                     iconColor={S.error}
-                    borderAccent={S.error}
+                    index={1}
                 />
                 {/* Active Screens */}
                 <KpiCard
@@ -666,32 +654,16 @@ const Dashboard = () => {
                     Icon={Monitor}
                     iconBg={S.secondaryFixed}
                     iconColor={S.secondary}
-                    extraContent={
-                        <div style={{
-                            marginTop: '8px',
-                            height: '6px', borderRadius: '999px',
-                            background: S.surfaceContainerHighest, overflow: 'hidden',
-                        }}>
-                            <div style={{
-                                height: '100%', borderRadius: '999px',
-                                background: S.secondary,
-                                width: `${screenRatio}%`,
-                                transition: 'width 0.5s ease',
-                            }} />
-                        </div>
-                    }
+                    index={2}
                 />
                 {/* Total Revenue */}
                 <KpiCard
                     label={t('dashboard.report_total_profit')}
                     value={`$${Number(totalRevenue).toLocaleString()}`}
-                    note={t('dashboard.total_profit_note')}
-                    noteIcon={TrendingUp}
-                    noteColor={S.primaryContainer}
-                    accentColor={S.primaryContainer}
                     Icon={DollarSign}
                     iconBg={S.primaryFixed}
                     iconColor={S.primary}
+                    index={3}
                 />
             </div>
 

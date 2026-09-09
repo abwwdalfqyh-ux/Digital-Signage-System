@@ -67,7 +67,7 @@ const KpiCard = ({ label, value, subtitle, icon: Icon, iconBg, iconColor, border
     >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-                <p style={{ margin: 0, fontSize: '13px', fontWeight: 500, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
+                <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
                 {subtitle && <p style={{ margin: '2px 0 0', fontSize: '11px', color: S.outlineVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{subtitle}</p>}
             </div>
             {Icon && (
@@ -77,7 +77,7 @@ const KpiCard = ({ label, value, subtitle, icon: Icon, iconBg, iconColor, border
             )}
         </div>
         <div>
-            <span style={{ fontSize: '38px', fontWeight: 700, color: borderColor || S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif", lineHeight: 1 }}>
+            <span style={{ fontSize: '30px', fontWeight: 500, color: '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif", lineHeight: 1 }}>
                 {value}
             </span>
             {trend && (

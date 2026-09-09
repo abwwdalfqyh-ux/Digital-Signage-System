@@ -28,15 +28,11 @@ const PremiumInput = ({
 
     return (
         <div className="input-group flex flex-col w-full group">
-            {/* Bilingual label row */}
+            {/* Arabic label only */}
             <div className="flex justify-between items-center mb-1.5 px-1">
                 <label className="block text-sm font-bold text-[#111827] transition-colors">
                     {arabicLabel}
-                    {required && <span className="text-red-500 mr-1">*</span>}
                 </label>
-                <span className="text-[10px] text-[#6B7280] uppercase tracking-wider font-bold" dir="ltr">
-                    {englishLabel}{required ? ' *' : ''}
-                </span>
             </div>
 
             {/* Input wrapper */}
@@ -140,7 +136,6 @@ const RegisterPage = () => {
                         className="text-center mb-8 mt-2"
                     >
                         <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">{t('auth.register_title')}</h1>
-                        <p className="text-[#6B7280] text-[15px] font-bold">{t('auth.register_subtitle')}</p>
                     </motion.div>
 
                     {/* Form — vertical stacked fields */}
@@ -345,9 +340,6 @@ const RegisterPage = () => {
                                 {t('auth.join_network_line1')}
                                 <span className="block text-[#d9a05b] mt-3">{t('auth.join_network_line2')}</span>
                             </h2>
-                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
-                                {t('auth.join_network_desc')}
-                            </p>
                         </motion.div>
                     </div>
 

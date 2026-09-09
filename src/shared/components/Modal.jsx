@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Maximize2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Modal = ({ isOpen, onClose, title, children, allowMaximize = true }) => {
+const Modal = ({ isOpen, onClose, title, children, allowMaximize = true, maxWidth = 'max-w-[680px]' }) => {
     const [isMaximized, setIsMaximized] = useState(false);
     return (
         <AnimatePresence>
@@ -20,7 +20,7 @@ const Modal = ({ isOpen, onClose, title, children, allowMaximize = true }) => {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 10 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className={`relative bg-surface/95 backdrop-blur-xl border border-outline-variant/60 rounded-3xl shadow-xl flex flex-col overflow-hidden transition-all duration-300 ${isMaximized ? 'w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh]' : 'w-full max-w-[680px] max-h-[90vh]'}`}
+                        className={`relative bg-surface/95 backdrop-blur-xl border border-outline-variant/60 rounded-3xl shadow-xl flex flex-col overflow-hidden transition-all duration-300 ${isMaximized ? 'w-[95vw] h-[95vh] max-w-[95vw] max-h-[95vh]' : `w-full ${maxWidth} max-h-[90vh]`}`}
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-outline-variant/50 bg-surface-container-lowest/50">

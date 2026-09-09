@@ -329,8 +329,8 @@ const CreateAdPage = () => {
                     <div className="flex items-center justify-between h-16 sm:h-20">
                         {/* Left/Start: Title and Back */}
                         <div className="flex items-center gap-4">
-                            <button 
-                                onClick={() => navigate('/dashboard/ads')} 
+                            <button
+                                onClick={() => navigate('/dashboard/ads')}
                                 className="w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-all border border-outline-variant/30 shadow-sm group"
                             >
                                 <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1" style={{ transform: dir === 'ltr' ? 'rotate(180deg)' : 'none' }}>arrow_forward</span>
@@ -367,7 +367,7 @@ const CreateAdPage = () => {
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <button
                                 onClick={() => navigate('/dashboard/ads')}
                                 className="group flex items-center gap-2 px-4 py-2 sm:py-2.5 bg-error/10 hover:bg-error/20 border border-error/20 text-error rounded-xl transition-all font-bold shadow-sm"
@@ -396,13 +396,13 @@ const CreateAdPage = () => {
                     {/* Glowing Orbs for Aesthetics */}
                     <div className="absolute top-[-50%] right-[-10%] w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
                     <div className="absolute bottom-[-50%] left-[-10%] w-64 h-64 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
-                    
+
                     <div className="relative z-10 px-4 md:px-12 mt-2">
                         {/* Connecting Line */}
                         <div className="absolute top-5 left-12 right-12 h-1 bg-outline-variant/30 rounded-full -z-10"></div>
-                        <div 
+                        <div
                             className="absolute top-5 h-1 bg-gradient-to-r from-primary to-secondary rounded-full -z-10 transition-all duration-500 ease-out"
-                            style={{ 
+                            style={{
                                 width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - ${((currentStep - 1) / (steps.length - 1)) * 3}rem)`,
                                 [dir === 'rtl' ? 'right' : 'left']: '3rem'
                             }}
@@ -413,18 +413,17 @@ const CreateAdPage = () => {
                                 const current = isStepCurrent(step.id);
                                 const done = isStepDone(step.id);
                                 return (
-                                    <div 
+                                    <div
                                         key={step.id}
                                         onClick={() => { if (step.id < currentStep || done) setCurrentStep(step.id); }}
                                         className={`flex flex-col items-center gap-3 cursor-pointer group ${!current && !done ? 'opacity-40 hover:opacity-80' : ''} transition-all duration-300 w-28`}
                                     >
                                         <div className="relative flex justify-center">
                                             {current && <div className="absolute inset-0 bg-primary/20 rounded-full blur-md animate-pulse scale-150"></div>}
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm z-10 transition-all duration-500 ${
-                                                done ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-100 group-hover:scale-110' :
-                                                current ? 'bg-surface border-4 border-primary text-primary shadow-xl scale-125' :
-                                                'bg-surface-container-highest border-2 border-outline-variant/50 text-outline group-hover:border-primary/50 group-hover:text-primary/70'
-                                            }`}>
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm z-10 transition-all duration-500 ${done ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-100 group-hover:scale-110' :
+                                                    current ? 'bg-surface border-4 border-primary text-primary shadow-xl scale-125' :
+                                                        'bg-surface-container-highest border-2 border-outline-variant/50 text-outline group-hover:border-primary/50 group-hover:text-primary/70'
+                                                }`}>
                                                 {done ? <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: '"FILL" 1' }}>check</span> : step.id}
                                             </div>
                                         </div>
@@ -484,7 +483,7 @@ const CreateAdPage = () => {
                                                     <input type="text" value={form.title} onChange={(e) => setForm(p => ({ ...p, title: e.target.value }))} placeholder={t('ads.campaign_title_placeholder')} className={inputClass} />
                                                     <p className="font-caption text-caption text-on-surface-variant mt-1.5 px-1">{t('ads.campaign_title_note')}</p>
                                                 </div>
-                                                
+
                                                 <div className="flex-1 flex flex-col justify-start">
                                                     <label className={labelClass}>{t('ads.category_label', { defaultValue: 'تصنيف الحملة' })} <span className="text-error">*</span></label>
                                                     <div className="relative">
@@ -561,7 +560,7 @@ const CreateAdPage = () => {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         {/* Duration Visual Summary */}
                                                         {form.start_date && form.end_date && (
                                                             <div className="mb-6 p-2.5 bg-primary-container/10 border border-primary-container/30 rounded-xl flex items-center justify-between transition-all">
@@ -842,7 +841,7 @@ const CreateAdPage = () => {
                                                             {t('ads.available_screens', { defaultValue: 'قائمة الشاشات' })}
                                                         </h4>
                                                     </div>
-                                                    
+
                                                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 -mr-2">
                                                         {screens.length === 0 ? (
                                                             <div className="flex flex-col items-center justify-center h-full py-16">
@@ -865,17 +864,17 @@ const CreateAdPage = () => {
                                                                 {filteredScreensForAd.map(screen => {
                                                                     const isSelected = selectedScreens.includes(screen.screen_id);
                                                                     const currentStatus = screen.computed_status || screen.status;
-                                                                    
+
                                                                     // Colors mapping
                                                                     let statusBg = 'bg-gray-100', statusText = 'text-gray-700', statusDot = 'bg-gray-500';
                                                                     if (currentStatus === 'Online') { statusBg = 'bg-green-100'; statusText = 'text-green-800'; statusDot = 'bg-green-500'; }
                                                                     else if (currentStatus === 'Offline') { statusBg = 'bg-red-100'; statusText = 'text-red-800'; statusDot = 'bg-red-500'; }
                                                                     else if (currentStatus === 'Maintenance') { statusBg = 'bg-yellow-100'; statusText = 'text-yellow-800'; statusDot = 'bg-yellow-500'; }
-                                                                    
+
                                                                     const statusLabel = currentStatus === 'Online' ? t('common.online') : currentStatus === 'Offline' ? t('common.offline') : currentStatus === 'Maintenance' ? t('common.maintenance') : currentStatus === 'pending_activation' ? t('screens.tab_pending_activation', { defaultValue: 'بانتظار التفعيل' }) : currentStatus;
 
                                                                     return (
-                                                                            <div key={screen.screen_id}
+                                                                        <div key={screen.screen_id}
                                                                             onClick={() => toggleScreen(screen.screen_id)}
                                                                             className={`relative flex flex-col p-4 rounded-2xl transition-all duration-300 cursor-pointer overflow-hidden group
                                                                     ${isSelected ? 'bg-primary/5 border-2 border-primary shadow-sm' : 'bg-white border border-border-color hover:shadow-md hover:border-primary/40'}`}>
@@ -918,7 +917,7 @@ const CreateAdPage = () => {
                                                                                     </span>
                                                                                     {screen.price && <span className="text-[10px] text-outline">/{t('common.day')}</span>}
                                                                                 </div>
-                                                                                
+
                                                                                 <div className="flex items-center gap-1.5">
                                                                                     <button
                                                                                         type="button"

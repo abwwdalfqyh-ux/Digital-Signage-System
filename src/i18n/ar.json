@@ -857,7 +857,7 @@
     "daily_base_price": "السعر الأساسي اليومي ($)",
     "price_placeholder": "مثال: 15",
     "price_desc": "سعر عرض الإعلان لمدة يوم كامل",
-    "screen_owner_optional": "مالك الشاشة (اختياري)",
+    "screen_owner_optional": "مالك الشاشة",
     "add_owner_quick": "إضافة مالك جديد سريعاً",
     "peak_hours_pricing": "أوقات الذروة والتسعير الديناميكي",
     "step_4_of_4": "الخطوة 4 من 4",

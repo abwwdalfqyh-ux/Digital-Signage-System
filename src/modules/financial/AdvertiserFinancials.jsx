@@ -48,7 +48,7 @@ const BalanceCard = ({ title, amount, subtitle, icon: Icon, gradient, accentColo
     >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-                <p style={{ margin: 0, fontSize: '13px', fontWeight: 500, opacity: gradient ? 0.8 : undefined, color: gradient ? '#fff' : S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{title}</p>
+                <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, opacity: gradient ? 0.9 : undefined, color: gradient ? '#fff' : '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{title}</p>
                 {subtitle && <p style={{ margin: '3px 0 0', fontSize: '11px', opacity: 0.65, color: gradient ? '#fff' : S.outlineVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{subtitle}</p>}
             </div>
             <div style={{ width: 46, height: 46, borderRadius: '14px', background: gradient ? 'rgba(255,255,255,0.2)' : S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
@@ -56,7 +56,7 @@ const BalanceCard = ({ title, amount, subtitle, icon: Icon, gradient, accentColo
             </div>
         </div>
         <div>
-            <span style={{ fontSize: '36px', fontWeight: 800, lineHeight: 1, color: gradient ? '#fff' : (accentColor || S.onBackground), fontFamily: "'IBM Plex Sans Arabic', sans-serif", letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: '30px', fontWeight: 500, lineHeight: 1, color: gradient ? '#fff' : '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif", letterSpacing: '-0.01em' }}>
                 ${Number(amount || 0).toLocaleString()}
             </span>
         </div>

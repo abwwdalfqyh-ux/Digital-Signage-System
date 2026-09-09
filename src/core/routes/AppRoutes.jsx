@@ -68,12 +68,20 @@ const PublicRoute = ({ children }) => {
 
 /**
  * Role-Based Route - restricts access to specific roles
+ * SuperAdmin & Admin always pass through so impersonation works correctly.
  */
 const RoleRoute = ({ children, allowedRoles }) => {
-    const { isAuthenticated, getRoleId } = useAuthStore();
-    const roleId = getRoleId();
+    const { isAuthenticated, getRoleId, user } = useAuthStore();
     if (!isAuthenticated) return <Navigate to="/login" replace />;
-    if (allowedRoles && !allowedRoles.includes(roleId)) return <Navigate to="/dashboard" replace />;
+
+    // Real role check — admins always get through
+    const realRoleId = user?.role_id ?? user?.role?.role_id;
+    const isRealAdmin = realRoleId === 1 || realRoleId === 7;
+    if (isRealAdmin) return children;
+
+    // For non-admins use effective role (respects impersonation)
+    const effectiveRoleId = getRoleId();
+    if (allowedRoles && !allowedRoles.includes(effectiveRoleId)) return <Navigate to="/dashboard" replace />;
     return children;
 };
 
@@ -171,9 +179,9 @@ const AppRoutes = () => {
                 } />
                 <Route path="profile" element={<AdminProfilePage />} />
 
-                {/* Owner Earnings (Screen Owner) */}
+                {/* Owner Earnings (Screen Owner + Admins) */}
                 <Route path="earnings" element={
-                    <RoleRoute allowedRoles={[ROLES.SCREEN_OWNER]}>
+                    <RoleRoute allowedRoles={[ROLES.SCREEN_OWNER, ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
                         <OwnerEarningsPage />
                     </RoleRoute>
                 } />
@@ -183,7 +191,7 @@ const AppRoutes = () => {
 
                 {/* Advertiser Financials */}
                 <Route path="my-financials" element={
-                    <RoleRoute allowedRoles={[ROLES.ADVERTISER]}>
+                    <RoleRoute allowedRoles={[ROLES.ADVERTISER, ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
                         <AdvertiserFinancials />
                     </RoleRoute>
                 } />
@@ -218,9 +226,9 @@ const AppRoutes = () => {
                     } />
                 </Route>
 
-                {/* Owner Analytics (Screen Owner only) */}
+                {/* Owner Analytics (Screen Owner + Admins) */}
                 <Route path="analytics/owner" element={
-                    <RoleRoute allowedRoles={[ROLES.SCREEN_OWNER]}>
+                    <RoleRoute allowedRoles={[ROLES.SCREEN_OWNER, ROLES.SUPER_ADMIN, ROLES.ADMIN]}>
                         <OwnerAnalyticsPage />
                     </RoleRoute>
                 } />

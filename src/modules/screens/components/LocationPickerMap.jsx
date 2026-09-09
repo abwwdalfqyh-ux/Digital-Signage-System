@@ -34,7 +34,7 @@ const LocationPickerMap = ({ onSelect, initialLat, initialLng, onClose }) => {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '400px', borderRadius: '12px', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', height: '540px', borderRadius: '14px', overflow: 'hidden' }}>
       <MapContainer
         center={position ? [position.lat, position.lng] : defaultCenter}
         zoom={position ? 15 : 12}

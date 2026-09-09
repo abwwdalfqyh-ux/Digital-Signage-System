@@ -163,44 +163,19 @@ const AdsPage = () => {
 
     return (
         <div className="flex-1 overflow-y-auto" dir={dir} style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-            {/* Page Header */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <Megaphone className="text-[#004ac6] w-8 h-8 md:w-[36px] md:h-[36px]" />
-                        <h1 className="text-2xl md:text-3xl font-semibold text-[#141b2b] flex items-center gap-3">
-                            {t('ads.live_ad_center')}
-                            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full text-xs font-medium border border-emerald-100">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                                {t('ads.live')}
-                            </div>
-                        </h1>
-                    </div>
-                    <p className="text-base text-[#434655]">{t('ads.live_ad_desc')}</p>
-                </div>
-                {(can('create_campaigns') || can('review_ads')) && (
-                    <div className="flex items-center gap-[12px]">
-                        <button
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            title={t('common.refresh')}
-                            className="w-[48px] h-[48px] flex items-center justify-center rounded-lg bg-white text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm"
-                        >
-                            <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
-                        </button>
-
-                        {can('create_campaigns') && (
-                            <button onClick={() => navigate('/dashboard/ads/create')}
-                                className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-6 py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md">
-                                <Plus className="w-5 h-5" />
-                                {t('ads.start_new_campaign')}
-                            </button>
-                        )}
-                    </div>
-                )}
+            {/* Page Title */}
+            <div className="text-center mb-8 pt-2">
+                <h1 style={{
+                    fontSize: '32px',
+                    fontWeight: 800,
+                    color: '#141b2b',
+                    letterSpacing: '-0.02em',
+                    fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                    margin: 0,
+                }}>
+                    {t('ads.live_ad_center')}
+                </h1>
+                <div style={{ width: '60px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '10px auto 0' }} />
             </div>
 
             {/* Stats Summary Cards */}
@@ -210,8 +185,8 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#f1f3ff] flex items-center justify-center mb-4">
                         <Layers className="text-[#004ac6] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.total_transactions')}</p>
-                    <h3 className="text-5xl font-bold text-[#141b2b]">{stats.total}</h3>
+                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.total_transactions')}</p>
+                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.total}</h3>
                 </div>
 
                 {/* Active Campaigns */}
@@ -219,8 +194,8 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
                         <Activity className="text-[#0284C7] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.currently_broadcasting')}</p>
-                    <h3 className="text-5xl font-bold text-[#141b2b]">{stats.active}</h3>
+                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.currently_broadcasting')}</p>
+                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.active}</h3>
                 </div>
 
                 {/* Pending Approval */}
@@ -228,8 +203,8 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center mb-4">
                         <Clock className="text-[#D97706] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.pending_approval_short')}</p>
-                    <h3 className="text-5xl font-bold text-[#141b2b]">{stats.pending}</h3>
+                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.pending_approval_short')}</p>
+                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.pending}</h3>
                 </div>
 
                 {/* Rejected Ads */}
@@ -237,8 +212,8 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#ffdad6] flex items-center justify-center mb-4">
                         <Ban className="text-[#ba1a1a] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.rejected_ads')}</p>
-                    <h3 className="text-5xl font-bold text-[#141b2b]">{stats.rejected}</h3>
+                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.rejected_ads')}</p>
+                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.rejected}</h3>
                 </div>
 
                 {/* Stopped Campaigns */}
@@ -246,35 +221,62 @@ const AdsPage = () => {
                     <div className="w-12 h-12 rounded-full bg-[#dce2f7] flex items-center justify-center mb-4">
                         <PauseCircle className="text-[#434655] w-6 h-6" />
                     </div>
-                    <p className="text-sm font-medium text-[#434655] mb-1">{t('ads.paused_campaigns')}</p>
-                    <h3 className="text-5xl font-bold text-[#141b2b]">{stats.paused}</h3>
+                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.paused_campaigns')}</p>
+                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.paused}</h3>
                 </div>
             </div>
 
-            {/* Filters Bar */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-                <div className="flex overflow-x-auto gap-2 bg-white p-1 rounded-lg border border-[#E5E7EB] w-full lg:w-auto">
+            {/* Toolbar: Refresh + New Campaign + Search + Filters */}
+            <div className="flex flex-col gap-3 mb-6">
+                {/* Top Row: Search + Action Buttons */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    {/* Search Box */}
+                    <div className="relative flex-1">
+                        <input 
+                            type="text" 
+                            placeholder={t('dashboard.search_ads')} 
+                            value={searchTerm}
+                            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                            className="w-full pr-10 pl-4 py-2.5 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:border-[#004ac6] focus:ring-1 focus:ring-[#004ac6] transition-colors shadow-sm"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        {/* Refresh */}
+                        <button
+                            onClick={handleRefresh}
+                            disabled={isRefreshing}
+                            title={t('common.refresh')}
+                            className="w-[42px] h-[42px] flex items-center justify-center rounded-lg bg-white text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm"
+                        >
+                            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
+                        </button>
+
+                        {/* New Campaign */}
+                        {can('create_campaigns') && (
+                            <button onClick={() => navigate('/dashboard/ads/create')}
+                                className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md whitespace-nowrap">
+                                <Plus className="w-4 h-4" />
+                                {t('ads.start_new_campaign')}
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="flex bg-white p-1 rounded-lg border border-[#E5E7EB] w-full shadow-sm">
                     {statusTabs.map(tab => (
                         <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setCurrentPage(1); }}
-                            className={`px-4 py-2 rounded text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === tab.key ? 'bg-[#111827] text-white' : 'text-[#434655] hover:bg-[#f1f3ff]'}`}>
+                            className={`flex-1 py-2.5 rounded text-sm font-semibold text-center transition-colors ${statusFilter === tab.key ? 'bg-[#111827] text-white' : 'text-[#434655] hover:bg-[#f1f3ff]'}`}>
                             {tab.label}
                         </button>
                     ))}
-                </div>
-
-                <div className="relative w-full lg:w-80">
-                    <input 
-                        type="text" 
-                        placeholder={t('dashboard.search_ads')} 
-                        value={searchTerm}
-                        onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                        className="w-full pr-10 pl-4 py-2 bg-white border border-[#E5E7EB] rounded-lg text-sm focus:outline-none focus:border-[#004ac6] focus:ring-1 focus:ring-[#004ac6] transition-colors"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
                 </div>
             </div>
 
@@ -284,16 +286,16 @@ const AdsPage = () => {
                     <table className="w-full text-right font-sans">
                         <thead>
                             <tr className="bg-surface-container-low border-b border-border-color">
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.ad_title')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.advertiser')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.publish_status')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.total_cost')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.target_screen')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.duration')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('ads.size')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.from')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap">{t('ads.to')}</th>
-                                <th className="py-3 px-3 font-label-md text-label-md text-on-surface font-bold whitespace-nowrap text-center">{t('common.actions')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap">{t('ads.ad_title')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap">{t('ads.advertiser')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap text-center">{t('ads.publish_status')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap">{t('ads.total_cost')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap text-center">{t('ads.target_screen')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap text-center">{t('ads.duration')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap text-center">{t('ads.size')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap">{t('ads.from')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap">{t('ads.to')}</th>
+                                <th className="py-4 px-4 text-base text-on-surface font-bold whitespace-nowrap text-center">{t('common.actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-outline-variant/30">
@@ -312,21 +314,21 @@ const AdsPage = () => {
                             ) : (
                                 filteredAds.map(row => (
                                     <tr key={row.ad_id} className="hover:bg-surface-container-low transition-colors group">
-                                        <td className="py-2 px-3">
-                                            <span className="font-label-lg text-label-lg text-on-background font-bold whitespace-nowrap">{row.title}</span>
+                                        <td className="py-3 px-4">
+                                            <span className="text-base text-on-background font-bold whitespace-nowrap">{row.title}</span>
                                         </td>
-                                        <td className="py-2 px-3">
-                                            <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{row.advertiser?.full_name || t('common.unspecified')}</span>
+                                        <td className="py-3 px-4">
+                                            <span className="text-sm text-on-surface-variant whitespace-nowrap">{row.advertiser?.full_name || t('common.unspecified')}</span>
                                         </td>
-                                        <td className="py-2 px-3 text-center">
+                                        <td className="py-3 px-4 text-center">
                                             {renderStatusBadge(row.status)}
                                         </td>
-                                        <td className="py-2 px-3 font-label-lg text-label-lg text-primary font-bold">${row.total_cost || 0}</td>
-                                        <td className="py-2 px-3 text-center">
+                                        <td className="py-3 px-4 text-base text-primary font-bold">${row.total_cost || 0}</td>
+                                        <td className="py-3 px-4 text-center">
                                             <div className="flex flex-wrap gap-1 justify-center max-w-[150px] mx-auto">
                                                 {row.screens && row.screens.length > 0 ? (
                                                     row.screens.map(s => (
-                                                        <span key={s.screen_id} className="inline-flex px-2 py-1 bg-surface border border-outline-variant rounded-md text-on-surface-variant font-body-sm text-[11px] whitespace-nowrap shadow-sm" title={s.screen_name}>
+                                                        <span key={s.screen_id} className="inline-flex px-2 py-1 bg-surface border border-outline-variant rounded-md text-on-surface-variant text-xs whitespace-nowrap shadow-sm" title={s.screen_name}>
                                                             {s.screen_name.length > 10 ? s.screen_name.substring(0, 10) + '...' : s.screen_name}
                                                         </span>
                                                     ))
@@ -335,22 +337,22 @@ const AdsPage = () => {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="py-2 px-3 text-center font-caption text-caption text-on-background">
+                                        <td className="py-3 px-4 text-center text-sm text-on-background">
                                             {getDurationInDays(row.start_date, row.end_date)}
                                         </td>
-                                        <td className="py-2 px-3 text-center font-caption text-caption text-on-surface-variant whitespace-nowrap">
+                                        <td className="py-3 px-4 text-center text-sm text-on-surface-variant whitespace-nowrap">
                                             {row.file_size ? `${row.file_size} MB` : '—'}
                                         </td>
-                                        <td className="py-2 px-3 text-center" dir="ltr">
+                                        <td className="py-3 px-4 text-center" dir="ltr">
                                             <div className="flex flex-col items-center">
-                                                <span className="font-caption text-caption text-on-surface-variant whitespace-nowrap">{row.start_date || '—'}</span>
-                                                <span className="text-[10px] text-outline mt-0.5">{formatTime(row.schedules?.[0]?.start_time)}</span>
+                                                <span className="text-sm text-on-surface-variant whitespace-nowrap">{row.start_date || '—'}</span>
+                                                <span className="text-xs text-outline mt-0.5">{formatTime(row.schedules?.[0]?.start_time)}</span>
                                             </div>
                                         </td>
-                                        <td className="py-2 px-3 text-center" dir="ltr">
+                                        <td className="py-3 px-4 text-center" dir="ltr">
                                             <div className="flex flex-col items-center">
-                                                <span className="font-caption text-caption text-on-surface-variant whitespace-nowrap">{row.end_date || '—'}</span>
-                                                <span className="text-[10px] text-outline mt-0.5">{formatTime(row.schedules?.[0]?.end_time)}</span>
+                                                <span className="text-sm text-on-surface-variant whitespace-nowrap">{row.end_date || '—'}</span>
+                                                <span className="text-xs text-outline mt-0.5">{formatTime(row.schedules?.[0]?.end_time)}</span>
                                             </div>
                                         </td>
                                         <td className="py-2 px-3">
@@ -512,16 +514,16 @@ const AdsPage = () => {
 
                         <div className="grid grid-cols-2 gap-4 bg-surface-container-low p-5 rounded-2xl border border-outline-variant">
                             <div className="space-y-1.5">
-                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">{t('ads.allocated_budget')}</span>
-                                <span className="font-title-md text-title-md text-primary font-black flex items-center gap-1">
+                                <span className="text-base font-bold text-on-surface-variant uppercase tracking-wider block">{t('ads.allocated_budget')}</span>
+                                <span className="text-xl text-primary font-black flex items-center gap-1">
                                     <DollarSign className="w-5 h-5" />
                                     {detailsModal.ad.total_cost || 0}
                                 </span>
                             </div>
 
                             <div className="space-y-1 mt-2">
-                                <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block">{t('ads.media_length')}</span>
-                                <span className="font-body-md text-body-md text-on-background flex items-center gap-1.5 border border-outline-variant/50 bg-surface rounded p-1.5" dir="ltr">
+                                <span className="text-base font-bold text-on-surface-variant uppercase tracking-wider block">{t('ads.media_length')}</span>
+                                <span className="text-base text-on-background flex items-center gap-1.5 border border-outline-variant/50 bg-surface rounded p-1.5" dir="ltr">
                                     <Clock className="w-4 h-4 text-primary" />
                                     {detailsModal.ad.duration ? `${detailsModal.ad.duration}s` : '—'}
                                 </span>
@@ -529,25 +531,25 @@ const AdsPage = () => {
 
                             <div className="col-span-2 grid grid-cols-2 gap-4 pt-5 mt-3 border-t border-outline-variant">
                                 <div className="space-y-2">
-                                    <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+                                    <span className="text-sm font-bold text-on-surface-variant flex items-center gap-1.5">
                                         <div className="w-6 h-6 rounded-md bg-secondary/10 text-secondary flex items-center justify-center">
                                             <Calendar className="w-3.5 h-3.5" />
                                         </div>
                                         {t('ads.start_date')}
                                     </span>
-                                    <span className="font-body-lg text-body-lg text-on-background font-bold block pl-8" dir="ltr">
-                                        {detailsModal.ad.start_date || '—'} <span className="text-sm font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.start_time)}</span>
+                                    <span className="text-base text-on-background font-bold block pl-8" dir="ltr">
+                                        {detailsModal.ad.start_date || '—'} <span className="text-xs font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.start_time)}</span>
                                     </span>
                                 </div>
                                 <div className="space-y-2 border-r border-outline-variant pr-4">
-                                    <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+                                    <span className="text-sm font-bold text-on-surface-variant flex items-center gap-1.5">
                                         <div className="w-6 h-6 rounded-md bg-error/10 text-error flex items-center justify-center">
                                             <Calendar className="w-3.5 h-3.5" />
                                         </div>
                                         {t('ads.end_date')}
                                     </span>
-                                    <span className="font-body-lg text-body-lg text-on-background font-bold block pl-8" dir="ltr">
-                                        {detailsModal.ad.end_date || '—'} <span className="text-sm font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.end_time)}</span>
+                                    <span className="text-base text-on-background font-bold block pl-8" dir="ltr">
+                                        {detailsModal.ad.end_date || '—'} <span className="text-xs font-normal text-outline ml-1">{formatTime(detailsModal.ad.schedules?.[0]?.end_time)}</span>
                                     </span>
                                 </div>
                             </div>

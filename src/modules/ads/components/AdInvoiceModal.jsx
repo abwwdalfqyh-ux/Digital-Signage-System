@@ -201,62 +201,62 @@ const AdInvoiceModal = ({ open, onClose, ad }) => {
                                 {/* Info Grid */}
                                 <div className="grid grid-cols-2 gap-8 mb-8">
                                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t('ads.advertiser_info')}</h3>
-                                        <p className="text-base font-bold text-gray-900">{ad.advertiser?.name || t('common.unavailable')}</p>
-                                        <p className="text-sm text-gray-600 mt-1">{ad.advertiser?.email}</p>
-                                        <p className="text-sm text-gray-600 mt-1" dir="ltr">{ad.advertiser?.phone}</p>
+                                        <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">{t('ads.advertiser_info')}</h3>
+                                        <p className="text-lg font-bold text-gray-900">{ad.advertiser?.name || t('common.unavailable')}</p>
+                                        <p className="text-base font-semibold text-gray-700 mt-1">{ad.advertiser?.email}</p>
+                                        <p className="text-base font-semibold text-gray-700 mt-1" dir="ltr">{ad.advertiser?.phone}</p>
                                     </div>
                                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{t('ads.payment_details')}</h3>
-                                        <div className="space-y-2 text-sm">
+                                        <h3 className="text-base font-black text-gray-800 uppercase tracking-wider mb-3">{t('ads.payment_details')}</h3>
+                                        <div className="space-y-2.5">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{t('ads.issue_date')}:</span>
-                                                <span className="font-semibold text-gray-900">{new Date(ad.created_at || ad.uploaded_at).toLocaleDateString(dir === 'rtl' ? 'ar-SA' : 'en-US')}</span>
+                                                <span className="text-base font-bold text-gray-700">{t('ads.broadcast_package')}:</span>
+                                                <span className="text-base font-bold text-gray-900">{ad.package_name || t('ads.free_customization')}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{t('ads.payment_status')}:</span>
-                                                <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                                                <span className="text-base font-bold text-gray-700">{t('ads.payment_status')}:</span>
+                                                <span className="text-base font-bold text-emerald-600 flex items-center gap-1">
                                                     <CheckCircle className="w-4 h-4" /> {t('ads.paid_female')}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{t('ads.broadcast_package')}:</span>
-                                                <span className="font-semibold text-gray-900">{ad.package_name || t('ads.free_customization')}</span>
+                                                <span className="text-base font-bold text-gray-700">{t('ads.issue_date')}:</span>
+                                                <span className="text-base font-bold text-gray-900">{new Date(ad.created_at || ad.uploaded_at).toLocaleDateString(dir === 'rtl' ? 'ar-SA' : 'en-US')}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold text-gray-900 mb-4">{t('ads.ad_campaign_details')}</h3>
+                                    <h3 className="text-xl font-bold text-gray-900 mb-4">{t('ads.ad_campaign_details')}</h3>
                                     <div className="border border-gray-200 rounded-xl overflow-hidden">
-                                        <table className="w-full text-sm text-right" dir={dir}>
-                                            <thead className="bg-gray-50 border-b border-gray-200 text-gray-600">
+                                        <table className="w-full text-right" dir={dir}>
+                                            <thead className="bg-gray-50 border-b border-gray-200 text-gray-700">
                                                 <tr>
-                                                    <th className="px-4 py-3 font-semibold text-start">{t('ads.description')}</th>
-                                                    <th className="px-4 py-3 font-semibold text-center">{t('ads.date')}</th>
-                                                    <th className="px-4 py-3 font-semibold text-center">{t('ads.screens')}</th>
-                                                    <th className="px-4 py-3 font-semibold text-center">{t('ads.duration')}</th>
+                                                    <th className="px-4 py-4 text-base font-bold text-start">{t('ads.description')}</th>
+                                                    <th className="px-4 py-4 text-base font-bold text-center">{t('ads.date')}</th>
+                                                    <th className="px-4 py-4 text-base font-bold text-center">{t('ads.screens')}</th>
+                                                    <th className="px-4 py-4 text-base font-bold text-center">{t('ads.duration')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-100">
                                                 <tr className="bg-white">
-                                                    <td className="px-4 py-4 text-start">
-                                                        <div className="font-bold text-gray-900">{ad.title}</div>
-                                                        <div className="text-gray-500 text-xs mt-1">{t('ads.category')}: {ad.category?.category_name || t('ads.general')}</div>
+                                                    <td className="px-4 py-5 text-start">
+                                                        <div className="text-base font-bold text-gray-900">{ad.title}</div>
+                                                        <div className="text-gray-500 text-sm mt-1">{t('ads.category')}: {ad.category?.category_name || t('ads.general')}</div>
                                                     </td>
-                                                    <td className="px-4 py-4 text-center text-gray-600" dir="ltr">
-                                                        <div className="text-xs">{ad.start_date || '—'}</div>
-                                                        <div className="text-xs text-gray-400">{t('ads.to')}</div>
-                                                        <div className="text-xs">{ad.end_date || '—'}</div>
+                                                    <td className="px-4 py-5 text-center text-gray-700" dir="ltr">
+                                                        <div className="text-sm font-semibold">{ad.start_date || '—'}</div>
+                                                        <div className="text-xs text-gray-400 my-0.5">{t('ads.to')}</div>
+                                                        <div className="text-sm font-semibold">{ad.end_date || '—'}</div>
                                                     </td>
-                                                    <td className="px-4 py-4 text-center">
-                                                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md font-medium text-xs">
-                                                            <Monitor className="w-3 h-3" />
+                                                    <td className="px-4 py-5 text-center">
+                                                        <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md font-bold text-sm">
+                                                            <Monitor className="w-4 h-4" />
                                                             {ad.screens?.length || 0} {t('ads.screens')}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-4 text-center text-gray-600">
+                                                    <td className="px-4 py-5 text-center text-base font-semibold text-gray-700">
                                                         {ad.duration} {t('common.seconds')}
                                                     </td>
                                                 </tr>

@@ -50,14 +50,14 @@ const KpiCard = ({ label, value, icon: Icon, iconBg, iconColor, accentColor, ind
         }}
     >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <p style={{ margin: 0, fontSize: '13px', fontWeight: 500, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
+            <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
             {Icon && (
                 <div style={{ width: 40, height: 40, borderRadius: '50%', background: iconBg || S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon style={{ width: 20, height: 20, color: iconColor || S.primaryContainer }} />
                 </div>
             )}
         </div>
-        <span style={{ fontSize: '36px', fontWeight: 700, lineHeight: 1, color: accentColor || S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <span style={{ fontSize: '30px', fontWeight: 500, lineHeight: 1, color: '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             {value}
         </span>
     </motion.div>

@@ -14,7 +14,6 @@ const PremiumInput = ({ icon: Icon, englishLabel, arabicLabel, type = "text", va
         <div className="input-group flex flex-col w-full mb-2 group">
             <div className="flex justify-between items-center mb-1.5 px-1">
                 <label className="block text-sm font-bold text-[#111827] transition-colors">{arabicLabel}</label>
-                <span className="text-[10px] text-[#6B7280] uppercase tracking-wider font-bold">{englishLabel}</span>
             </div>
             <div className="relative">
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
@@ -151,7 +150,6 @@ const LoginPage = () => {
                     {/* Header */}
                     <div className="text-center mb-12 mt-4">
                         <h1 className="text-4xl lg:text-[42px] font-black text-[#111827] mb-3">{t('auth.login_title')}</h1>
-                        <p className="text-[#6B7280] text-[15px] font-bold">{t('auth.login_subtitle')}</p>
                     </div>
 
                     {/* Form */}
@@ -177,20 +175,7 @@ const LoginPage = () => {
                         />
 
                         {/* Options */}
-                        <div className="flex items-center justify-between mt-6 px-1">
-                            <div className="flex items-center">
-                                <input 
-                                    id="remember-me" 
-                                    name="remember-me" 
-                                    type="checkbox" 
-                                    checked={rememberMe}
-                                    onChange={() => setRememberMe(!rememberMe)}
-                                    className="h-4 w-4 text-[#14506b] focus:ring-2 focus:ring-[#14506b] border-[#E5E7EB] rounded-[4px] cursor-pointer accent-[#14506b] transition-all" 
-                                />
-                                <label htmlFor="remember-me" className="mr-2.5 block text-[13px] text-[#111827] cursor-pointer font-bold select-none">
-                                    {t('auth.remember_me')}
-                                </label>
-                            </div>
+                        <div className="flex items-center justify-end mt-6 px-1">
                             <div>
                                 <Link to="/forgot-password" className="text-[13px] font-bold text-[#14506b] hover:text-[#0f3c50] transition-colors underline-offset-4 hover:underline">
                                     {t('auth.forgot_password')}
@@ -287,9 +272,6 @@ const LoginPage = () => {
                                 {t('auth.branding_title')}
                                 <span className="block text-[#d9a05b] mt-3">{t('auth.branding_highlight')}</span>
                             </h2>
-                            <p className="text-white/80 text-[14px] leading-relaxed mt-4 font-medium px-4">
-                                {t('auth.branding_desc')}
-                            </p>
                         </div>
                     </div>
 

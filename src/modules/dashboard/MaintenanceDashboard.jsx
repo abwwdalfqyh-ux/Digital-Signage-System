@@ -188,7 +188,7 @@ const MaintKpiCard = ({ icon: Icon, label, value, sub, color, bgColor, borderCol
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                <p style={{ margin: 0, fontSize: '12px', fontWeight: 500, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
+                <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
                 {badge && (
                     <span style={{ fontSize: '10px', fontWeight: 700, color: badge.color, background: badge.bg, padding: '2px 8px', borderRadius: '99px', display: 'inline-block', width: 'fit-content' }}>
                         {badge.label}
@@ -201,7 +201,7 @@ const MaintKpiCard = ({ icon: Icon, label, value, sub, color, bgColor, borderCol
         </div>
 
         <div>
-            <div style={{ fontSize: '36px', fontWeight: 800, color: S.onBackground, lineHeight: 1, fontFamily: "'IBM Plex Sans Arabic', sans-serif", letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: '30px', fontWeight: 500, color: '#555555', lineHeight: 1, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                 {value}
             </div>
             {sub && <p style={{ margin: '4px 0 0', fontSize: '11px', color: S.onSurfaceVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{sub}</p>}

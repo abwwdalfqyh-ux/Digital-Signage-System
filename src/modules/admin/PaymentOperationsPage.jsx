@@ -175,8 +175,8 @@ const PaymentOperationsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.total_operations')}</p>
-                        <p className="text-3xl font-black text-on-surface">{pendingPayments.length + completedPayments.length}</p>
+                        <p className="text-xl font-extrabold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.total_operations')}</p>
+                        <p className="text-base font-normal text-on-surface">{pendingPayments.length + completedPayments.length}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <span className="material-symbols-outlined text-2xl">payments</span>
@@ -184,8 +184,8 @@ const PaymentOperationsPage = () => {
                 </div>
                 <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.pending_waiting')}</p>
-                        <p className="text-3xl font-black text-orange-500">{pendingPayments.length}</p>
+                        <p className="text-xl font-extrabold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.pending_waiting')}</p>
+                        <p className="text-base font-normal text-orange-500">{pendingPayments.length}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
                         <span className="material-symbols-outlined text-2xl">pending</span>
@@ -193,8 +193,8 @@ const PaymentOperationsPage = () => {
                 </div>
                 <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.completed_approved')}</p>
-                        <p className="text-3xl font-black text-emerald-600">{completedPayments.length}</p>
+                        <p className="text-xl font-extrabold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.completed_approved')}</p>
+                        <p className="text-base font-normal text-emerald-600">{completedPayments.length}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
                         <span className="material-symbols-outlined text-2xl">check_circle</span>
@@ -202,8 +202,8 @@ const PaymentOperationsPage = () => {
                 </div>
                 <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.total_collected')}</p>
-                        <p className="text-3xl font-black text-primary">${totalCompleted.toFixed(0)}</p>
+                        <p className="text-xl font-extrabold text-on-surface-variant uppercase tracking-wide mb-2">{t('payment_ops.total_collected')}</p>
+                        <p className="text-base font-normal text-primary">${totalCompleted.toFixed(0)}</p>
                     </div>
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
                         <span className="material-symbols-outlined text-2xl">account_balance</span>

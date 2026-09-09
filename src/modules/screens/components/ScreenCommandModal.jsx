@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Power, Moon, RefreshCw, RefreshCcw, TerminalSquare } from 'lucide-react';
+import { Power, Moon, RefreshCw, RefreshCcw } from 'lucide-react';
 import Modal from '../../../shared/components/Modal';
 import ConfirmDialog from '../../../shared/components/ConfirmDialog';
 import axiosClient from '../../../core/api/axiosClient';
@@ -11,7 +11,7 @@ const commands = [
     { id: 'RESTART_APP', labelKey: 'screens.cmd_restart_app', icon: RefreshCw, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
     { id: 'WAKE_SCREEN', labelKey: 'screens.cmd_wake_screen', icon: Power, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
     { id: 'SLEEP_SCREEN', labelKey: 'screens.cmd_sleep_screen', icon: Moon, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-200' },
-    { id: 'SYNC_PLAYLIST', labelKey: 'screens.cmd_sync_playlist', icon: RefreshCcw, color: 'text-[var(--color-dark-turquoise)]', bg: 'bg-[var(--color-dark-turquoise)]/10', border: 'border-[var(--color-dark-turquoise)]/30' },
+    { id: 'SYNC_PLAYLIST', labelKey: 'screens.cmd_sync_playlist', icon: RefreshCcw, color: 'text-[#004ac6]', bg: 'bg-[#e1e8fd]', border: 'border-[#c3c6d7]' },
 ];
 
 const ScreenCommandModal = ({ isOpen, onClose, screen }) => {
@@ -46,19 +46,17 @@ const ScreenCommandModal = ({ isOpen, onClose, screen }) => {
                 isOpen={isOpen} 
                 onClose={onClose} 
                 title={
-                    <span className="flex items-center gap-2">
-                        <TerminalSquare className="w-5 h-5 text-[var(--color-dark-turquoise)]" /> 
+                    <span className="text-[20px] font-extrabold text-[#141b2b]">
                         {t('screens.remote_control_system')}
                     </span>
                 }
             >
                 <div className="space-y-4" dir={dir}>
-                    <div className="bg-white p-4 rounded-xl border-[1.5px] border-gray-100 shadow-sm flex justify-between items-center relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-1.5 h-full bg-[var(--color-dark-turquoise)]"></div>
-                        <div>
-                            <p className="text-[10px] text-gray-400 font-bold mb-0.5">{t('screens.target_screen')}</p>
-                            <h3 className="font-black text-sm text-gray-800">{screen?.screen_name || t('screens.unknown')}</h3>
-                            <p className="text-[11px] text-gray-400 mt-1 font-mono tracking-widest text-left mt-0.5" dir="ltr">{screen?.mac_address || '---'}</p>
+                    <div className="bg-[#f9f9ff] p-4 rounded-xl border border-[#c3c6d7] shadow-sm flex justify-between items-center relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-1.5 h-full bg-[#004ac6]"></div>
+                        <div className="w-full">
+                            <h3 className="font-extrabold text-[18px] text-[#141b2b]">{screen?.screen_name || t('screens.unknown')}</h3>
+                            <p className="text-[16px] text-[#004ac6] mt-1 font-mono font-bold tracking-wider" dir="ltr">{screen?.mac_address || '---'}</p>
                         </div>
                     </div>
 
@@ -72,14 +70,14 @@ const ScreenCommandModal = ({ isOpen, onClose, screen }) => {
                                     key={cmd.id}
                                     disabled={!!loadingCommand}
                                     onClick={() => setConfirmAction(cmd)}
-                                    className={`flex flex-col items-center justify-center py-6 px-2 gap-3 rounded-2xl border-[1.5px] transition-all hover:shadow-md ${cmd.bg} ${cmd.border} hover:opacity-80 active:scale-95 disabled:opacity-50 disabled:scale-100 group`}
+                                    className={`flex flex-col items-center justify-center py-6 px-3 gap-3 rounded-2xl border-[1.5px] transition-all hover:shadow-md ${cmd.bg} ${cmd.border} hover:opacity-80 active:scale-95 disabled:opacity-50 disabled:scale-100 group cursor-pointer`}
                                 >
                                     {isLoading ? (
-                                        <div className={`w-8 h-8 border-4 border-t-transparent rounded-full animate-spin ${cmd.color.replace('text-', 'border-')}`}></div>
+                                        <div className={`w-9 h-9 border-4 border-t-transparent rounded-full animate-spin ${cmd.color.replace('text-', 'border-')}`}></div>
                                     ) : (
-                                        <Icon className={`w-8 h-8 ${cmd.color} group-hover:scale-110 transition-transform`} />
+                                        <Icon className={`w-9 h-9 ${cmd.color} group-hover:scale-110 transition-transform`} />
                                     )}
-                                    <span className={`text-xs font-black ${cmd.color}`}>{t(cmd.labelKey)}</span>
+                                    <span className={`text-[16px] font-extrabold ${cmd.color}`}>{t(cmd.labelKey)}</span>
                                 </button>
                             );
                         })}

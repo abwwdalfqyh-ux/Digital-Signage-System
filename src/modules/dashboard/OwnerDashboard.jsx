@@ -80,7 +80,7 @@ const KpiCard = ({ label, sublabel, value, note, noteIcon: NoteIcon, noteColor, 
 /* ══════════════════════════════════════════════════════
    WEEKLY REVENUE SVG CHART
 ══════════════════════════════════════════════════════ */
-const WeeklyChart = ({ data = [] }) => {
+const WeeklyChart = ({ data = [], t }) => {
     const svgRef = useRef(null);
     const [tip, setTip] = useState(null);
 
@@ -252,7 +252,7 @@ const OwnerDashboard = () => {
         monthly_revenue: kpis.kpis?.monthly_earnings ?? kpis.monthly_earnings ?? 0,
         today_revenue: kpis.kpis?.today_earnings ?? kpis.today_earnings ?? 0,
         revenue_growth: '+0%', // Can be calculated from history
-        notifications: kpis.financial_activities ? kpis.financial_activities.length : 0
+        notifications: Array.isArray(kpis.financial_activities) ? kpis.financial_activities.length : 0
     };
 
     let weeklyData = [
@@ -263,7 +263,7 @@ const OwnerDashboard = () => {
         weeklyData = kpis.charts.weekly_revenue;
     }
 
-    const quickAlerts = (kpis.financial_activities || []).map(act => {
+    const quickAlerts = (Array.isArray(kpis.financial_activities) ? kpis.financial_activities : []).map(act => {
         let text = act.text;
         try {
             const parsed = JSON.parse(text);
@@ -323,7 +323,7 @@ const OwnerDashboard = () => {
                         <h3 className="m-0 text-lg font-bold text-[#141b2b]">{t('dashboard.revenue_growth')}</h3>
                         <p className="text-xs text-gray-400 font-medium">{t('dashboard.revenue_growth_desc')}</p>
                     </div>
-                    <WeeklyChart data={weeklyData} />
+                    <WeeklyChart data={weeklyData} t={t} />
                 </motion.div>
 
                 {/* Status Donut Chart */}

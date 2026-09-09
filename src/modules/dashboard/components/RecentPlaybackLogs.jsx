@@ -44,7 +44,7 @@ const RecentPlaybackLogs = () => {
 
     // Polling every 15 seconds to keep it real-time
     const { data, isLoading } = usePlaybackLogs(params, {
-        refetchInterval: 15000, 
+        refetchInterval: 15000,
     });
 
     const logs = data?.logs || [];
@@ -79,7 +79,7 @@ const RecentPlaybackLogs = () => {
     const handleCleanup = async () => {
         const daysLabel = cleanupDays == 1 ? t('dashboard.cleanup_day') : cleanupDays == 7 ? t('dashboard.cleanup_week') : t('dashboard.cleanup_days', { days: cleanupDays });
         if (!window.confirm(t('dashboard.cleanup_confirm', { daysLabel }))) return;
-        
+
         try {
             setIsCleaning(true);
             const response = await axiosClient.delete(ENDPOINTS.LOGS.PLAYBACK_CLEANUP, {
@@ -100,44 +100,45 @@ const RecentPlaybackLogs = () => {
             transition={{ duration: 0.5, delay: 0.5 }}
             style={{ ...glassCard, overflow: 'hidden', marginTop: '30px' }}
         >
-            {/* toolbar */}
+            {/* toolbar: Title centered + Buttons row below */}
             <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '16px 20px',
                 background: S.surfaceContainerLowest,
                 borderBottom: `1px solid ${S.outlineVariant}`,
-                flexWrap: 'wrap', gap: '16px'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {/* Title Row - centered */}
+                <div style={{
+                    padding: '20px 20px 12px',
+                    textAlign: 'center',
+                }}>
                     <h3 style={{
-                        margin: 0, fontSize: '18px', fontWeight: 700,
+                        margin: 0, fontSize: '26px', fontWeight: 800,
                         color: S.onBackground,
                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                        letterSpacing: '-0.02em',
                     }}>
                         {t('dashboard.live_playback_logs')}
-                        <span style={{
-                            display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
-                            background: '#34d399', marginRight: 8,
-                            boxShadow: '0 0 8px #34d399'
-                        }}></span>
                     </h3>
-                    <span style={{ fontSize: '12px', background: S.surfaceContainerLow, padding: '4px 10px', borderRadius: '12px', fontWeight: 'bold' }}>
-                        {t('dashboard.total_logs', { total: stats.total_plays })}
-                    </span>
+                    <div style={{ width: '50px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '8px auto 0' }} />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    
-                    {/* Cleanup Section */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: S.surfaceContainerLow, borderRadius: '8px', padding: '4px' }}>
+                {/* Buttons Row - Full Width */}
+                <div style={{
+                    display: 'flex', alignItems: 'stretch',
+                    padding: '0 20px 16px',
+                    gap: '12px',
+                }}>
+
+                    {/* Cleanup Section - flex:1 */}
+                    <div style={{ display: 'flex', alignItems: 'stretch', gap: '0', background: S.surfaceContainerLow, borderRadius: '10px', overflow: 'hidden', border: `1px solid ${S.outlineVariant}`, flex: 1 }}>
                         <select
                             value={cleanupDays}
                             onChange={(e) => setCleanupDays(e.target.value)}
                             style={{
                                 background: 'transparent', border: 'none', outline: 'none',
-                                color: S.onSurface, padding: '4px 8px',
-                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px',
-                                cursor: 'pointer'
+                                color: S.onSurface, padding: '10px 12px',
+                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '14px',
+                                cursor: 'pointer', fontWeight: 600,
+                                flex: 1,
                             }}
                         >
                             <option value="30">{t('dashboard.older_than_month')}</option>
@@ -145,63 +146,67 @@ const RecentPlaybackLogs = () => {
                             <option value="7">{t('dashboard.older_than_week')}</option>
                             <option value="1">{t('dashboard.older_than_day')}</option>
                         </select>
-                        <button 
+                        <button
                             onClick={handleCleanup}
                             disabled={isCleaning}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: '4px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                                 background: isCleaning ? S.surfaceContainerLowest : '#fee2e2',
                                 color: isCleaning ? S.outline : '#ef4444',
-                                border: 'none', padding: '6px 12px', borderRadius: '6px',
-                                cursor: isCleaning ? 'wait' : 'pointer', fontWeight: 600,
-                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px'
+                                border: 'none', borderRight: `1px solid ${S.outlineVariant}`,
+                                padding: '10px 18px',
+                                cursor: isCleaning ? 'wait' : 'pointer', fontWeight: 700,
+                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '14px',
+                                whiteSpace: 'nowrap',
                             }}
                             title={t('dashboard.delete_logs_title')}
                         >
-                            <Trash2 style={{ fontSize: '16px', width: '16px', height: '16px' }} />
+                            <Trash2 style={{ width: '16px', height: '16px' }} />
                             {t('dashboard.clear_btn')}
                         </button>
                     </div>
 
-                    {/* Export Section */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: S.surfaceContainerLow, borderRadius: '8px', padding: '4px' }}>
+                    {/* Export Section - flex:1 */}
+                    <div style={{ display: 'flex', alignItems: 'stretch', gap: '0', background: S.surfaceContainerLow, borderRadius: '10px', overflow: 'hidden', border: `1px solid ${S.outlineVariant}`, flex: 1 }}>
                         <select
                             value={exportFormat}
                             onChange={(e) => setExportFormat(e.target.value)}
                             style={{
                                 background: 'transparent', border: 'none', outline: 'none',
-                                color: S.onSurface, padding: '4px 8px',
-                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px',
-                                cursor: 'pointer'
+                                color: S.onSurface, padding: '10px 12px',
+                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '14px',
+                                cursor: 'pointer', fontWeight: 600,
+                                flex: 1,
                             }}
                         >
                             <option value="csv">Excel (CSV)</option>
                             <option value="pdf">PDF</option>
                         </select>
-                        <button 
+                        <button
                             onClick={handleExport}
                             disabled={isExporting}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: '4px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                                 background: isExporting ? S.surfaceContainerLowest : '#e8efae',
                                 color: isExporting ? S.outline : '#4d5118',
-                                border: 'none', padding: '6px 12px', borderRadius: '6px',
-                                cursor: isExporting ? 'wait' : 'pointer', fontWeight: 600,
-                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '13px'
+                                border: 'none', padding: '10px 18px',
+                                cursor: isExporting ? 'wait' : 'pointer', fontWeight: 700,
+                                fontFamily: "'IBM Plex Sans Arabic', sans-serif", fontSize: '14px',
+                                whiteSpace: 'nowrap',
                             }}
                         >
-                            <Download style={{ fontSize: '16px', width: '16px', height: '16px' }} />
+                            <Download style={{ width: '16px', height: '16px' }} />
                             {t('dashboard.export_btn')}
                         </button>
                     </div>
 
-                    {/* pagination */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {/* Pagination */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}
                             disabled={page === 1}
                             style={{
-                                width: 34, height: 34, borderRadius: '6px',
+                                width: 40, height: 40, borderRadius: '10px',
                                 border: `1px solid ${S.outlineVariant}`,
                                 background: S.surfaceContainerLowest,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -209,13 +214,13 @@ const RecentPlaybackLogs = () => {
                                 color: S.onSurfaceVariant,
                             }}
                         >
-                            <ChevronRight style={{ width: 18, height: 18 }} />
+                            <ChevronRight style={{ width: 20, height: 20 }} />
                         </button>
                         <span style={{
-                            padding: '0 12px', height: 34, borderRadius: '6px',
+                            padding: '0 16px', height: 40, borderRadius: '10px',
                             background: '#e8efae', color: '#4d5118',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '13px', fontWeight: 700,
+                            fontSize: '14px', fontWeight: 800,
                         }}>
                             {page} / {pagination.last_page}
                         </span>
@@ -223,7 +228,7 @@ const RecentPlaybackLogs = () => {
                             onClick={() => setPage(p => Math.min(pagination.last_page, p + 1))}
                             disabled={page === pagination.last_page || pagination.last_page === 0}
                             style={{
-                                width: 34, height: 34, borderRadius: '6px',
+                                width: 40, height: 40, borderRadius: '10px',
                                 border: `1px solid ${S.outlineVariant}`,
                                 background: S.surfaceContainerLowest,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -231,7 +236,7 @@ const RecentPlaybackLogs = () => {
                                 color: S.onSurfaceVariant,
                             }}
                         >
-                            <ChevronLeft style={{ width: 18, height: 18 }} />
+                            <ChevronLeft style={{ width: 20, height: 20 }} />
                         </button>
                     </div>
                 </div>
@@ -257,9 +262,9 @@ const RecentPlaybackLogs = () => {
                                 t('dashboard.status_col')
                             ].map((label, i) => (
                                 <th key={i} style={{
-                                    padding: '16px 20px',
+                                    padding: '18px 20px',
                                     textAlign: dir === 'rtl' ? 'right' : 'left',
-                                    fontSize: '14px', fontWeight: 600,
+                                    fontSize: '17px', fontWeight: 700,
                                     color: S.onSurface,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                 }}>
@@ -295,32 +300,24 @@ const RecentPlaybackLogs = () => {
                                     onMouseEnter={e => e.currentTarget.style.background = S.surfaceContainerLow}
                                     onMouseLeave={e => e.currentTarget.style.background = S.surfaceContainerLowest}
                                 >
-                                    <td style={{ padding: '16px 20px', fontSize: '13px', fontWeight: 'bold', color: S.onSurfaceVariant }}>
+                                    <td style={{ padding: '18px 20px', fontSize: '15px', fontWeight: 700, color: S.onSurfaceVariant }}>
                                         #{log.log_id}
                                     </td>
                                     <td style={{ padding: '16px 20px' }}>
-                                        <span style={{ 
-                                            fontSize: '14px', fontWeight: 600, 
-                                            color: S.onSurface, 
-                                            fontFamily: "'IBM Plex Sans Arabic', sans-serif" 
+                                        <span style={{
+                                            fontSize: '16px', fontWeight: 600,
+                                            color: S.onSurface,
+                                            fontFamily: "'IBM Plex Sans Arabic', sans-serif"
                                         }}>
                                             {log.ad_name}
                                         </span>
                                     </td>
                                     <td style={{ padding: '16px 20px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <div style={{
-                                                width: 28, height: 28, borderRadius: '50%',
-                                                background: '#f1f3f4',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                color: S.onSurfaceVariant, flexShrink: 0
-                                            }}>
-                                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>tv</span>
-                                            </div>
-                                            <span style={{ 
-                                                fontSize: '13px', fontWeight: 500,
-                                                color: S.onSurfaceVariant, 
-                                                fontFamily: "'IBM Plex Sans Arabic', sans-serif" 
+                                            <span style={{
+                                                fontSize: '15px', fontWeight: 500,
+                                                color: S.onSurfaceVariant,
+                                                fontFamily: "'IBM Plex Sans Arabic', sans-serif"
                                             }}>
                                                 {log.screen_name}
                                             </span>
@@ -328,19 +325,19 @@ const RecentPlaybackLogs = () => {
                                     </td>
                                     <td style={{ padding: '16px 20px' }}>
                                         <span style={{
-                                            fontSize: '13px', fontWeight: 500,
+                                            fontSize: '15px', fontWeight: 500,
                                             color: S.onSurface,
                                             fontFamily: "'IBM Plex Sans Arabic', sans-serif"
                                         }}>
                                             {log.duration} {t('dashboard.seconds_unit')}
                                         </span>
                                     </td>
-                                    <td style={{ padding: '16px 20px' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                            <span style={{ fontSize: '13px', fontWeight: 600, color: S.onSurface }}>
+                                    <td style={{ padding: '18px 20px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', alignItems: 'center' }} dir="ltr">
+                                            <span style={{ fontSize: '15px', fontWeight: 600, color: S.onSurface, letterSpacing: '0.01em' }}>
                                                 {log.played_at}
                                             </span>
-                                            <span style={{ fontSize: '11px', color: S.outline }}>
+                                            <span style={{ fontSize: '13px', color: S.outline }}>
                                                 {log.played_at_human}
                                             </span>
                                         </div>
@@ -348,7 +345,7 @@ const RecentPlaybackLogs = () => {
                                     <td style={{ padding: '16px 20px' }}>
                                         <span style={{
                                             background: 'rgba(52, 211, 153, 0.1)', color: '#059669',
-                                            padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold'
+                                            padding: '6px 14px', borderRadius: '12px', fontSize: '14px', fontWeight: 700
                                         }}>
                                             {t('dashboard.completed_status')}
                                         </span>

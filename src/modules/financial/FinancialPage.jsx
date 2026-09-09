@@ -356,14 +356,14 @@ const FinancialPage = () => {
                 <div className="md:col-span-6 lg:col-span-6 rounded-2xl text-white p-lg shadow-md relative overflow-hidden flex flex-col justify-between min-h-[200px]" style={{ background: 'linear-gradient(135deg, #004ac6 0%, #00174b 100%)' }}>
                     <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
                     <div className="relative z-10 flex justify-between items-start">
-                        <h3 className="font-title-lg text-title-lg text-inverse-primary opacity-90 flex items-center gap-2">
+                        <h3 className="text-2xl font-extrabold text-inverse-primary opacity-90 flex items-center gap-2">
                             <span className="material-symbols-outlined font-normal">account_balance</span>
                             {t('financial.platform_net_profits')}
                         </h3>
                         <span className="material-symbols-outlined text-3xl opacity-50 font-normal">trending_up</span>
                     </div>
                     <div className="relative z-10 mt-6">
-                        <div className="font-display-lg text-display-lg font-bold tracking-tight mb-4">
+                        <div className="text-xl font-bold tracking-tight mb-4">
                             {isAmountVisible ? `$${parseFloat(platformProfit).toFixed(2)}` : '****'}
                         </div>
                         <button 
@@ -386,8 +386,8 @@ const FinancialPage = () => {
                             <span className="material-symbols-outlined text-primary font-normal">payments</span>
                         </div>
                         <div>
-                            <p className="font-label-md text-label-md text-on-surface-variant mb-1">{t('financial.total_cash_flow')}</p>
-                            <p className="font-headline-lg text-headline-lg text-on-surface">${parseFloat(totalCashFlow).toFixed(2)}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.total_cash_flow')}</p>
+                            <p className="text-base font-normal text-on-surface">${parseFloat(totalCashFlow).toFixed(2)}</p>
                         </div>
                     </div>
 
@@ -397,8 +397,8 @@ const FinancialPage = () => {
                             <span className="material-symbols-outlined font-normal">group</span>
                         </div>
                         <div>
-                            <p className="font-label-md text-label-md text-on-surface-variant mb-1">{t('financial.owners_liabilities')}</p>
-                            <p className="font-headline-lg text-headline-lg text-on-surface">${parseFloat(ownersLiabilities).toFixed(2)}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.owners_liabilities')}</p>
+                            <p className="text-base font-normal text-on-surface">${parseFloat(ownersLiabilities).toFixed(2)}</p>
                         </div>
                     </div>
 
@@ -408,8 +408,8 @@ const FinancialPage = () => {
                             <span className="material-symbols-outlined text-error font-normal">schedule</span>
                         </div>
                         <div>
-                            <p className="font-label-md text-label-md text-on-surface-variant mb-1">{t('financial.requests_under_review')}</p>
-                            <p className="font-headline-lg text-headline-lg text-on-surface">{pendingTransactions}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.requests_under_review')}</p>
+                            <p className="text-base font-normal text-on-surface">{pendingTransactions}</p>
                         </div>
                         <div className="absolute bottom-0 left-0 w-full h-1 bg-error opacity-20"></div>
                     </div>
