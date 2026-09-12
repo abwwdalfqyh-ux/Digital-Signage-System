@@ -138,31 +138,28 @@ const AdvertiserDashboard = () => {
             {/* 1. Header (Matched to Admin Dashboard) */}
             <motion.div
                 variants={itemVariants}
-                className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-2"
+                className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-4"
             >
                 <div>
-                    <h1 className="text-[28px] font-bold text-on-background m-0 leading-tight font-sans">
+                    <h1 className="text-[32px] font-extrabold text-[#141b2b] m-0 leading-tight font-sans">
                         {t('dashboard.overview')}
                     </h1>
-                    <p className="mt-1 text-[13px] text-outline font-sans">
-                        {t('dashboard.overview_desc')}
-                    </p>
                 </div>
 
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                     <button
                         onClick={handleRefresh}
                         disabled={isRefreshing}
                         title={t('common.refresh')}
-                        className="w-10 h-10 flex items-center justify-center rounded-[10px] bg-white text-gray-500 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm"
+                        className="w-11 h-11 flex items-center justify-center rounded-xl bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm cursor-pointer"
                     >
-                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#2563EB]' : ''}`} />
+                        <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin text-[#2563EB]' : ''}`} />
                     </button>
                     <button
                         onClick={() => navigate('/dashboard/ads/create')}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-[10px] bg-[#2563EB] text-white text-[13px] font-bold cursor-pointer font-sans shadow-[0_2px_8px_rgba(37,99,235,0.30)] hover:bg-[#1D4ED8] transition-colors border-none"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#2563EB] text-white text-[16px] font-extrabold cursor-pointer font-sans shadow-[0_2px_8px_rgba(37,99,235,0.30)] hover:bg-[#1D4ED8] transition-colors border-none"
                     >
-                        <PlusCircle className="w-[15px] h-[15px]" />
+                        <PlusCircle className="w-5 h-5" />
                         {t('ads.create')}
                     </button>
                 </div>
@@ -171,117 +168,70 @@ const AdvertiserDashboard = () => {
             {/* 2. KPI Stats Cards */}
             <motion.div
                 variants={itemVariants}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6"
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-6"
             >
                 {/* Active Cards */}
                 <div
                     onClick={() => setStatusFilter(statusFilter === 'Active' ? 'all' : 'Active')}
-                    className={`bg-white rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] cursor-pointer flex flex-col justify-between transition-all duration-300 group relative overflow-hidden ${statusFilter === 'Active'
+                    className={`bg-white rounded-3xl py-6 px-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] cursor-pointer flex flex-col items-center justify-center text-center transition-all duration-300 ${statusFilter === 'Active'
                             ? 'border-2 border-emerald-500 shadow-[0_8px_30px_-4px_rgba(16,185,129,0.2)] -translate-y-1'
-                            : 'border-2 border-transparent hover:border-emerald-500/30 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 border border-gray-100'
+                            : 'border border-gray-200 hover:border-emerald-500/30 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1'
                         }`}
                 >
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.active_ads_now')}</p>
-                            <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">{data?.active_ads_count || '0'}</h3>
-                        </div>
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${statusFilter === 'Active' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100'}`}>
-                            <Megaphone className="w-7 h-7" />
-                        </div>
-                    </div>
-                    <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-[10px] md:text-xs font-bold transition-colors">
-                        <div className="flex items-center gap-2 text-emerald-600">
-                            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                            <span>{t('dashboard.online_status')}</span>
-                        </div>
-                        <span className="text-gray-400">{statusFilter === 'Active' ? t('dashboard.clear_filter') : t('dashboard.filter_table')}</span>
-                    </div>
+                    <p className="text-xl md:text-2xl font-black text-[#141b2b] mb-1.5">{t('dashboard.active_ads_now')}</p>
+                    <p className="text-lg md:text-xl font-bold text-emerald-600">{data?.active_ads_count || '0'}</p>
                 </div>
 
                 {/* Pending Card */}
                 <div
                     onClick={() => setStatusFilter(statusFilter === 'Pending' ? 'all' : 'Pending')}
-                    className={`bg-white rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] cursor-pointer flex flex-col justify-between transition-all duration-300 group relative overflow-hidden ${statusFilter === 'Pending'
+                    className={`bg-white rounded-3xl py-6 px-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] cursor-pointer flex flex-col items-center justify-center text-center transition-all duration-300 ${statusFilter === 'Pending'
                             ? 'border-2 border-[var(--color-gold)] shadow-[0_8px_30px_-4px_rgba(196,160,82,0.2)] -translate-y-1'
-                            : 'border-2 border-transparent hover:border-[var(--color-gold)]/30 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1 border border-gray-100'
+                            : 'border border-gray-200 hover:border-[var(--color-gold)]/30 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] hover:-translate-y-1'
                         }`}
                 >
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-[var(--color-gold)]/10 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.under_review')}</p>
-                            <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">{data?.pending_ads_count || '0'}</h3>
-                        </div>
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${statusFilter === 'Pending' ? 'bg-[var(--color-gold)] text-white shadow-lg shadow-[var(--color-gold)]/30' : 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] group-hover:bg-[var(--color-gold)]/20'}`}>
-                            <Clock className="w-7 h-7" />
-                        </div>
-                    </div>
-                    <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex justify-between items-center text-[10px] md:text-xs font-bold transition-colors">
-                        <div className="flex items-center gap-2 text-amber-600">
-                            <Clock className="w-3.5 h-3.5" />
-                            <span>{t('dashboard.waiting_approval')}</span>
-                        </div>
-                        <span className="text-gray-400">{statusFilter === 'Pending' ? t('dashboard.clear_filter') : t('dashboard.filter_table')}</span>
-                    </div>
+                    <p className="text-xl md:text-2xl font-black text-[#141b2b] mb-1.5">{t('dashboard.under_review')}</p>
+                    <p className="text-lg md:text-xl font-bold text-amber-600">{data?.pending_ads_count || '0'}</p>
                 </div>
 
                 {/* Expenses Card */}
-                <div className="bg-white rounded-3xl p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] border-2 border-transparent border-gray-100 flex flex-col justify-between hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all duration-300 relative overflow-hidden group">
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-[var(--color-dark-turquoise)]/5 rounded-full blur-3xl -ml-16 -mt-16 opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
-                    <div className="flex justify-between items-start mb-6 relative z-10">
-                        <div className="space-y-1.5">
-                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{t('dashboard.total_expenses')}</p>
-                            <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">${data?.total_spent || '0'}</h3>
-                        </div>
-                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 bg-[var(--color-dark-turquoise)]/10 text-[var(--color-dark-turquoise)] group-hover:bg-[var(--color-dark-turquoise)]/20">
-                            <DollarSign className="w-7 h-7" />
-                        </div>
-                    </div>
-                    <div className="relative z-10 bg-gray-50 rounded-xl px-3.5 py-2.5 flex items-center gap-2 text-gray-500 text-[10px] md:text-xs font-bold">
-                        <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-                        <span>{t('dashboard.approved_invoices')}</span>
-                    </div>
+                <div className="bg-white rounded-3xl py-6 px-5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] border border-gray-200 flex flex-col items-center justify-center text-center hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] transition-all duration-300">
+                    <p className="text-xl md:text-2xl font-black text-[#141b2b] mb-1.5">{t('dashboard.total_expenses')}</p>
+                    <p className="text-lg md:text-xl font-bold text-[#141b2b]">${data?.total_spent || '0'}</p>
                 </div>
             </motion.div>
 
             {/* 3. Filterable Campaigns / Ads registry */}
             <motion.div
                 variants={itemVariants}
-                className="bg-white rounded-3xl border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col"
+                className="bg-white rounded-3xl border border-gray-200 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col"
             >
                 {/* Search / Filter Header */}
-                <div className="p-6 md:p-8 border-b border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
-                            <Calendar className="w-6 h-6 text-[var(--color-dark-turquoise)]" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-black text-gray-900 tracking-tight mb-1">
-                                {t('dashboard.recent_ads_registry')}
-                            </h3>
-                            <p className="text-xs text-gray-500 font-bold">
-                                {statusFilter !== 'all' ? (
-                                    <span className="text-[var(--color-dark-turquoise)] flex items-center gap-1.5">
-                                        {statusFilter === 'Active' ? t('dashboard.filter_active_only') : t('dashboard.filter_pending_only')}
-                                        <button onClick={() => setStatusFilter('all')} className="underline hover:text-[#005e6b] flex items-center gap-1 ml-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                            <RotateCcw className="w-3 h-3" /> {t('common.reset')}
-                                        </button>
-                                    </span>
-                                ) : t('dashboard.browse_latest_ads')}
+                <div className="p-6 md:p-8 border-b border-gray-200 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div>
+                        <h3 className="text-2xl font-black text-[#141b2b] tracking-tight mb-1">
+                            {t('dashboard.recent_ads_registry')}
+                        </h3>
+                        {statusFilter !== 'all' && (
+                            <p className="text-sm text-gray-500 font-bold">
+                                <span className="text-[var(--color-dark-turquoise)] flex items-center gap-1.5">
+                                    {statusFilter === 'Active' ? t('dashboard.filter_active_only') : t('dashboard.filter_pending_only')}
+                                    <button onClick={() => setStatusFilter('all')} className="underline hover:text-[#005e6b] flex items-center gap-1 ml-2 text-gray-400 hover:text-gray-600 transition-colors">
+                                        <RotateCcw className="w-3.5 h-3.5" /> {t('common.reset')}
+                                    </button>
+                                </span>
                             </p>
-                        </div>
+                        )}
                     </div>
 
                     {/* Search Field */}
-                    <div className="relative w-full lg:w-auto lg:min-w-[320px]">
+                    <div className="relative w-full lg:w-auto lg:min-w-[360px]">
                         <input
                             type="text"
                             placeholder={t('dashboard.search_ads')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-3.5 px-12 text-sm font-bold text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[var(--color-dark-turquoise)] focus:bg-white focus:ring-4 focus:ring-[var(--color-dark-turquoise)]/10 transition-all text-right"
+                            className="w-full bg-gray-50 border border-gray-300 rounded-2xl py-3.5 px-12 text-base font-bold text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[var(--color-dark-turquoise)] focus:bg-white focus:ring-4 focus:ring-[var(--color-dark-turquoise)]/10 transition-all text-right"
                         />
                         <Search className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
@@ -290,15 +240,15 @@ const AdvertiserDashboard = () => {
                 {/* Table Content */}
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-right border-collapse min-w-[800px]">
-                        <thead className="bg-gray-50/80 sticky top-0 z-10 backdrop-blur-sm">
-                            <tr className="border-b border-gray-100">
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">{t('ads.ad_title')}</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider">{t('ads.campaign_date')}</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-right">{t('ads.total_cost')}</th>
-                                <th className="py-5 px-6 md:px-8 text-xs font-black text-gray-400 uppercase tracking-wider text-center">{t('ads.publish_status')}</th>
+                        <thead className="bg-gray-50/90 sticky top-0 z-10 backdrop-blur-sm border-b border-gray-200">
+                            <tr className="border-b border-gray-200">
+                                <th className="py-5 px-6 md:px-8 text-[17px] md:text-[19px] font-extrabold text-[#141b2b] uppercase tracking-wider">{t('ads.ad_title')}</th>
+                                <th className="py-5 px-6 md:px-8 text-[17px] md:text-[19px] font-extrabold text-[#141b2b] uppercase tracking-wider">{t('ads.campaign_date')}</th>
+                                <th className="py-5 px-6 md:px-8 text-[17px] md:text-[19px] font-extrabold text-[#141b2b] uppercase tracking-wider text-right">{t('ads.total_cost')}</th>
+                                <th className="py-5 px-6 md:px-8 text-[17px] md:text-[19px] font-extrabold text-[#141b2b] uppercase tracking-wider text-center">{t('ads.publish_status')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-gray-100 bg-white">
                             <AnimatePresence>
                                 {filteredAds.map((ad, idx) => {
                                     const status = ad.status;
@@ -326,33 +276,33 @@ const AdvertiserDashboard = () => {
                                             exit={{ opacity: 0 }}
                                             transition={{ duration: 0.2 }}
                                             key={`${ad.id}-${idx}`}
-                                            className="hover:bg-gray-50/60 transition-colors group cursor-default"
+                                            className="hover:bg-gray-50/80 transition-colors group cursor-default"
                                         >
                                             <td className="py-5 px-6 md:px-8">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 shrink-0 group-hover:bg-white transition-colors">
-                                                        <Tv className="w-5 h-5" />
+                                                    <div className="w-11 h-11 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 shrink-0 group-hover:bg-white transition-colors">
+                                                        <Tv className="w-6 h-6" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-black text-gray-900 leading-snug mb-1 truncate max-w-[250px]" title={ad.title}>
+                                                        <p className="text-[17px] font-black text-[#141b2b] leading-snug mb-1 truncate max-w-[280px]" title={ad.title}>
                                                             {ad.title || t('ads.no_title')}
                                                         </p>
-                                                        <p className="text-[10px] text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded-md inline-block">{t('ads.duration')}: {ad.duration || '0'} {t('ads.seconds')}</p>
+                                                        <p className="text-xs md:text-sm font-bold text-gray-500 bg-gray-100 px-2.5 py-0.5 rounded-md inline-block">{t('ads.duration')}: {ad.duration || '0'} {t('ads.seconds')}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="py-5 px-6 md:px-8 text-xs font-bold text-gray-500">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="text-gray-900">{t('ads.from')}: <span className="font-sans">{ad.start_date || '--'}</span></span>
-                                                    <span className="text-gray-400">{t('ads.to')}: <span className="font-sans">{ad.end_date || '--'}</span></span>
+                                            <td className="py-5 px-6 md:px-8 text-sm font-bold text-gray-600">
+                                                <div className="flex flex-col gap-1 text-[15px]">
+                                                    <span className="text-gray-900 font-bold">{t('ads.from')}: <span className="font-sans">{ad.start_date || '--'}</span></span>
+                                                    <span className="text-gray-500">{t('ads.to')}: <span className="font-sans">{ad.end_date || '--'}</span></span>
                                                 </div>
                                             </td>
-                                            <td className="py-5 px-6 md:px-8 text-sm font-black text-gray-900">
+                                            <td className="py-5 px-6 md:px-8 text-base md:text-lg font-black text-[#141b2b]">
                                                 ${ad.total_cost || '0'}
                                             </td>
                                             <td className="py-5 px-6 md:px-8 text-center">
-                                                <span className={`inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-black w-32 ${statusClass}`}>
-                                                    {status === 'Active' && <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shrink-0"></span>}
+                                                <span className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full text-xs md:text-sm font-extrabold w-36 ${statusClass}`}>
+                                                    {status === 'Active' && <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shrink-0"></span>}
                                                     {statusText}
                                                 </span>
                                             </td>
@@ -371,14 +321,14 @@ const AdvertiserDashboard = () => {
                                         >
                                             <div className="w-24 h-24 mb-6 relative">
                                                 <div className="absolute inset-0 bg-[var(--color-dark-turquoise)]/10 rounded-full animate-ping"></div>
-                                                <div className="absolute inset-0 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-lg">
-                                                    <Megaphone className="w-10 h-10 text-gray-300" />
+                                                <div className="absolute inset-0 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-lg">
+                                                    <Megaphone className="w-10 h-10 text-gray-400" />
                                                 </div>
                                             </div>
-                                            <h4 className="text-lg font-black text-gray-900 mb-2 whitespace-nowrap">
+                                            <h4 className="text-xl font-black text-[#141b2b] mb-2 whitespace-nowrap">
                                                 {searchQuery || statusFilter !== 'all' ? t('dashboard.no_matches') : t('dashboard.no_ads_yet')}
                                             </h4>
-                                            <p className="text-sm font-medium text-gray-500 mb-8 leading-relaxed">
+                                            <p className="text-base font-bold text-gray-500 mb-8 leading-relaxed">
                                                 {searchQuery || statusFilter !== 'all'
                                                     ? t('dashboard.try_changing_filters')
                                                     : t('dashboard.start_first_campaign')}
@@ -386,9 +336,9 @@ const AdvertiserDashboard = () => {
                                             {!searchQuery && statusFilter === 'all' && (
                                                 <button
                                                     onClick={() => navigate('/dashboard/ads/create')}
-                                                    className="px-8 py-3.5 bg-[var(--color-dark-turquoise)] text-white text-sm font-bold rounded-xl hover:opacity-90 shadow-[0_8px_16px_rgba(20,93,106,0.2)] transition-opacity flex items-center gap-2"
+                                                    className="px-8 py-4 bg-[var(--color-dark-turquoise)] text-white text-base font-black rounded-xl hover:opacity-90 shadow-[0_8px_16px_rgba(20,93,106,0.2)] transition-opacity flex items-center gap-2"
                                                 >
-                                                    <PlusCircle className="w-5 h-5" />
+                                                    <PlusCircle className="w-6 h-6" />
                                                     {t('ads.start_new_campaign')}
                                                 </button>
                                             )}

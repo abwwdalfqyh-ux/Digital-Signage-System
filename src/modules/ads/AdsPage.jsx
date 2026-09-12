@@ -164,7 +164,7 @@ const AdsPage = () => {
     return (
         <div className="flex-1 overflow-y-auto" dir={dir} style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             {/* Page Title */}
-            <div className="text-center mb-8 pt-2">
+            <div className="text-right mb-6 pt-2">
                 <h1 style={{
                     fontSize: '32px',
                     fontWeight: 800,
@@ -175,61 +175,57 @@ const AdsPage = () => {
                 }}>
                     {t('ads.live_ad_center')}
                 </h1>
-                <div style={{ width: '60px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '10px auto 0' }} />
+                <div style={{ width: '60px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '10px 0 0' }} />
             </div>
 
+            {/* Start New Campaign Button - Full Width above Cards */}
+            {can('create_campaigns') && (
+                <button 
+                    onClick={() => navigate('/dashboard/ads/create')}
+                    className="w-full flex items-center justify-center gap-2.5 bg-[#004ac6] text-[#ffffff] py-4 px-6 rounded-xl hover:bg-[#141b2b] transition-all shadow-md text-[18px] font-extrabold cursor-pointer border border-[#004ac6] mb-6"
+                >
+                    <Plus className="w-6 h-6 stroke-[2.5]" />
+                    <span>{t('ads.start_new_campaign')}</span>
+                </button>
+            )}
+
             {/* Stats Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
                 {/* Total Transactions */}
-                <div className="bg-white rounded-[16px] p-6 border border-[#E5E7EB] flex flex-col justify-between items-center text-center shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-[#f1f3ff] flex items-center justify-center mb-4">
-                        <Layers className="text-[#004ac6] w-6 h-6" />
-                    </div>
-                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.total_transactions')}</p>
-                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.total}</h3>
+                <div className="bg-white rounded-[16px] py-4 px-4 border border-[#E5E7EB] flex flex-col items-center justify-center text-center shadow-sm">
+                    <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('ads.total_transactions')}</p>
+                    <p className="text-base md:text-lg font-normal text-[#141b2b]">{stats.total}</p>
                 </div>
 
                 {/* Active Campaigns */}
-                <div className="bg-white rounded-[16px] p-6 border border-[#E5E7EB] flex flex-col justify-between items-center text-center shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-[#E0F2FE] flex items-center justify-center mb-4">
-                        <Activity className="text-[#0284C7] w-6 h-6" />
-                    </div>
-                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.currently_broadcasting')}</p>
-                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.active}</h3>
+                <div className="bg-white rounded-[16px] py-4 px-4 border border-[#E5E7EB] flex flex-col items-center justify-center text-center shadow-sm">
+                    <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('ads.currently_broadcasting')}</p>
+                    <p className="text-base md:text-lg font-normal text-[#0284C7]">{stats.active}</p>
                 </div>
 
                 {/* Pending Approval */}
-                <div className="bg-white rounded-[16px] p-6 border border-[#E5E7EB] flex flex-col justify-between items-center text-center shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center mb-4">
-                        <Clock className="text-[#D97706] w-6 h-6" />
-                    </div>
-                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.pending_approval_short')}</p>
-                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.pending}</h3>
+                <div className="bg-white rounded-[16px] py-4 px-4 border border-[#E5E7EB] flex flex-col items-center justify-center text-center shadow-sm">
+                    <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('ads.pending_approval_short')}</p>
+                    <p className="text-base md:text-lg font-normal text-[#D97706]">{stats.pending}</p>
                 </div>
 
                 {/* Rejected Ads */}
-                <div className="bg-white rounded-[16px] p-6 border border-[#E5E7EB] flex flex-col justify-between items-center text-center shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-[#ffdad6] flex items-center justify-center mb-4">
-                        <Ban className="text-[#ba1a1a] w-6 h-6" />
-                    </div>
-                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.rejected_ads')}</p>
-                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.rejected}</h3>
+                <div className="bg-white rounded-[16px] py-4 px-4 border border-[#E5E7EB] flex flex-col items-center justify-center text-center shadow-sm">
+                    <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('ads.rejected_ads')}</p>
+                    <p className="text-base md:text-lg font-normal text-[#ba1a1a]">{stats.rejected}</p>
                 </div>
 
                 {/* Stopped Campaigns */}
-                <div className="bg-white rounded-[16px] p-6 border border-[#E5E7EB] flex flex-col justify-between items-center text-center shadow-sm">
-                    <div className="w-12 h-12 rounded-full bg-[#dce2f7] flex items-center justify-center mb-4">
-                        <PauseCircle className="text-[#434655] w-6 h-6" />
-                    </div>
-                    <p className="text-base font-bold text-[#141b2b] mb-2">{t('ads.paused_campaigns')}</p>
-                    <h3 className="text-2xl font-extrabold text-[#141b2b]">{stats.paused}</h3>
+                <div className="bg-white rounded-[16px] py-4 px-4 border border-[#E5E7EB] flex flex-col items-center justify-center text-center shadow-sm">
+                    <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('ads.paused_campaigns')}</p>
+                    <p className="text-base md:text-lg font-normal text-[#434655]">{stats.paused}</p>
                 </div>
             </div>
 
-            {/* Toolbar: Refresh + New Campaign + Search + Filters */}
+            {/* Toolbar: Search + Refresh + Filters */}
             <div className="flex flex-col gap-3 mb-6">
-                {/* Top Row: Search + Action Buttons */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                {/* Top Row: Search + Refresh Button */}
+                <div className="flex items-center gap-3">
                     {/* Search Box */}
                     <div className="relative flex-1">
                         <input 
@@ -246,27 +242,15 @@ const AdsPage = () => {
                         </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                        {/* Refresh */}
-                        <button
-                            onClick={handleRefresh}
-                            disabled={isRefreshing}
-                            title={t('common.refresh')}
-                            className="w-[42px] h-[42px] flex items-center justify-center rounded-lg bg-white text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm"
-                        >
-                            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
-                        </button>
-
-                        {/* New Campaign */}
-                        {can('create_campaigns') && (
-                            <button onClick={() => navigate('/dashboard/ads/create')}
-                                className="bg-[#004ac6] hover:bg-[#2563eb] text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shadow-sm transition-all hover:shadow-md whitespace-nowrap">
-                                <Plus className="w-4 h-4" />
-                                {t('ads.start_new_campaign')}
-                            </button>
-                        )}
-                    </div>
+                    {/* Refresh Button */}
+                    <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                        title={t('common.refresh')}
+                        className="w-[42px] h-[42px] flex items-center justify-center rounded-lg bg-white text-[#434655] border border-[#E5E7EB] hover:bg-[#f3f4f6] hover:text-[#141b2b] transition-colors shadow-sm shrink-0"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#2563eb]' : ''}`} />
+                    </button>
                 </div>
 
                 {/* Filter Tabs */}

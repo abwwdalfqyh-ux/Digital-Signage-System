@@ -49,51 +49,34 @@ const StatusPill = ({ status, t }) => {
 };
 
 /* ─── KPI Card ─── */
-const KpiCard = ({ label, value, subtitle, icon: Icon, iconBg, iconColor, borderColor, index, onClick, trend }) => (
+const KpiCard = ({ label, value, subtitle, index, onClick }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.07 }}
-        whileHover={{ y: -4, boxShadow: '0 12px 32px -8px rgba(0,74,198,0.14)' }}
+        whileHover={{ y: -3, boxShadow: '0 6px 20px rgba(0,0,0,0.06)' }}
         onClick={onClick}
         style={{
-            background: S.surfaceContainerLowest, borderRadius: '18px', padding: '22px',
+            background: S.surfaceContainerLowest, borderRadius: '16px', padding: '18px 16px',
             border: `1px solid ${S.outlineVariant}`,
-            borderRight: `4px solid ${borderColor || S.primaryContainer}`,
             cursor: onClick ? 'pointer' : 'default',
-            display: 'flex', flexDirection: 'column', gap: '12px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '6px',
             transition: 'all 0.2s ease',
         }}
     >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-                <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
-                {subtitle && <p style={{ margin: '2px 0 0', fontSize: '11px', color: S.outlineVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{subtitle}</p>}
-            </div>
-            {Icon && (
-                <div style={{ width: 42, height: 42, borderRadius: '12px', background: iconBg || S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon style={{ width: 20, height: 20, color: iconColor || S.primaryContainer }} />
-                </div>
-            )}
-        </div>
-        <div>
-            <span style={{ fontSize: '30px', fontWeight: 500, color: '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif", lineHeight: 1 }}>
-                {value}
-            </span>
-            {trend && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px' }}>
-                    <TrendingUp style={{ width: 13, height: 13, color: '#16a34a' }} />
-                    <span style={{ fontSize: '11px', color: '#16a34a', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{trend}</span>
-                </div>
-            )}
-        </div>
+        <p style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif", textAlign: 'center' }}>
+            {label}
+        </p>
+        <span style={{ fontSize: '18px', fontWeight: 500, color: '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif", textAlign: 'center' }}>
+            {value}
+        </span>
     </motion.div>
 );
 
 /* ─── Quick Action Card ─── */
-const ActionCard = ({ title, desc, icon: Icon, iconBg, iconColor, onClick, badge }) => (
+const ActionCard = ({ title, desc, onClick, badge }) => (
     <motion.div
-        whileHover={{ y: -2, boxShadow: '0 8px 20px rgba(0,74,198,0.10)' }}
+        whileHover={{ y: -2, boxShadow: '0 6px 16px rgba(0,0,0,0.06)' }}
         whileTap={{ scale: 0.98 }}
         onClick={onClick}
         style={{
@@ -103,20 +86,16 @@ const ActionCard = ({ title, desc, icon: Icon, iconBg, iconColor, onClick, badge
             transition: 'all 0.2s ease', position: 'relative',
         }}
     >
-        <div style={{ width: 46, height: 46, borderRadius: '14px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Icon style={{ width: 22, height: 22, color: iconColor }} />
-        </div>
         <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{title}</p>
-            <p style={{ margin: '2px 0 0', fontSize: '12px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{desc}</p>
+            <p style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{title}</p>
+            <p style={{ margin: '3px 0 0', fontSize: '13px', fontWeight: 700, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{desc}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {badge != null && badge > 0 && (
-                <span style={{ padding: '2px 8px', borderRadius: '999px', background: '#fee2e2', color: '#dc2626', fontSize: '12px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                <span style={{ padding: '3px 10px', borderRadius: '999px', background: '#fee2e2', color: '#dc2626', fontSize: '13px', fontWeight: 900, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                     {badge}
                 </span>
             )}
-            <ChevronRight style={{ width: 16, height: 16, color: S.outline, transform: 'scaleX(-1)' }} />
         </div>
     </motion.div>
 );
@@ -127,37 +106,33 @@ const PendingAdRow = ({ ad, onApprove, onReject, dir, t }) => (
         initial={{ opacity: 0, x: 10 }}
         animate={{ opacity: 1, x: 0 }}
         style={{
-            display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px',
+            display: 'flex', alignItems: 'center', gap: '14px', padding: '16px 20px',
             borderBottom: `1px solid ${S.outlineVariant}`, background: S.surfaceContainerLowest,
         }}
     >
-        {/* Ad thumb */}
-        <div style={{ width: 44, height: 44, borderRadius: '10px', background: S.surfaceContainerHigh, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Megaphone style={{ width: 20, height: 20, color: S.primaryContainer }} />
-        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {ad.title || ad.campaign_name || `${t('secretary.ad_number')}${ad.ad_id}`}
             </p>
-            <p style={{ margin: '2px 0 0', fontSize: '11px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+            <p style={{ margin: '3px 0 0', fontSize: '13px', fontWeight: 700, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                 {ad.advertiser_name || t('secretary.advertiser')} · ${ad.total_cost || 0}
             </p>
         </div>
         <StatusPill status={ad.status} t={t} />
-        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
             <button
                 onClick={() => onApprove(ad)}
                 title={t('secretary.approve')}
-                style={{ width: 32, height: 32, borderRadius: '8px', border: 'none', background: '#dcfce7', color: '#16a34a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: 'none', background: '#dcfce7', color: '#16a34a', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-                <CheckCircle style={{ width: 15, height: 15 }} />
+                <CheckCircle style={{ width: 18, height: 18 }} />
             </button>
             <button
                 onClick={() => onReject(ad)}
                 title={t('secretary.reject')}
-                style={{ width: 32, height: 32, borderRadius: '8px', border: 'none', background: S.errorContainer, color: S.error, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ width: 36, height: 36, borderRadius: '10px', border: 'none', background: S.errorContainer, color: S.error, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-                <XCircle style={{ width: 15, height: 15 }} />
+                <XCircle style={{ width: 18, height: 18 }} />
             </button>
         </div>
     </motion.div>
@@ -261,22 +236,12 @@ const SecretaryDashboard = () => {
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}
             >
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                        <div style={{ width: 44, height: 44, borderRadius: '14px', background: S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <ShieldCheck style={{ width: 22, height: 22, color: S.primaryContainer }} />
-                        </div>
-                        <div>
-                            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                {t('dashboard.overview')}
-                            </h1>
-                            <p style={{ margin: '3px 0 0', fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                {t('dashboard.welcome_secretary')}
-                            </p>
-                        </div>
-                    </div>
+                    <h1 style={{ margin: 0, fontSize: '32px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                        {t('dashboard.overview')}
+                    </h1>
                 </div>
                 <button
                     onClick={() => fetchData()}
@@ -284,10 +249,9 @@ const SecretaryDashboard = () => {
                         display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px',
                         borderRadius: '12px', border: `1px solid ${S.outlineVariant}`,
                         background: S.surfaceContainerLowest, color: S.onSurfaceVariant,
-                        cursor: 'pointer', fontSize: '14px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                        cursor: 'pointer', fontSize: '14px', fontWeight: 800, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                     }}
                 >
-                    <RefreshCw style={{ width: 15, height: 15 }} />
                     {t('common.refresh')}
                 </button>
             </motion.div>
@@ -297,10 +261,6 @@ const SecretaryDashboard = () => {
                 <KpiCard
                     label={t('secretary.ads_pending_approval')}
                     value={pendingCount}
-                    icon={Clock}
-                    iconBg="#fef3c7"
-                    iconColor="#b45309"
-                    borderColor="#f59e0b"
                     index={0}
                     onClick={() => navigate('/dashboard/ads')}
                     trend={pendingCount > 0 ? t('secretary.needs_review_now') : undefined}
@@ -308,30 +268,18 @@ const SecretaryDashboard = () => {
                 <KpiCard
                     label={t('secretary.pending_payments')}
                     value={paymentsCount}
-                    icon={DollarSign}
-                    iconBg="#dbeafe"
-                    iconColor="#2563eb"
-                    borderColor="#2563eb"
                     index={1}
                     onClick={() => navigate('/dashboard/payment-ops')}
                 />
                 <KpiCard
                     label={t('secretary.offline_screens')}
                     value={offlineScreens}
-                    icon={Monitor}
-                    iconBg={S.errorContainer}
-                    iconColor={S.error}
-                    borderColor={S.error}
                     index={2}
                     onClick={() => navigate('/dashboard/screens')}
                 />
                 <KpiCard
                     label={t('secretary.total_ads')}
                     value={totalAds}
-                    icon={PlayCircle}
-                    iconBg="#e0e7ff"
-                    iconColor="#4f46e5"
-                    borderColor="#4f46e5"
                     index={3}
                     onClick={() => navigate('/dashboard/ads')}
                 />
@@ -348,21 +296,16 @@ const SecretaryDashboard = () => {
                     style={{ background: S.surfaceContainerLowest, borderRadius: '20px', border: `1px solid ${S.outlineVariant}`, overflow: 'hidden' }}
                 >
                     <div style={{ padding: '20px 24px', borderBottom: `1px solid ${S.outlineVariant}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '10px', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Clock style={{ width: 18, height: 18, color: '#b45309' }} />
-                            </div>
-                            <div>
-                                <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                    {t('secretary.ads_waiting_review')}
-                                </h3>
-                                <p style={{ margin: '2px 0 0', fontSize: '12px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                    {ads.length}{t('secretary.ads_waiting_decision')}
-                                </p>
-                            </div>
+                        <div>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                {t('secretary.ads_waiting_review')}
+                            </h3>
+                            <p style={{ margin: '3px 0 0', fontSize: '13px', fontWeight: 700, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                {ads.length}{t('secretary.ads_waiting_decision')}
+                            </p>
                         </div>
                         {ads.length > 0 && (
-                            <span style={{ padding: '4px 12px', borderRadius: '999px', background: '#fee2e2', color: S.error, fontSize: '12px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            <span style={{ padding: '4px 14px', borderRadius: '999px', background: '#fee2e2', color: S.error, fontSize: '14px', fontWeight: 900, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                 {ads.length}
                             </span>
                         )}
@@ -370,11 +313,8 @@ const SecretaryDashboard = () => {
 
                     {ads.length === 0 ? (
                         <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-                            <div style={{ width: 64, height: 64, borderRadius: '50%', background: S.surfaceContainerLow, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                                <CheckCircle style={{ width: 28, height: 28, color: '#16a34a' }} />
-                            </div>
-                            <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('secretary.all_good')}</p>
-                            <p style={{ margin: '6px 0 0', fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('secretary.no_pending_ads')}</p>
+                            <p style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('secretary.all_good')}</p>
+                            <p style={{ margin: '6px 0 0', fontSize: '14px', fontWeight: 700, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('secretary.no_pending_ads')}</p>
                         </div>
                     ) : (
                         <div>
@@ -395,14 +335,14 @@ const SecretaryDashboard = () => {
                                     onClick={() => navigate('/dashboard/ads')}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '6px',
-                                        padding: '8px 20px', borderRadius: '10px',
+                                        padding: '10px 24px', borderRadius: '12px',
                                         border: `1px solid ${S.outlineVariant}`,
                                         background: S.surfaceContainerLowest, color: S.primaryContainer,
-                                        cursor: 'pointer', fontSize: '13px', fontWeight: 700,
+                                        cursor: 'pointer', fontSize: '15px', fontWeight: 900,
                                         fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     }}
                                 >
-                                    {t('secretary.view_all_ads')} <ArrowRight style={{ width: 14, height: 14, transform: dir === 'rtl' ? 'scaleX(-1)' : 'none' }} />
+                                    {t('secretary.view_all_ads')} <ArrowRight style={{ width: 16, height: 16, transform: dir === 'rtl' ? 'scaleX(-1)' : 'none' }} />
                                 </button>
                             </div>
                         </div>
@@ -420,7 +360,7 @@ const SecretaryDashboard = () => {
                         style={{ background: S.surfaceContainerLowest, borderRadius: '20px', border: `1px solid ${S.outlineVariant}`, overflow: 'hidden' }}
                     >
                         <div style={{ padding: '18px 20px', borderBottom: `1px solid ${S.outlineVariant}` }}>
-                            <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                 {t('secretary.quick_access')}
                             </h3>
                         </div>
@@ -428,36 +368,24 @@ const SecretaryDashboard = () => {
                             <ActionCard
                                 title={t('secretary.payment_ops')}
                                 desc={t('secretary.review_payments')}
-                                icon={DollarSign}
-                                iconBg="#dbeafe"
-                                iconColor="#2563eb"
                                 onClick={() => navigate('/dashboard/payment-ops')}
                                 badge={paymentsCount}
                             />
                             <ActionCard
                                 title={t('secretary.ads_management')}
                                 desc={t('secretary.monitor_campaigns')}
-                                icon={Megaphone}
-                                iconBg="#fef3c7"
-                                iconColor="#b45309"
                                 onClick={() => navigate('/dashboard/ads')}
                                 badge={pendingCount}
                             />
                             <ActionCard
                                 title={t('secretary.screens')}
                                 desc={t('secretary.monitor_screens')}
-                                icon={Monitor}
-                                iconBg={S.surfaceContainer}
-                                iconColor={S.primaryContainer}
                                 onClick={() => navigate('/dashboard/screens')}
                                 badge={offlineScreens > 0 ? offlineScreens : undefined}
                             />
                             <ActionCard
                                 title={t('secretary.reports')}
                                 desc={t('secretary.financial_reports')}
-                                icon={FileText}
-                                iconBg="#f0fdf4"
-                                iconColor="#16a34a"
                                 onClick={() => navigate('/dashboard/reports')}
                             />
                         </div>
@@ -470,7 +398,7 @@ const SecretaryDashboard = () => {
                         transition={{ delay: 0.3 }}
                         style={{ background: S.surfaceContainerLowest, borderRadius: '20px', border: `1px solid ${S.outlineVariant}`, padding: '20px' }}
                     >
-                        <h3 style={{ margin: '0 0 16px', fontSize: '15px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                        <h3 style={{ margin: '0 0 16px', fontSize: '18px', fontWeight: 900, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                             {t('secretary.system_status')}
                         </h3>
                         {[
@@ -480,10 +408,10 @@ const SecretaryDashboard = () => {
                         ].map((item, i) => (
                             <div key={i} style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '10px 0', borderBottom: i < 2 ? `1px solid ${S.outlineVariant}` : 'none',
+                                padding: '12px 0', borderBottom: i < 2 ? `1px solid ${S.outlineVariant}` : 'none',
                             }}>
-                                <span style={{ fontSize: '13px', color: S.onSurfaceVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{item.label}</span>
-                                <span style={{ padding: '2px 12px', borderRadius: '999px', background: item.bg, color: item.color, fontSize: '13px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                <span style={{ fontSize: '15px', fontWeight: 800, color: S.onSurfaceVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{item.label}</span>
+                                <span style={{ padding: '3px 14px', borderRadius: '999px', background: item.bg, color: item.color, fontSize: '15px', fontWeight: 900, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                     {item.value}
                                 </span>
                             </div>

@@ -100,98 +100,99 @@ const FinancialReportPage = () => {
             {/* Header - Hidden on Print */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 print:hidden">
                 <div>
-                    <h1 className="text-3xl font-bold text-on-background flex items-center gap-3">
-                        <DollarSign className="w-8 h-8 text-primary" />
+                    <h1 className="text-3xl md:text-4xl font-bold text-on-background flex items-center gap-3">
+                        <DollarSign className="w-9 h-9 text-primary" />
                         {t('reports.financial_report_title', 'Comprehensive Financial Report')}
                     </h1>
-                    <p className="text-on-surface-variant mt-2 text-sm">{t('reports.financial_report_desc', 'Detailed financial overview including platform commissions and owner profits.')}</p>
                 </div>
             </div>
 
             {/* Filters Section - Hidden on Print */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm mb-8 print:hidden">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                    
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.report_type', 'Report Type')}</label>
-                        <select 
-                            value={reportType} 
-                            onChange={(e) => setReportType(e.target.value)}
-                            className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
-                        >
-                            <option value="comprehensive">{t('reports.comprehensive_report', 'Comprehensive Report')}</option>
-                            <option value="detailed">{t('reports.detailed_ledger', 'Detailed Ledger')}</option>
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.from_date')}</label>
-                        <div className="relative">
-                            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
-                            <input 
-                                type="date" 
-                                name="start_date" 
-                                value={filters.start_date} 
-                                onChange={handleFilterChange}
-                                className="w-full h-11 pr-10 pl-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
-                            />
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
+                        
+                        <div className="space-y-2">
+                            <label className="text-base font-bold text-on-surface block whitespace-nowrap">{t('reports.report_type', 'Report Type')}</label>
+                            <select 
+                                value={reportType} 
+                                onChange={(e) => setReportType(e.target.value)}
+                                className="w-full h-12 px-3 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                            >
+                                <option value="comprehensive">{t('reports.comprehensive_report', 'Comprehensive Report')}</option>
+                                <option value="detailed">{t('reports.detailed_ledger', 'Detailed Ledger')}</option>
+                            </select>
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.to_date')}</label>
-                        <div className="relative">
-                            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
-                            <input 
-                                type="date" 
-                                name="end_date" 
-                                value={filters.end_date} 
-                                onChange={handleFilterChange}
-                                className="w-full h-11 pr-10 pl-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
-                            />
-                        </div>
-                    </div>
-                    
-                    {[1, 2, 7, 8].includes(Number(user?.role_id)) && (
-                        <>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-on-surface block">{t('reports.role', 'الصلاحية')}</label>
-                                <select 
-                                    value={selectedRole} 
-                                    onChange={(e) => {
-                                        setSelectedRole(e.target.value);
-                                        setFilters(prev => ({ ...prev, user_id: '' })); // reset user
-                                    }}
-                                    className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
-                                >
-                                    <option value="">{t('reports.all_roles', 'الكل')}</option>
-                                    {roles.map(r => (
-                                        <option key={r.role_id} value={r.role_id}>{r.role_name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-sm font-semibold text-on-surface block">{t('reports.advertiser_owner', 'المستخدم (معلن / مالك)')}</label>
-                                <select 
-                                    name="user_id"
-                                    value={filters.user_id || ''} 
+                        <div className="space-y-2">
+                            <label className="text-base font-bold text-on-surface block whitespace-nowrap">{t('reports.from_date')}</label>
+                            <div className="relative">
+                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
+                                <input 
+                                    type="date" 
+                                    name="start_date" 
+                                    value={filters.start_date} 
                                     onChange={handleFilterChange}
-                                    className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
-                                >
-                                    <option value="">{t('reports.all_users', 'الكل')}</option>
-                                    {users.filter(u => selectedRole ? u.role_id == selectedRole : true).map(u => (
-                                        <option key={u.user_id} value={u.user_id}>{u.full_name || u.username}</option>
-                                    ))}
-                                </select>
+                                    className="w-full h-12 pr-10 pl-3 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                />
                             </div>
-                        </>
-                    )}
+                        </div>
 
-                    <div className={`flex justify-end gap-3 mt-2 ${[1, 2, 7, 8].includes(Number(user?.role_id)) ? 'md:col-span-3' : 'col-span-1'}`}>
+                        <div className="space-y-2">
+                            <label className="text-base font-bold text-on-surface block whitespace-nowrap">{t('reports.to_date')}</label>
+                            <div className="relative">
+                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
+                                <input 
+                                    type="date" 
+                                    name="end_date" 
+                                    value={filters.end_date} 
+                                    onChange={handleFilterChange}
+                                    className="w-full h-12 pr-10 pl-3 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                />
+                            </div>
+                        </div>
+                        
+                        {[1, 2, 7, 8].includes(Number(user?.role_id)) && (
+                            <>
+                                <div className="space-y-2">
+                                    <label className="text-base font-bold text-on-surface block whitespace-nowrap">{t('reports.role', 'الصلاحية')}</label>
+                                    <select 
+                                        value={selectedRole} 
+                                        onChange={(e) => {
+                                            setSelectedRole(e.target.value);
+                                            setFilters(prev => ({ ...prev, user_id: '' })); // reset user
+                                        }}
+                                        className="w-full h-12 px-3 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                    >
+                                        <option value="">{t('reports.all_roles', 'الكل')}</option>
+                                        {roles.map(r => (
+                                            <option key={r.role_id} value={r.role_id}>{r.role_name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-base font-bold text-on-surface block whitespace-nowrap">{t('reports.advertiser_owner', 'المستخدم')}</label>
+                                    <select 
+                                        name="user_id"
+                                        value={filters.user_id || ''} 
+                                        onChange={handleFilterChange}
+                                        className="w-full h-12 px-3 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                    >
+                                        <option value="">{t('reports.all_users', 'الكل')}</option>
+                                        {users.filter(u => selectedRole ? u.role_id == selectedRole : true).map(u => (
+                                            <option key={u.user_id} value={u.user_id}>{u.full_name || u.username}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-outline-variant/50">
                         <button 
                             onClick={generateReport}
                             disabled={loadingReport}
-                            className="bg-primary hover:bg-primary/90 text-white px-8 h-11 font-medium rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 shadow-sm"
+                            className="bg-primary hover:bg-primary/90 text-white px-8 h-12 text-base font-bold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 shadow-sm"
                         >
                             {loadingReport ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -206,7 +207,7 @@ const FinancialReportPage = () => {
                         <button 
                             onClick={handlePrint}
                             disabled={!reportData && !detailedData}
-                            className="w-11 h-11 shrink-0 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary font-medium rounded-xl flex items-center justify-center transition-all disabled:opacity-50 shadow-sm"
+                            className="w-12 h-12 shrink-0 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary text-base font-bold rounded-xl flex items-center justify-center transition-all disabled:opacity-50 shadow-sm"
                             title={t('reports.print_report')}
                         >
                             <Printer className="w-5 h-5" />
@@ -500,7 +501,6 @@ const FinancialReportPage = () => {
                         <FileText className="w-10 h-10 text-primary/40" />
                     </div>
                     <h3 className="text-xl font-bold text-on-background mb-2 whitespace-nowrap">{t('reports.reports_ready')}</h3>
-                    <p className="text-on-surface-variant min-w-[min(100%,400px)] max-w-[500px] w-full mx-auto leading-relaxed">{t('reports.reports_ready_desc')}</p>
                 </div>
             )}
         </div>

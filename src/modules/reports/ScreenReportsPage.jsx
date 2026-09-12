@@ -99,11 +99,10 @@ const ScreenReportsPage = () => {
             {/* Header - Hidden on Print */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 print:hidden">
                 <div>
-                    <h1 className="text-3xl font-bold text-on-background flex items-center gap-3">
-                        <FileText className="w-8 h-8 text-primary" />
+                    <h1 className="text-3xl md:text-4xl font-bold text-on-background flex items-center gap-3">
+                        <FileText className="w-9 h-9 text-primary" />
                         {t('reports.screen_performance_report')}
                     </h1>
-                    <p className="text-on-surface-variant mt-2 text-sm">{t('reports.screen_report_desc')}</p>
                 </div>
             </div>
 
@@ -113,12 +112,12 @@ const ScreenReportsPage = () => {
                     
                     {isAdmin && (
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-on-surface block">{t('reports.filter_by_owner')}</label>
+                            <label className="text-base font-bold text-on-surface block">{t('reports.filter_by_owner')}</label>
                             <select 
                                 name="owner_id" 
                                 value={filters.owner_id} 
                                 onChange={handleFilterChange}
-                                className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                className="w-full h-12 px-4 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                 disabled={loadingScreens}
                             >
                                 <option value="">{t('reports.all_owners')}</option>
@@ -132,12 +131,12 @@ const ScreenReportsPage = () => {
                     )}
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.select_screen')}</label>
+                        <label className="text-base font-bold text-on-surface block">{t('reports.select_screen')}</label>
                         <select 
                             name="screen_id" 
                             value={filters.screen_id} 
                             onChange={handleFilterChange}
-                            className="w-full h-11 px-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                            className="w-full h-12 px-4 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                             disabled={loadingScreens}
                         >
                             <option value="">{t('reports.please_select_screen')}</option>
@@ -150,7 +149,7 @@ const ScreenReportsPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.from_date')}</label>
+                        <label className="text-base font-bold text-on-surface block">{t('reports.from_date')}</label>
                         <div className="relative">
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
                             <input 
@@ -158,13 +157,13 @@ const ScreenReportsPage = () => {
                                 name="start_date" 
                                 value={filters.start_date} 
                                 onChange={handleFilterChange}
-                                className="w-full h-11 pr-10 pl-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                className="w-full h-12 pr-10 pl-4 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-on-surface block">{t('reports.to_date')}</label>
+                        <label className="text-base font-bold text-on-surface block">{t('reports.to_date')}</label>
                         <div className="relative">
                             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant pointer-events-none" />
                             <input 
@@ -172,16 +171,16 @@ const ScreenReportsPage = () => {
                                 name="end_date" 
                                 value={filters.end_date} 
                                 onChange={handleFilterChange}
-                                className="w-full h-11 pr-10 pl-4 rounded-xl border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
+                                className="w-full h-12 pr-10 pl-4 rounded-xl text-base font-medium border border-outline-variant bg-surface text-on-surface focus:border-primary outline-none transition-all"
                             />
                         </div>
                     </div>
 
-                    <div className="flex gap-3 h-11">
+                    <div className="flex gap-3 h-12">
                         <button 
                             onClick={generateReport}
                             disabled={loadingReport || !filters.screen_id}
-                            className="flex-1 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                            className="flex-1 bg-primary hover:bg-primary/90 text-white text-base font-bold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                         >
                             {loadingReport ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -196,7 +195,7 @@ const ScreenReportsPage = () => {
                         <button 
                             onClick={handlePrint}
                             disabled={!reportData}
-                            className="px-5 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary font-medium rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                            className="px-5 bg-surface border border-outline-variant text-on-surface hover:text-primary hover:bg-primary-container hover:border-primary text-base font-bold rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                             title={t('reports.print_report')}
                         >
                             <Printer className="w-5 h-5" />
@@ -361,7 +360,6 @@ const ScreenReportsPage = () => {
                         <FileText className="w-10 h-10 text-primary/40" />
                     </div>
                     <h3 className="text-xl font-bold text-on-background mb-2 whitespace-nowrap">{t('reports.reports_ready')}</h3>
-                    <p className="text-on-surface-variant min-w-[min(100%,400px)] max-w-[500px] w-full mx-auto leading-relaxed">{t('reports.reports_ready_desc')}</p>
                 </div>
             )}
         </div>

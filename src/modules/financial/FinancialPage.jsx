@@ -30,6 +30,7 @@ const FinancialPage = () => {
     const [formData, setFormData] = useState({ amount: '', reference_number: '', payment_method: 'bank_transfer' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAmountVisible, setIsAmountVisible] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
     const [archiveMonths, setArchiveMonths] = useState('6');
@@ -140,7 +141,17 @@ const FinancialPage = () => {
 
     const rawTransactions = Array.isArray(data.transactions) ? data.transactions : Object.values(data.transactions || {});
     const transactions = rawTransactions.filter(t => t && typeof t === 'object' && Object.keys(t).length > 0 && t.created_at);
-    const filteredTransactions = transactions.filter(t => activeFilter === 'all' || t.status === activeFilter);
+    const filteredTransactions = transactions.filter(t => {
+        const matchesFilter = activeFilter === 'all' || t.status === activeFilter;
+        if (!matchesFilter) return false;
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase();
+        const userName = t.user?.full_name?.toLowerCase() || '';
+        const ref = t.reference_number?.toLowerCase() || '';
+        const amount = String(t.amount || '');
+        const method = t.payment_method?.toLowerCase() || '';
+        return userName.includes(q) || ref.includes(q) || amount.includes(q) || method.includes(q);
+    });
     
     // Financial Metrics
     const platformProfit = data.platform_profit || 0;
@@ -153,11 +164,11 @@ const FinancialPage = () => {
             key: 'created_at', 
             header: t('common.date'), 
             cell: (row) => (
-                <div className="flex flex-col">
-                    <span className="font-label-md text-label-md text-on-surface" dir="ltr">
+                <div className="flex flex-col items-center justify-center">
+                    <span className="font-extrabold text-base md:text-lg text-on-surface" dir="ltr">
                         {new Date(row.created_at).toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </span>
-                    <span className="font-caption text-[10px] text-on-surface-variant" dir="ltr">
+                    <span className="font-bold text-xs text-on-surface-variant mt-0.5" dir="ltr">
                         {new Date(row.created_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                 </div>
@@ -167,11 +178,8 @@ const FinancialPage = () => {
             key: 'user.full_name', 
             header: t('common.advertiser'), 
             cell: (row) => (
-                <div className="flex items-center gap-3 py-1">
-                    <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center font-bold text-on-surface-variant text-xs shadow-inner shrink-0">
-                        {row.user?.full_name?.charAt(0) || '-'}
-                    </div>
-                    <span className="font-label-md text-label-md text-on-surface">{row.user?.full_name || '—'}</span>
+                <div className="flex items-center justify-center py-1">
+                    <span className="font-extrabold text-base md:text-lg text-on-surface">{row.user?.full_name || '—'}</span>
                 </div>
             )
         },
@@ -180,48 +188,40 @@ const FinancialPage = () => {
             header: t('financial.transaction_type') || 'نوع العملية',
             cell: (row) => {
                 let label = row.transaction_type;
-                let colorClass = "bg-gray-100 text-gray-700 border-gray-200";
-                
                 switch (row.transaction_type) {
                     case 'payment':
                     case 'payment_in':
                         label = 'دفع إعلان';
-                        colorClass = 'bg-blue-50 text-blue-700 border-blue-200';
                         break;
                     case 'payment_pending':
                         label = 'مراجعة دفعة';
-                        colorClass = 'bg-orange-50 text-orange-700 border-orange-200';
                         break;
                     case 'platform_fee':
                         label = 'عمولة منصة';
-                        colorClass = 'bg-purple-50 text-purple-700 border-purple-200';
                         break;
                     case 'payout_pending':
                         label = 'أرباح مستحقة';
-                        colorClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
                         break;
                     case 'payout_requested':
                         label = 'طلب سحب';
-                        colorClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
                         break;
                     case 'platform_payout_deduction':
                         label = 'صرف أرباح';
-                        colorClass = 'bg-red-50 text-red-700 border-red-200';
                         break;
                 }
                 
                 return (
-                    <div className="flex flex-col items-center gap-1">
-                        <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${colorClass} whitespace-nowrap`}>
+                    <div className="flex flex-col items-center justify-center gap-0.5">
+                        <span className="font-extrabold text-base md:text-lg text-on-surface whitespace-nowrap">
                             {label}
                         </span>
                         {row.advertisement?.title && (
-                            <span className="text-[10px] text-gray-500 max-w-[120px] truncate" title={row.advertisement.title}>
+                            <span className="text-xs font-semibold text-on-surface-variant max-w-[140px] truncate" title={row.advertisement.title}>
                                 إعلان: {row.advertisement.title}
                             </span>
                         )}
                         {row.screen?.screen_name && (row.transaction_type === 'payout_pending' || row.transaction_type === 'platform_payout_deduction') && (
-                            <span className="text-[10px] text-gray-500 max-w-[120px] truncate" title={row.screen.screen_name}>
+                            <span className="text-xs font-semibold text-on-surface-variant max-w-[140px] truncate" title={row.screen.screen_name}>
                                 شاشة: {row.screen.screen_name}
                             </span>
                         )}
@@ -233,8 +233,8 @@ const FinancialPage = () => {
             key: 'payment_method', 
             header: t('financial.payment_method'), 
             cell: (row) => (
-                <span className="bg-surface-container-high text-on-surface-variant px-2.5 py-1 rounded-md font-caption text-xs uppercase flex w-max gap-1 items-center">
-                    <span className="material-symbols-outlined text-[14px]">account_balance_wallet</span> {row.payment_method || 'N/A'}
+                <span className="font-extrabold text-base md:text-lg text-on-surface uppercase">
+                    {row.payment_method || 'N/A'}
                 </span>
             )
         },
@@ -242,7 +242,7 @@ const FinancialPage = () => {
             key: 'reference_number', 
             header: t('financial.reference'), 
             cell: (row) => (
-                <span className="font-mono text-xs font-bold text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant">
+                <span className="font-mono text-base md:text-lg font-extrabold text-on-surface">
                     #{row.reference_number || '---'}
                 </span>
             )
@@ -251,7 +251,7 @@ const FinancialPage = () => {
             key: 'amount', 
             header: t('financial.amount'), 
             cell: (row) => (
-                <span className="font-body-md text-base font-bold text-primary tracking-tighter">
+                <span className="text-lg md:text-xl font-black text-on-surface tracking-tighter">
                     ${parseFloat(row.amount || 0).toFixed(2)}
                 </span>
             )
@@ -260,19 +260,13 @@ const FinancialPage = () => {
             key: 'status', 
             header: t('common.status'), 
             cell: (row) => {
-                if (row.status === 'completed') return (
-                    <span className="bg-secondary-container/20 border border-secondary text-secondary font-label-md text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 w-max shadow-sm">
-                        <span className="material-symbols-outlined text-[14px]">check_circle</span> {t('common.approved')}
-                    </span>
-                );
-                if (row.status === 'rejected') return (
-                    <span className="bg-error-container border border-error/50 text-error font-label-md text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 w-max shadow-sm">
-                        <span className="material-symbols-outlined text-[14px]">cancel</span> {t('common.rejected')}
-                    </span>
-                );
+                let statusText = t('common.under_review');
+                if (row.status === 'completed') statusText = t('common.approved');
+                if (row.status === 'rejected') statusText = t('common.rejected');
+
                 return (
-                    <span className="bg-surface-container-high border border-outline-variant text-on-surface-variant font-label-md text-[11px] px-2.5 py-1 rounded-full flex items-center gap-1.5 w-max shadow-sm">
-                        <span className="material-symbols-outlined text-[14px]">schedule</span> {t('common.under_review')}
+                    <span className="font-extrabold text-base md:text-lg text-on-surface">
+                        {statusText}
                     </span>
                 );
             }
@@ -285,7 +279,7 @@ const FinancialPage = () => {
                     return (
                         <button 
                             onClick={() => setReviewModalData(row)}
-                            className="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                            className="bg-primary/10 text-primary hover:bg-primary/20 px-4 py-2 rounded-xl text-sm font-extrabold transition-colors shadow-sm"
                         >
                             {t('financial.review request')}
                         </button>
@@ -330,24 +324,14 @@ const FinancialPage = () => {
                 `}
             </style>
             {/* Page Header */}
-            <div className="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
-                            <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>account_balance_wallet</span>
-                        </div>
-                        <h1 className="font-headline-lg text-headline-lg md:text-display-lg text-on-surface">{t('financial.financial_ledger')}</h1>
-                    </div>
-                    <p className="font-body-md text-body-md text-on-surface-variant">{t('financial.ledger_desc')}</p>
-                </div>
-                <div>
-                    <button 
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md text-label-md hover:bg-primary-fixed-variant transition-colors shadow-sm flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[20px]">add</span>
-                        {t('financial.add_transaction')}
-                    </button>
-                </div>
+            <div className="mb-lg flex flex-col gap-4">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-on-surface text-center w-full">{t('financial.financial_ledger')}</h1>
+                <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="w-full bg-primary text-on-primary py-4 rounded-xl text-lg font-extrabold hover:bg-primary-fixed-variant transition-all shadow-md flex items-center justify-center gap-3">
+                    <span className="material-symbols-outlined text-[24px]">add</span>
+                    {t('financial.add_transaction')}
+                </button>
             </div>
 
             {/* Dashboard Bento Grid */}
@@ -357,10 +341,8 @@ const FinancialPage = () => {
                     <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
                     <div className="relative z-10 flex justify-between items-start">
                         <h3 className="text-2xl font-extrabold text-inverse-primary opacity-90 flex items-center gap-2">
-                            <span className="material-symbols-outlined font-normal">account_balance</span>
                             {t('financial.platform_net_profits')}
                         </h3>
-                        <span className="material-symbols-outlined text-3xl opacity-50 font-normal">trending_up</span>
                     </div>
                     <div className="relative z-10 mt-6">
                         <div className="text-xl font-bold tracking-tight mb-4">
@@ -381,37 +363,27 @@ const FinancialPage = () => {
                 {/* Secondary Metrics Group */}
                 <div className="md:col-span-6 lg:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-md">
                     {/* Total Cash Flow */}
-                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
-                        <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center mb-4">
-                            <span className="material-symbols-outlined text-primary font-normal">payments</span>
-                        </div>
+                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md transition-shadow">
                         <div>
-                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.total_cash_flow')}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-3">{t('financial.total_cash_flow')}</p>
                             <p className="text-base font-normal text-on-surface">${parseFloat(totalCashFlow).toFixed(2)}</p>
                         </div>
                     </div>
 
                     {/* Owners Liabilities */}
-                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
-                        <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center mb-4 text-warning">
-                            <span className="material-symbols-outlined font-normal">group</span>
-                        </div>
+                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md transition-shadow">
                         <div>
-                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.owners_liabilities')}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-3">{t('financial.owners_liabilities')}</p>
                             <p className="text-base font-normal text-on-surface">${parseFloat(ownersLiabilities).toFixed(2)}</p>
                         </div>
                     </div>
 
                     {/* Under Review */}
-                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                        <div className="w-10 h-10 rounded-full bg-error-container flex items-center justify-center mb-4">
-                            <span className="material-symbols-outlined text-error font-normal">schedule</span>
-                        </div>
+                    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md transition-shadow">
                         <div>
-                            <p className="text-xl font-extrabold text-on-surface-variant mb-1">{t('financial.requests_under_review')}</p>
+                            <p className="text-xl font-extrabold text-on-surface-variant mb-3">{t('financial.requests_under_review')}</p>
                             <p className="text-base font-normal text-on-surface">{pendingTransactions}</p>
                         </div>
-                        <div className="absolute bottom-0 left-0 w-full h-1 bg-error opacity-20"></div>
                     </div>
                 </div>
             </div>
@@ -419,62 +391,125 @@ const FinancialPage = () => {
             {/* Main Financial Log Card */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[400px]">
                 {/* Card Header & Filters */}
-                <div className="px-lg py-md border-b border-outline-variant flex flex-col md:flex-row justify-between items-start md:items-center bg-surface gap-4">
-                    <h2 className="font-title-lg text-title-lg text-on-surface flex items-center gap-2 shrink-0">
-                        <span className="material-symbols-outlined text-primary font-normal">monitoring</span>
-                        {t('financial.financial_ledger')} {activeFilter !== 'all' && <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-md mx-2">{activeFilter === 'completed' ? t('common.approved') : activeFilter === 'pending' ? t('common.pending') : t('common.rejected')}</span>}
-                    </h2>
-                    
-                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto hide-on-print">
-                        <div className="flex items-center gap-2 bg-surface-container-low rounded-lg p-1 border border-outline-variant">
-                            <input 
-                                type="date" 
-                                value={dateFilters.start_date}
-                                onChange={e => setDateFilters(prev => ({ ...prev, start_date: e.target.value }))}
-                                className="bg-transparent border-none text-sm font-bold text-on-surface outline-none px-2 py-1"
-                                title={t('common.from_date')}
-                            />
-                            <span className="text-on-surface-variant">-</span>
-                            <input 
-                                type="date" 
-                                value={dateFilters.end_date}
-                                onChange={e => setDateFilters(prev => ({ ...prev, end_date: e.target.value }))}
-                                className="bg-transparent border-none text-sm font-bold text-on-surface outline-none px-2 py-1"
-                                title={t('common.to_date')}
-                            />
+                <div className="px-lg py-md border-b border-outline-variant flex flex-col bg-surface gap-4">
+                    {/* Top Row: Title */}
+                    <div className="flex justify-center items-center w-full text-center">
+                        <h2 className="text-2xl md:text-3xl font-extrabold text-on-surface flex items-center justify-center gap-2">
+                            {t('financial.financial_ledger')} {activeFilter !== 'all' && <span className="bg-primary/10 text-primary text-sm px-2.5 py-1 rounded-md mx-2 font-bold">{activeFilter === 'completed' ? t('common.approved') : activeFilter === 'pending' ? t('common.pending') : t('common.rejected')}</span>}
+                        </h2>
+                    </div>
+
+                    {/* Bottom Row: Date Filters and Action Buttons */}
+                    <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 w-full hide-on-print pt-2 border-t border-outline-variant/40">
+                        {/* Date Filter */}
+                        <div className="flex items-center gap-2 bg-surface-container-low rounded-xl px-3 py-1.5 border border-outline-variant text-sm font-bold text-on-surface">
+                            <div className="flex items-center gap-1">
+                                <span className="text-xs text-on-surface-variant font-medium">من:</span>
+                                <input 
+                                    type="date" 
+                                    dir="ltr"
+                                    value={dateFilters.start_date}
+                                    onChange={e => setDateFilters(prev => ({ ...prev, start_date: e.target.value }))}
+                                    className="bg-transparent border-none text-sm font-bold text-on-surface outline-none px-1 py-0.5 cursor-pointer"
+                                    title={t('common.from_date')}
+                                />
+                            </div>
+                            <span className="text-on-surface-variant/40 font-bold">|</span>
+                            <div className="flex items-center gap-1">
+                                <span className="text-xs text-on-surface-variant font-medium">إلى:</span>
+                                <input 
+                                    type="date" 
+                                    dir="ltr"
+                                    value={dateFilters.end_date}
+                                    onChange={e => setDateFilters(prev => ({ ...prev, end_date: e.target.value }))}
+                                    className="bg-transparent border-none text-sm font-bold text-on-surface outline-none px-1 py-0.5 cursor-pointer"
+                                    title={t('common.to_date')}
+                                />
+                            </div>
                             {(dateFilters.start_date || dateFilters.end_date) && (
                                 <button 
                                     onClick={() => setDateFilters({ start_date: '', end_date: '' })}
-                                    className="p-1 text-error hover:bg-error-container rounded transition-colors"
+                                    className="p-1 text-error hover:bg-error-container rounded-lg transition-colors mr-1"
                                     title={t('common.clear_date')}
                                 >
                                     <span className="material-symbols-outlined text-[16px]">close</span>
                                 </button>
                             )}
                         </div>
-                        
-                        <div className="flex gap-2 shrink-0">
-                        <button 
-                            onClick={() => setIsFilterModalOpen(true)}
-                            className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors border border-outline-variant flex items-center justify-center" title={t('financial.filter_transactions')}>
-                            <span className="material-symbols-outlined text-[20px]">filter_list</span>
-                        </button>
-                        <button 
-                            onClick={handleExportCSV}
-                            className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors border border-outline-variant flex items-center justify-center" title={t('common.export_csv')}>
-                            <span className="material-symbols-outlined text-[20px]">download</span>
-                        </button>
-                        <button 
-                            onClick={handlePrintPlatformReport}
-                            className="p-2 text-white bg-[#1c5b8e] hover:bg-[#14355d] rounded-lg transition-colors border border-[#1c5b8e] flex items-center justify-center shadow-sm" title={t('financial.print_profits_report')}>
-                            <span className="material-symbols-outlined text-[20px]">print</span>
-                        </button>
-                        <button 
-                            onClick={() => setIsArchiveModalOpen(true)}
-                            className="p-2 text-error hover:bg-error-container rounded-lg transition-colors border border-error/30 flex items-center justify-center" title={t('financial.clear_and_archive_records')}>
-                            <span className="material-symbols-outlined text-[20px]">delete_sweep</span>
-                        </button>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <button 
+                                onClick={() => setIsFilterModalOpen(true)}
+                                className="px-4 py-2.5 text-on-surface-variant hover:bg-surface-container rounded-xl transition-colors border border-outline-variant flex items-center gap-2 text-base font-extrabold shadow-sm" title={t('financial.filter_transactions')}>
+                                <span className="material-symbols-outlined text-[22px]">filter_list</span>
+                                <span>تصفية</span>
+                            </button>
+                            <button 
+                                onClick={handleExportCSV}
+                                className="px-4 py-2.5 text-on-surface-variant hover:bg-surface-container rounded-xl transition-colors border border-outline-variant flex items-center gap-2 text-base font-extrabold shadow-sm" title={t('common.export_csv')}>
+                                <span className="material-symbols-outlined text-[22px]">download</span>
+                                <span>تصدير CSV</span>
+                            </button>
+                            <button 
+                                onClick={handlePrintPlatformReport}
+                                className="px-4 py-2.5 text-white bg-[#1c5b8e] hover:bg-[#14355d] rounded-xl transition-colors border border-[#1c5b8e] flex items-center gap-2 text-base font-extrabold shadow-sm" title={t('financial.print_profits_report')}>
+                                <span className="material-symbols-outlined text-[22px]">print</span>
+                                <span>طباعة التقرير</span>
+                            </button>
+                            <button 
+                                onClick={() => setIsArchiveModalOpen(true)}
+                                className="px-4 py-2.5 text-error hover:bg-error-container rounded-xl transition-colors border border-error/30 flex items-center gap-2 text-base font-extrabold shadow-sm" title={t('financial.clear_and_archive_records')}>
+                                <span className="material-symbols-outlined text-[22px]">delete_sweep</span>
+                                <span>أرشفة</span>
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Middle Row: Search Bar, Refresh & Analytics Buttons (Dedicated Row) */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full hide-on-print pt-2 border-t border-outline-variant/40">
+                        {/* Search Input Container - Spans Full Available Width */}
+                        <div className="relative flex-1 w-full">
+                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px] pointer-events-none">
+                                search
+                            </span>
+                            <input 
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="بحث في السجل المالي (اسم المعلن، رقم المرجع، المبلغ، طريقة الدفع)..."
+                                className="w-full bg-surface-container-low border border-outline-variant rounded-xl py-2.5 pr-10 pl-10 text-base font-bold text-on-surface placeholder-on-surface-variant/70 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+                            />
+                            {searchQuery && (
+                                <button 
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-error transition-colors p-1"
+                                    title="مسح البحث"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">close</span>
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Refresh & Analytics Action Buttons Next to Search Input */}
+                        <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
+                            <button 
+                                onClick={() => queryClient.invalidateQueries({ queryKey: ['ledger'] })}
+                                className="flex-1 sm:flex-none px-4 py-2.5 text-on-surface-variant hover:bg-surface-container rounded-xl transition-colors border border-outline-variant flex items-center justify-center gap-2 text-base font-extrabold shadow-sm"
+                                title="تحديث البيانات"
+                            >
+                                <span className="material-symbols-outlined text-[22px]">refresh</span>
+                                <span>تحديث</span>
+                            </button>
+                            <button 
+                                onClick={() => setIsFilterModalOpen(true)}
+                                className="flex-1 sm:flex-none px-4 py-2.5 text-primary bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors border border-primary/20 flex items-center justify-center gap-2 text-base font-extrabold shadow-sm"
+                                title="تحليل البيانات المالية"
+                            >
+                                <span className="material-symbols-outlined text-[22px]">analytics</span>
+                                <span>التحليل</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -567,21 +602,17 @@ const FinancialPage = () => {
             </Modal>
 
             {/* Add Transaction Modal */}
-            <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t('financial.record_financial_transaction')}>
-                <form onSubmit={handleSubmit} className="space-y-5" dir={dir}>
-                    <div className="bg-primary-container/20 border border-primary/20 p-4 rounded-xl flex items-start gap-3">
-                        <span className="material-symbols-outlined text-primary mt-0.5">info</span>
-                        <div>
-                            <h4 className="font-label-md text-label-md text-primary mb-1">{t('financial.manual_record')}</h4>
-                            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">{t('financial.manual_record_desc')}</p>
-                        </div>
+            <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title={t('financial.record_financial_transaction')} maxWidth="max-w-[760px]">
+                <form onSubmit={handleSubmit} className="space-y-6" dir={dir}>
+                    <div className="bg-surface-container-low border border-outline-variant p-3.5 rounded-xl flex items-center">
+                        <h4 className="font-extrabold text-base md:text-lg text-primary">{t('financial.manual_record') || 'تسجيل يدوي'}</h4>
                     </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-1.5">
-                            <label className="font-label-md text-label-md text-on-surface">{t('financial.received_amount')} <span className="text-error">*</span></label>
+                    <div className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="font-extrabold text-base md:text-lg text-on-surface block">{t('financial.received_amount') || 'المبلغ المستلم'}</label>
                             <div className="relative">
-                                <span className={`absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-on-surface-variant font-bold`}>$</span>
+                                <span className={`absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-on-surface-variant font-extrabold text-lg`}>$</span>
                                 <input 
                                     type="number" 
                                     step="0.01"
@@ -589,57 +620,63 @@ const FinancialPage = () => {
                                     required
                                     value={formData.amount}
                                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                                    className={`w-full bg-surface border border-outline-variant rounded-xl py-3 ${dir === 'rtl' ? 'pl-4 pr-10' : 'pr-4 pl-10'} font-body-lg text-body-lg text-on-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
-                                    placeholder={t('financial.amount_placeholder')}
+                                    className={`w-full bg-surface border border-outline-variant rounded-xl py-3.5 ${dir === 'rtl' ? 'pl-4 pr-10' : 'pr-4 pl-10'} text-base md:text-lg font-extrabold text-on-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm`}
+                                    placeholder={t('financial.amount_placeholder') || 'أدخل المبلغ'}
                                 />
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="font-label-md text-label-md text-on-surface">{t('financial.reference_number_label')} <span className="text-error">*</span></label>
+                        <div className="space-y-2">
+                            <label className="font-extrabold text-base md:text-lg text-on-surface block">{t('financial.reference_number_label') || 'رقم المرجع / الحوالة'}</label>
                             <input 
                                 type="text" 
                                 required
                                 value={formData.reference_number}
                                 onChange={(e) => setFormData({...formData, reference_number: e.target.value})}
-                                className="w-full bg-surface border border-outline-variant rounded-xl py-3 px-4 font-body-md text-body-md text-on-background placeholder-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                                placeholder={t('financial.ref_placeholder')}
+                                className="w-full bg-surface border border-outline-variant rounded-xl py-3.5 px-4 text-base md:text-lg font-extrabold text-on-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
+                                placeholder={t('financial.ref_placeholder') || 'أدخل رقم المرجع'}
                             />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="font-label-md text-label-md text-on-surface">{t('financial.payment_method')} <span className="text-error">*</span></label>
+                        <div className="space-y-2">
+                            <label className="font-extrabold text-base md:text-lg text-on-surface block">{t('financial.payment_method') || 'طريقة الدفع'}</label>
                             <div className="relative">
                                 <select 
                                     required
                                     value={formData.payment_method}
                                     onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
-                                    className={`w-full appearance-none bg-surface border border-outline-variant rounded-xl py-3 ${dir === 'rtl' ? 'pr-4 pl-10' : 'pl-4 pr-10'} font-body-md text-body-md text-on-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer`}
+                                    className={`w-full appearance-none bg-surface border border-outline-variant rounded-xl py-3.5 ${dir === 'rtl' ? 'pr-4 pl-10' : 'pl-4 pr-10'} text-base md:text-lg font-extrabold text-on-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer shadow-sm`}
                                 >
-                                    <option value="bank_transfer">{t('financial.bank_transfer')}</option>
-                                    <option value="cash">{t('financial.cash')}</option>
-                                    <option value="credit">{t('financial.credit_note')}</option>
+                                    <option value="bank_transfer">تحويل بنكي</option>
+                                    <option value="cash">نقداً (كاش)</option>
+                                    <option value="credit">إشعار دائن / رصيد</option>
+                                    <option value="credit_card">بطاقة ائتمانية / مدى</option>
                                 </select>
-                                <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none`}>expand_content</span>
+                                <span className={`material-symbols-outlined absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-xl`}>expand_more</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 mt-2 border-t border-outline-variant/60 flex items-center justify-end gap-3">
+                    <div className="pt-5 mt-3 border-t border-outline-variant/60 flex items-center justify-end gap-3">
                         <button 
                             type="button" 
                             onClick={() => setIsAddModalOpen(false)}
-                            className="px-5 py-2.5 rounded-xl font-label-md text-label-md border border-outline-variant text-on-surface hover:bg-surface-container transition-colors"
+                            className="px-6 py-3 rounded-xl text-base font-extrabold border border-outline-variant text-on-surface hover:bg-surface-container transition-colors"
                         >
-                            {t('common.cancel')}
+                            {t('common.cancel') || 'إلغاء'}
                         </button>
                         <button 
                             type="submit" 
                             disabled={isSubmitting}
-                            className={`px-6 py-2.5 rounded-xl font-label-md text-label-md text-on-primary transition-all shadow-sm flex items-center gap-2 ${isSubmitting ? 'bg-primary/70 cursor-not-allowed' : 'bg-primary hover:bg-primary-fixed-variant'}`}
+                            className={`px-8 py-3.5 rounded-xl text-base md:text-lg font-extrabold text-white transition-all shadow-md flex items-center gap-2 ${
+                                isSubmitting 
+                                    ? 'bg-[#1c5b8e]/70 cursor-not-allowed' 
+                                    : 'bg-[#1c5b8e] hover:bg-[#14355d] active:scale-95'
+                            }`}
                         >
-                            {isSubmitting ? t('common.saving') : t('financial.save_transaction')}
-                            {!isSubmitting && <span className="material-symbols-outlined text-[18px]">save</span>}
+                            {isSubmitting ? (t('common.saving') || 'جاري الحفظ...') : (t('financial.save_transaction') || 'حفظ المعاملة')}
+                            {!isSubmitting && <span className="material-symbols-outlined text-[22px]">save</span>}
+                            {isSubmitting && <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>}
                         </button>
                     </div>
                 </form>

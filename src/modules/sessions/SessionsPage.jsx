@@ -328,41 +328,8 @@ const SessionsPage = () => {
         <div className="space-y-lg w-full font-sans" dir="rtl">
 
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
-                <div className="flex items-start gap-md">
-                    <div className="p-sm bg-surface-container rounded-lg text-primary">
-                        <span className="material-symbols-outlined text-3xl">security</span>
-                    </div>
-                    <div>
-                        <h2 className="font-headline-lg text-headline-lg text-on-surface">{t('sessions.manage_sessions_title')}</h2>
-                        <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-                            {isSuperAdmin
-                                ? t('sessions.manage_sessions_admin_desc')
-                                : t('sessions.manage_sessions_desc')}
-                        </p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-sm">
-                    {/* Refresh */}
-                    <button
-                        onClick={() => fetchSessions(true)}
-                        disabled={refreshing}
-                        className="flex items-center gap-xs px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                        <span className={`material-symbols-outlined text-sm ${refreshing ? 'animate-spin' : ''}`}>sync</span>
-                        {t('sessions.refresh')}
-                    </button>
-                    {/* Revoke others — only shown when there are other sessions */}
-                    {!loading && !error && otherSessions.length > 0 && (
-                        <button
-                            onClick={() => setRevokeTarget({ type: 'others' })}
-                            className="flex items-center gap-xs px-md py-sm bg-error-container text-on-error-container rounded-lg font-label-md text-label-md hover:bg-error hover:text-on-error transition-colors shadow-sm"
-                        >
-                            <span className="material-symbols-outlined text-sm">cancel</span>
-                            {t('sessions.terminate_other_btn')}
-                        </button>
-                    )}
-                </div>
+            <div className="mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-on-surface">{t('sessions.manage_sessions_title')}</h2>
             </div>
 
             {/* ══════════════════════════════
@@ -390,29 +357,45 @@ const SessionsPage = () => {
                 <PageErrorState onRetry={() => fetchSessions(false)} />
             ) : (
                 <>
-                    {/* ── Tabs ── */}
-                    <div className="flex items-center gap-4 border-b border-outline-variant pb-px mb-6">
+                    {/* ── Tabs & Refresh Button Row ── */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full mb-8">
                         <button 
                             onClick={() => setActiveTab('sessions')}
-                            className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${activeTab === 'sessions' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}
+                            className={`flex-1 w-full py-3.5 px-6 font-bold text-lg sm:text-xl rounded-xl transition-all border shadow-sm flex items-center justify-center gap-3 ${
+                                activeTab === 'sessions' 
+                                    ? 'bg-primary text-white border-primary shadow-md' 
+                                    : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant hover:bg-surface-container'
+                            }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">devices</span>
                             {t('sessions.active_sessions_tab')}
-                            <span className="bg-surface-container-high text-xs px-2 py-0.5 rounded-full">
-                                {sessions.length}
-                            </span>
+                            {activeTab === 'sessions' && (
+                                <span className="text-xs sm:text-sm px-2.5 py-0.5 rounded-full font-bold bg-white/20 text-white">
+                                    {sessions.length}
+                                </span>
+                            )}
                         </button>
                         <button 
                             onClick={() => setActiveTab('blocklist')}
-                            className={`pb-3 px-2 font-bold text-sm transition-all border-b-2 flex items-center gap-2 ${activeTab === 'blocklist' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}
+                            className={`flex-1 w-full py-3.5 px-6 font-bold text-lg sm:text-xl rounded-xl transition-all border shadow-sm flex items-center justify-center gap-3 ${
+                                activeTab === 'blocklist' 
+                                    ? 'bg-primary text-white border-primary shadow-md' 
+                                    : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant hover:bg-surface-container'
+                            }`}
                         >
-                            <span className="material-symbols-outlined text-[18px]">block</span>
                             {t('sessions.blocklist_tab')}
-                            {blockedList.length > 0 && (
-                                <span className="bg-error/10 text-error text-xs px-2 py-0.5 rounded-full">
+                            {activeTab === 'blocklist' && (
+                                <span className="text-xs sm:text-sm px-2.5 py-0.5 rounded-full font-bold bg-white/20 text-white">
                                     {blockedList.length}
                                 </span>
                             )}
+                        </button>
+                        <button
+                            onClick={() => fetchSessions(true)}
+                            disabled={refreshing}
+                            className="w-full sm:w-auto py-3.5 px-6 bg-surface-container-lowest border border-outline-variant rounded-xl font-bold text-lg sm:text-xl text-on-surface hover:bg-surface-container transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shrink-0"
+                        >
+                            <span className={`material-symbols-outlined text-xl ${refreshing ? 'animate-spin' : ''}`}>sync</span>
+                            {t('sessions.refresh')}
                         </button>
                     </div>
 
@@ -428,35 +411,7 @@ const SessionsPage = () => {
                     {activeTab === 'sessions' && (
                         <>
                             {/* ── KPI Cards ── */}
-                    <SessionKpiCards sessions={sessions} loading={false} />
-
-                    {/* ── Security Banner (other sessions present) ── */}
-                    <AnimatePresence>
-                        {otherSessions.length > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -8 }}
-                                className="bg-[#FFFBEB] border border-[#FDE68A] rounded-xl p-md flex items-start gap-md"
-                            >
-                                <span className="material-symbols-outlined text-[#D97706] mt-xs">warning</span>
-                                <div>
-                                    <h3 className="font-title-lg text-title-lg text-[#92400E]">
-                                        {isSuperAdmin
-                                            ? t('sessions.security_alert', { count: otherSessions.length })
-                                            : t('sessions.security_alert', { count: otherSessions.length })
-                                        }
-                                    </h3>
-                                    <p className="font-body-md text-body-md text-[#B45309] mt-xs">
-                                        {isSuperAdmin
-                                            ? t('sessions.security_alert_admin_action')
-                                            : t('sessions.security_alert_action')
-                                        }
-                                    </p>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                            <SessionKpiCards sessions={sessions} loading={false} />
 
                     {/* ══════════════════════════════
                         DESKTOP: Table (lg+)
@@ -569,55 +524,59 @@ const SessionsPage = () => {
             />
 
             {/* ── View Details Modal ── */}
-            <Modal isOpen={!!viewTarget} onClose={() => setViewTarget(null)} title={t('sessions.session_details_title')}>
+            <Modal isOpen={!!viewTarget} onClose={() => setViewTarget(null)} title={t('sessions.session_details_title')} maxWidth="max-w-[750px]">
                 {viewTarget && (
                     <div className="flex flex-col pt-2" dir="rtl">
-                        <div className="flex items-center gap-4 mb-6 p-4 bg-surface-container-low rounded-2xl border border-outline-variant shadow-sm">
+                        <div className="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl border border-outline-variant shadow-sm mb-6">
                             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
                                 <DeviceIcon deviceName={viewTarget.device_name} className="text-3xl" />
                             </div>
                             <div>
-                                <h4 className="font-bold text-on-surface text-lg mb-1">{viewTarget.device_name || t('sessions.unknown_device')}</h4>
-                                <p className="text-sm text-on-surface-variant font-mono bg-surface-container rounded px-2 py-0.5 inline-block" dir="ltr">
+                                <h4 className="font-bold text-on-surface text-xl mb-1">{viewTarget.device_name || t('sessions.unknown_device')}</h4>
+                                <p className="text-base text-on-surface-variant font-mono bg-surface-container rounded-lg px-3 py-1 inline-block" dir="ltr">
                                     IP: {viewTarget.ip_address || t('sessions.ip_default')}
                                 </p>
                             </div>
                         </div>
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
-                                <span className="text-sm text-on-surface-variant flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">public</span> 
-                                    {t('sessions.os_browser')}
+                        <div className="space-y-5">
+                            <div className="flex items-center gap-3 border-b border-outline-variant/50 pb-4">
+                                <span className="text-base sm:text-lg font-bold text-on-surface-variant flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[20px] text-primary">public</span>
+                                    {t('sessions.os_browser')}:
                                 </span>
-                                <span className="text-xs font-medium text-on-surface font-mono max-w-[200px] truncate" title={viewTarget.user_agent}>
+                                <span className="text-base sm:text-lg font-medium text-on-surface font-mono" title={viewTarget.user_agent} dir="ltr">
                                     {viewTarget.user_agent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
-                                <span className="text-sm text-on-surface-variant flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">login</span>
-                                    {t('sessions.first_login')}
+                            <div className="flex items-center gap-3 border-b border-outline-variant/50 pb-4">
+                                <span className="text-base sm:text-lg font-bold text-on-surface-variant flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[20px] text-primary">login</span>
+                                    {t('sessions.first_login')}:
                                 </span>
-                                <span className="text-sm font-medium text-on-surface">{formatDateTime(viewTarget.created_at)}</span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-outline-variant/50 pb-3">
-                                <span className="text-sm text-on-surface-variant flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">update</span>
-                                    {t('sessions.last_activity')}
+                                <span className="text-base sm:text-lg font-medium text-on-surface">
+                                    {formatDateTime(viewTarget.created_at)}
                                 </span>
-                                <span className="text-sm font-medium text-on-surface">{viewTarget.last_used_at ? formatDateTime(viewTarget.last_used_at) : '—'}</span>
                             </div>
-                            <div className="flex justify-between items-center pt-2">
-                                <span className="text-sm text-on-surface-variant flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">policy</span>
-                                    {t('sessions.session_status')}
+                            <div className="flex items-center gap-3 border-b border-outline-variant/50 pb-4">
+                                <span className="text-base sm:text-lg font-bold text-on-surface-variant flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[20px] text-primary">update</span>
+                                    {t('sessions.last_activity')}:
+                                </span>
+                                <span className="text-base sm:text-lg font-medium text-on-surface">
+                                    {viewTarget.last_used_at ? formatDateTime(viewTarget.last_used_at) : '—'}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-3 pt-1">
+                                <span className="text-base sm:text-lg font-bold text-on-surface-variant flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[20px] text-primary">policy</span>
+                                    {t('sessions.session_status')}:
                                 </span>
                                 {viewTarget.is_current ? (
-                                    <span className="text-xs font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-3 py-1 rounded-full shadow-sm">
+                                    <span className="text-sm sm:text-base font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-3.5 py-1 rounded-full shadow-sm">
                                         {t('sessions.active_now')}
                                     </span>
                                 ) : (
-                                    <span className="text-xs font-bold text-orange-700 bg-orange-100 border border-orange-200 px-3 py-1 rounded-full shadow-sm">
+                                    <span className="text-sm sm:text-base font-bold text-orange-700 bg-orange-100 border border-orange-200 px-3.5 py-1 rounded-full shadow-sm">
                                         {t('sessions.active')}
                                     </span>
                                 )}
@@ -625,7 +584,7 @@ const SessionsPage = () => {
                         </div>
                         <button 
                             onClick={() => setViewTarget(null)} 
-                            className="mt-8 mb-2 w-full bg-surface-container text-on-surface py-3 rounded-xl font-bold text-sm hover:bg-outline-variant hover:text-surface-container-lowest transition-all"
+                            className="mt-8 mb-2 w-full bg-surface-container text-on-surface py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-outline-variant hover:text-surface-container-lowest transition-all"
                         >
                             {t('sessions.close')}
                         </button>

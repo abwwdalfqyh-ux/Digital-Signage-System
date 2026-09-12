@@ -8,22 +8,15 @@ import { useUsers, useCreateUser, useUpdateUser, useUpdateUserRole, useUpdateUse
 import { useRoles } from '../../hooks/api/useLookups';
 import useTranslation from '../../i18n/useTranslation';
 
-const StatCard = ({ title, value, icon, colorClass }) => (
-    <div className="bg-surface border border-outline-variant rounded-xl p-5 flex items-center gap-4 shadow-sm hover:shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-shadow">
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${colorClass}`}>
-            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                {icon}
-            </span>
-        </div>
-        <div>
-            <p className="font-caption text-caption text-on-surface-variant mb-1">{title}</p>
-            <p className="font-title-lg text-title-lg text-on-surface">{value}</p>
-        </div>
+const StatCard = ({ title, value }) => (
+    <div className="bg-surface border border-outline-variant rounded-xl p-5 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition-all">
+        <p className="text-base md:text-lg font-extrabold text-on-surface mb-3">{title}</p>
+        <p className="text-sm font-normal text-on-surface-variant">{value}</p>
     </div>
 );
 
 const UsersPage = () => {
-    const { data: users = [], isLoading: usersLoading } = useUsers();
+    const { data: users = [], isLoading: usersLoading, refetch } = useUsers();
     const { data: roles = [] } = useRoles();
     const { t, dir } = useTranslation();
     
@@ -147,8 +140,8 @@ const UsersPage = () => {
         }
     };
 
-    const inputClass = "w-full bg-background border border-outline-variant rounded-lg py-2 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-shadow text-right";
-    const labelClass = "font-label-md text-label-md text-on-surface-variant mb-2 block";
+    const inputClass = "w-full bg-background border border-outline-variant rounded-xl h-12 px-4 font-bold text-base md:text-lg focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-right text-on-surface";
+    const labelClass = "text-base md:text-lg font-extrabold text-on-surface mb-2 block";
 
     const handleSort = (key) => {
         let direction = 'asc';
@@ -213,86 +206,102 @@ const UsersPage = () => {
 
     const renderRoleBadge = (roleId, roleName) => {
         if (roleId === 1 || roleId === 7) {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-error/10 text-error border border-error/20">{roleName || 'SuperAdmin'}</span>;
+            return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-error/10 text-error border border-error/20">{roleName || 'SuperAdmin'}</span>;
         } else if (roleId === 2) {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container/20 text-secondary border border-secondary/20">{roleName || 'Advertiser'}</span>;
+            return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-secondary-container/20 text-secondary border border-secondary/20">{roleName || 'Advertiser'}</span>;
         } else if (roleId === 3) {
-            return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#a855f7]/10 text-[#9333ea] border border-[#a855f7]/20">{roleName || 'ScreenOwner'}</span>;
+            return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-[#a855f7]/10 text-[#9333ea] border border-[#a855f7]/20">{roleName || 'ScreenOwner'}</span>;
         }
-        return <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-outline-variant/30 text-on-surface-variant border border-outline-variant/50">{roleName || '—'}</span>;
+        return <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-outline-variant/30 text-on-surface-variant border border-outline-variant/50">{roleName || '—'}</span>;
     };
 
     return (
         <div className="flex flex-col gap-8">
-            <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <section className="flex flex-col gap-4">
                 <div>
                     <h2 className="font-headline-lg text-headline-lg text-on-surface mb-1">{t('users.manage_users')}</h2>
-                    <p className="font-body-md text-body-md text-on-surface-variant">{t('users.manage_users_desc')}</p>
                 </div>
-                <button onClick={() => handleOpenModal('add')} className="bg-primary hover:bg-primary/90 text-on-primary font-label-md text-label-md px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-[0px_4px_6px_-1px_rgba(0,0,0,0.1)] transition-all">
-                    <span className="material-symbols-outlined">add</span>
-                    <span>{t('users.add_new_user')}</span>
-                </button>
+                <div className="w-full">
+                    <button 
+                        onClick={() => handleOpenModal('add')} 
+                        className="w-full bg-primary hover:bg-primary/90 text-on-primary font-extrabold text-base md:text-lg py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
+                    >
+                        <span className="material-symbols-outlined text-2xl font-bold">add</span>
+                        <span>{t('users.add_new_user')}</span>
+                    </button>
+                </div>
             </section>
 
             {!loading && (
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <StatCard title={t('users.total_registered')} value={stats.total} icon="group" colorClass="bg-primary/10 text-primary" />
-                    <StatCard title={t('users.active_accounts')} value={stats.active} icon="person_check" colorClass="bg-[#22c55e]/10 text-[#22c55e]" />
-                    <StatCard title={t('users.admin_members')} value={stats.admin} icon="admin_panel_settings" colorClass="bg-secondary-container/20 text-secondary" />
-                    <StatCard title={t('users.top_advertisers')} value={stats.advertiser} icon="campaign" colorClass="bg-[#eab308]/10 text-[#eab308]" />
-                    <StatCard title={t('users.screen_owners')} value={stats.owner} icon="monitor" colorClass="bg-[#a855f7]/10 text-[#a855f7]" />
+                    <StatCard title={t('users.total_registered')} value={stats.total} />
+                    <StatCard title={t('users.active_accounts')} value={stats.active} />
+                    <StatCard title={t('users.admin_members')} value={stats.admin} />
+                    <StatCard title={t('users.top_advertisers')} value={stats.advertiser} />
+                    <StatCard title={t('users.screen_owners')} value={stats.owner} />
                 </section>
             )}
 
             <section className="bg-surface border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
-                <div className="p-4 border-b border-outline-variant bg-surface flex flex-col gap-4">
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                        {/* Search */}
-                        <div className="relative w-full lg:w-96">
-                            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <div className="p-5 border-b border-outline-variant bg-surface flex flex-col gap-4">
+                    {/* Row 1: Filters (All Roles, All Locations, All Statuses) in one row, full width */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                        <select
+                            value={filterRole}
+                            onChange={(e) => { setFilterRole(e.target.value); setCurrentPage(1); }}
+                            className="w-full bg-background border border-outline-variant rounded-xl h-12 px-4 font-semibold text-base focus:border-primary focus:ring-1 focus:outline-none transition-all cursor-pointer appearance-none text-on-surface"
+                            style={{ backgroundPosition: 'left 12px center', backgroundRepeat: 'no-repeat', backgroundSize: '20px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
+                        >
+                            <option value="ALL">{t('users.all_roles')}</option>
+                            {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
+                        </select>
+
+                        <select
+                            value={filterLocation}
+                            onChange={(e) => { setFilterLocation(e.target.value); setCurrentPage(1); }}
+                            className="w-full bg-background border border-outline-variant rounded-xl h-12 px-4 font-semibold text-base focus:border-primary focus:ring-1 focus:outline-none transition-all cursor-pointer appearance-none text-on-surface"
+                            style={{ backgroundPosition: 'left 12px center', backgroundRepeat: 'no-repeat', backgroundSize: '20px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
+                        >
+                            <option value="ALL">{t('users.all_locations')}</option>
+                            {uniqueLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
+                        </select>
+
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+                            className="w-full bg-background border border-outline-variant rounded-xl h-12 px-4 font-semibold text-base focus:border-primary focus:ring-1 focus:outline-none transition-all cursor-pointer appearance-none text-on-surface"
+                            style={{ backgroundPosition: 'left 12px center', backgroundRepeat: 'no-repeat', backgroundSize: '20px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
+                        >
+                            <option value="ALL">{t('users.all_statuses')}</option>
+                            <option value="ACTIVE">{t('users.active_accounts_filter')}</option>
+                            <option value="SUSPENDED">{t('users.suspended_accounts_filter')}</option>
+                        </select>
+                    </div>
+
+                    {/* Row 2: Search bar occupying full row with Refresh Button beside it */}
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+                        <div className="relative flex-1 w-full">
+                            <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-2xl">search</span>
                             <input
                                 value={searchTerm}
                                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                                className="w-full bg-background border border-outline-variant rounded-lg py-2.5 pr-10 pl-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-shadow"
+                                className="w-full bg-background border border-outline-variant rounded-xl h-12 pr-12 pl-4 font-semibold text-base focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all text-on-surface"
                                 placeholder={t('users.search_placeholder')}
                                 type="text"
                             />
                         </div>
 
-                        {/* Enterprise Advanced Filters */}
-                        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                            <select
-                                value={filterRole}
-                                onChange={(e) => { setFilterRole(e.target.value); setCurrentPage(1); }}
-                                className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
-                                style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
-                            >
-                                <option value="ALL">{t('users.all_roles')}</option>
-                                {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
-                            </select>
-
-                            <select
-                                value={filterLocation}
-                                onChange={(e) => { setFilterLocation(e.target.value); setCurrentPage(1); }}
-                                className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
-                                style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
-                            >
-                                <option value="ALL">{t('users.all_locations')}</option>
-                                {uniqueLocations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
-                            </select>
-
-                            <select
-                                value={filterStatus}
-                                onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
-                                className="bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-body-md focus:border-primary focus:ring-1 focus:outline-none transition-shadow min-w-[140px] cursor-pointer appearance-none"
-                                style={{ backgroundPosition: 'left 10px center', backgroundRepeat: 'no-repeat', backgroundSize: '18px', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%236b7280\'%3E%3Cpath d=\'M7 10l5 5 5-5z\'/%3E%3C/svg%3E")' }}
-                            >
-                                <option value="ALL">{t('users.all_statuses')}</option>
-                                <option value="ACTIVE">{t('users.active_accounts_filter')}</option>
-                                <option value="SUSPENDED">{t('users.suspended_accounts_filter')}</option>
-                            </select>
-                        </div>
+                        <button
+                            onClick={() => {
+                                if (refetch) refetch();
+                                addToast(t('common.data_refreshed', 'تم تحديث البيانات بنجاح'), 'success');
+                            }}
+                            className="h-12 px-6 bg-surface border border-outline-variant hover:border-primary hover:bg-primary-container text-on-surface hover:text-primary font-bold text-base rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all shrink-0 w-full sm:w-auto"
+                            title={t('common.refresh', 'تحديث البيانات')}
+                        >
+                            <span className="material-symbols-outlined text-xl">refresh</span>
+                            <span>{t('common.refresh', 'تحديث')}</span>
+                        </button>
                     </div>
                 </div>
 
@@ -313,67 +322,67 @@ const UsersPage = () => {
                         </div>
                     ) : (
                         <table className="w-full text-right border-collapse">
-                            <thead className="bg-background/80 border-b border-outline-variant font-label-md text-label-md text-on-surface-variant whitespace-nowrap">
+                            <thead className="bg-background/90 border-b border-outline-variant text-base md:text-lg font-extrabold text-on-surface whitespace-nowrap">
                                 <tr>
-                                    <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('full_name')}>
-                                        <div className="flex items-center gap-1">{t('users.name')} <SortIcon columnKey="full_name" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('full_name')}>
+                                        <div className="flex items-center gap-1.5">{t('users.name')} <SortIcon columnKey="full_name" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('email')}>
-                                        <div className="flex items-center gap-1">{t('users.email')} <SortIcon columnKey="email" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('email')}>
+                                        <div className="flex items-center gap-1.5">{t('users.email')} <SortIcon columnKey="email" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('role.role_name')}>
-                                        <div className="flex items-center gap-1">{t('users.role')} <SortIcon columnKey="role.role_name" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('role.role_name')}>
+                                        <div className="flex items-center gap-1.5">{t('users.role')} <SortIcon columnKey="role.role_name" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('phone')}>
-                                        <div className="flex items-center gap-1">{t('users.phone')} <SortIcon columnKey="phone" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('phone')}>
+                                        <div className="flex items-center gap-1.5">{t('users.phone')} <SortIcon columnKey="phone" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('location')}>
-                                        <div className="flex items-center gap-1">{t('users.location')} <SortIcon columnKey="location" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-right cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('location')}>
+                                        <div className="flex items-center gap-1.5">{t('users.location')} <SortIcon columnKey="location" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('account_status')}>
-                                        <div className="flex items-center justify-center gap-1">{t('users.account_status')} <SortIcon columnKey="account_status" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('account_status')}>
+                                        <div className="flex items-center justify-center gap-1.5">{t('users.account_status')} <SortIcon columnKey="account_status" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('is_active')}>
-                                        <div className="flex items-center justify-center gap-1">{t('users.active')} <SortIcon columnKey="is_active" /></div>
+                                    <th className="py-4 px-6 font-extrabold text-center cursor-pointer hover:bg-surface-container-low transition-colors" onClick={() => handleSort('is_active')}>
+                                        <div className="flex items-center justify-center gap-1.5">{t('users.active')} <SortIcon columnKey="is_active" /></div>
                                     </th>
-                                    <th className="py-4 px-6 font-medium text-center">{t('users.actions')}</th>
+                                    <th className="py-4 px-6 font-extrabold text-center">{t('users.actions')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="font-body-md text-body-md text-on-surface divide-y divide-outline-variant">
+                            <tbody className="text-base font-bold text-on-surface divide-y divide-outline-variant">
                                 {paginatedUsers.map((item) => (
                                     <tr key={item.user_id} onClick={(e) => handleRowClick(e, item)} className="hover:bg-surface-container-low/50 transition-colors cursor-pointer">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20">
-                                                    {item.full_name?.charAt(0) || <span className="material-symbols-outlined text-sm">person</span>}
+                                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-extrabold border border-primary/20 text-base">
+                                                    {item.full_name?.charAt(0) || <span className="material-symbols-outlined text-base">person</span>}
                                                 </div>
-                                                <span className="font-medium">{item.full_name}</span>
+                                                <span className="font-extrabold text-base md:text-lg text-on-surface">{item.full_name}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6 text-on-surface-variant dir-ltr text-right">
+                                        <td className="py-4 px-6 text-on-surface font-bold text-base dir-ltr text-right">
                                             {item.email}
                                         </td>
                                         <td className="py-4 px-6">
                                             <div>{renderRoleBadge(item.role?.role_id, item.role?.role_name)}</div>
                                         </td>
-                                        <td className="py-4 px-6 dir-ltr text-right">
+                                        <td className="py-4 px-6 dir-ltr text-right font-bold text-base text-on-surface">
                                             {item.phone || '—'}
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex items-center gap-1 text-on-surface-variant">
-                                                <span className="material-symbols-outlined text-sm">location_on</span>
+                                        <td className="py-4 px-6 font-bold text-base">
+                                            <div className="flex items-center gap-1.5 text-on-surface">
+                                                <span className="material-symbols-outlined text-lg text-primary">location_on</span>
                                                 <span>{item.location || '—'}</span>
                                             </div>
                                         </td>
                                         <td className="py-4 px-6 text-center">
                                             {item.account_status === 'Active' || !item.account_status ? (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#22c55e]/10 text-[#16a34a]">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-[#22c55e]/15 text-[#15803d]">
+                                                    <span className="w-2 h-2 rounded-full bg-[#15803d]"></span>
                                                     {t('users.status_active')}
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-outline-variant/30 text-on-surface-variant">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
+                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold bg-outline-variant/40 text-on-surface-variant">
+                                                    <span className="w-2 h-2 rounded-full bg-on-surface-variant"></span>
                                                     {t('users.status_inactive')}
                                                 </span>
                                             )}
@@ -385,13 +394,13 @@ const UsersPage = () => {
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button onClick={(e) => { e.stopPropagation(); handleOpenModal('edit', item) }} className="text-on-surface-variant hover:text-primary transition-colors p-1" title={t('users.edit_account')}>
-                                                    <span className="material-symbols-outlined text-xl">edit</span>
+                                            <div className="flex items-center justify-center gap-3">
+                                                <button onClick={(e) => { e.stopPropagation(); handleOpenModal('edit', item) }} className="text-on-surface-variant hover:text-primary transition-colors p-1.5 hover:bg-primary/10 rounded-lg" title={t('users.edit_account')}>
+                                                    <span className="material-symbols-outlined text-2xl font-bold">edit</span>
                                                 </button>
 
-                                                <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(item.user_id) }} className="text-on-surface-variant hover:text-error transition-colors p-1" title={t('users.delete_account')}>
-                                                    <span className="material-symbols-outlined text-xl">delete</span>
+                                                <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(item.user_id) }} className="text-on-surface-variant hover:text-error transition-colors p-1.5 hover:bg-error/10 rounded-lg" title={t('users.delete_account')}>
+                                                    <span className="material-symbols-outlined text-2xl font-bold">delete</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -438,7 +447,7 @@ const UsersPage = () => {
                 )}
             </section>
 
-            <Modal isOpen={modalConfig.open} onClose={() => setModalConfig({ open: false, type: '', user: null })} title={modalConfig.type === 'add' ? t('users.modal_add_title') : modalConfig.type === 'details' ? t('users.modal_details_title') : modalConfig.type === 'edit' ? t('users.modal_edit_title') : t('users.modal_role_title')} size="md">
+            <Modal isOpen={modalConfig.open} onClose={() => setModalConfig({ open: false, type: '', user: null })} title={modalConfig.type === 'add' ? t('users.modal_add_title') : modalConfig.type === 'details' ? t('users.modal_details_title') : modalConfig.type === 'edit' ? t('users.modal_edit_title') : t('users.modal_role_title')} maxWidth="max-w-[850px]">
                 {modalConfig.type === 'details' && modalConfig.user ? (
                     <div className="space-y-4 mt-4" dir="rtl">
                         <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant flex flex-col md:flex-row items-center md:items-start gap-4">
@@ -446,11 +455,11 @@ const UsersPage = () => {
                                 {modalConfig.user.full_name?.charAt(0) || <span className="material-symbols-outlined text-3xl">person</span>}
                             </div>
                             <div className="text-center md:text-right">
-                                <h4 className="font-title-lg text-title-lg text-on-surface">{modalConfig.user.full_name}</h4>
-                                <p className="font-body-md text-body-md text-on-surface-variant justify-center md:justify-start flex items-center gap-1 mt-1">
+                                <h4 className="font-title-lg text-title-lg text-on-surface font-extrabold">{modalConfig.user.full_name}</h4>
+                                <p className="font-body-md text-body-md text-on-surface-variant justify-center md:justify-start flex items-center gap-1 mt-1 font-bold">
                                     <span className="material-symbols-outlined text-[16px]">mail</span> <span className="dir-ltr">{modalConfig.user.email}</span>
                                 </p>
-                                <p className="font-body-md text-body-md text-on-surface-variant justify-center md:justify-start flex items-center gap-1 mt-1">
+                                <p className="font-body-md text-body-md text-on-surface-variant justify-center md:justify-start flex items-center gap-1 mt-1 font-bold">
                                     <span className="material-symbols-outlined text-[16px]">phone</span> <span className="dir-ltr">{modalConfig.user.phone || t('common.unavailable')}</span>
                                 </p>
                             </div>
@@ -458,47 +467,43 @@ const UsersPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.role')}</span>
+                                <span className="block font-extrabold text-base text-on-surface mb-2">{t('users.role')}</span>
                                 <div>{renderRoleBadge(modalConfig.user.role?.role_id, modalConfig.user.role?.role_name)}</div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.location')}</span>
-                                <div className="font-body-md text-on-surface flex items-center gap-1 text-sm">
-                                    <span className="material-symbols-outlined text-[18px] text-on-surface-variant">location_on</span>
+                                <span className="block font-extrabold text-base text-on-surface mb-2">{t('users.location')}</span>
+                                <div className="font-bold text-on-surface flex items-center gap-1 text-base">
+                                    <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
                                     {modalConfig.user.location || t('common.unavailable')}
                                 </div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.account_status')}</span>
-                                <div className="font-body-md text-on-surface flex items-center gap-1 text-sm font-medium">
+                                <span className="block font-extrabold text-base text-on-surface mb-2">{t('users.account_status')}</span>
+                                <div className="font-bold text-on-surface flex items-center gap-1 text-base">
                                     {modalConfig.user.account_status === 'Active' || !modalConfig.user.account_status ? (
-                                        <span className="text-[#16a34a] flex items-center gap-1.5 px-2.5 py-1 bg-[#22c55e]/10 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span> {t('users.status_active')}</span>
+                                        <span className="text-[#15803d] flex items-center gap-1.5 px-3 py-1 bg-[#22c55e]/15 rounded-full text-sm font-bold"><span className="w-2 h-2 rounded-full bg-[#15803d]"></span> {t('users.status_active')}</span>
                                     ) : (
-                                        <span className="text-on-surface-variant flex items-center gap-1.5 px-2.5 py-1 bg-outline-variant/30 rounded-full"><span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span> {t('users.status_inactive')}</span>
+                                        <span className="text-on-surface-variant flex items-center gap-1.5 px-3 py-1 bg-outline-variant/40 rounded-full text-sm font-bold"><span className="w-2 h-2 rounded-full bg-on-surface-variant"></span> {t('users.status_inactive')}</span>
                                     )}
                                 </div>
                             </div>
                             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-4">
-                                <span className="block font-caption text-caption text-on-surface-variant mb-2 font-medium">{t('users.registration_date')}</span>
-                                <div className="font-body-md text-on-surface flex items-center gap-1 text-sm dir-ltr justify-end text-on-surface-variant">
+                                <span className="block font-extrabold text-base text-on-surface mb-2">{t('users.registration_date')}</span>
+                                <div className="font-bold text-on-surface flex items-center gap-1 text-base dir-ltr justify-end">
                                     {modalConfig.user.created_at ? new Date(modalConfig.user.created_at).toLocaleDateString('en-GB') : '—'}
                                 </div>
                             </div>
                         </div>
 
-                        <button type="button" onClick={() => setModalConfig({ open: false, type: '', user: null })} className="w-full bg-surface-container-low text-on-surface font-label-md hover:bg-surface-container transition-colors py-3 rounded-xl border border-outline-variant shadow-sm mt-6">
+                        <button type="button" onClick={() => setModalConfig({ open: false, type: '', user: null })} className="w-full bg-surface-container-low text-on-surface font-extrabold text-base hover:bg-surface-container transition-colors py-3.5 rounded-xl border border-outline-variant shadow-sm mt-6">
                             {t('common.close')}
                         </button>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-6 mt-4" dir="rtl">
                         <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-4">
-                            <div className="flex items-center gap-2 mb-2 text-primary">
-                                <span className="material-symbols-outlined text-xl">admin_panel_settings</span>
-                                <h4 className="font-label-md text-label-md">{t('users.role_structure')}</h4>
-                            </div>
                             <div>
-                                <label className={labelClass}>{t('users.role_category')} <span className="text-error">*</span></label>
+                                <label className={labelClass}>{t('users.role_category')}</label>
                                 <select required value={form.role_id} onChange={e => setForm({ ...form, role_id: e.target.value })} className={inputClass}>
                                     <option value="">-- {t('users.select_role')} --</option>
                                     {roles.map(r => <option key={r.role_id || r.id} value={r.role_id || r.id}>{r.role_name}</option>)}
@@ -510,7 +515,7 @@ const UsersPage = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className={labelClass}>{t('users.full_name')} <span className="text-error">*</span></label>
+                                        <label className={labelClass}>{t('users.full_name')}</label>
                                         <input type="text" required value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} className={inputClass} placeholder={t('users.name_placeholder')} />
                                     </div>
                                     <div>
@@ -521,7 +526,7 @@ const UsersPage = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className={labelClass}>{t('users.email')} <span className="text-error">*</span></label>
+                                        <label className={labelClass}>{t('users.email')}</label>
                                         <input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputClass} dir="ltr" placeholder="user@example.com" />
                                     </div>
                                     <div>
@@ -531,11 +536,11 @@ const UsersPage = () => {
                                 </div>
 
                                 <div>
-                                    <label className={labelClass}>{t('users.password')} {modalConfig.type === 'add' && <span className="text-error">*</span>}</label>
+                                    <label className={labelClass}>{t('users.password')}</label>
                                     <div className="relative">
-                                        <input type={showPassword ? "text" : "password"} required={modalConfig.type === 'add'} minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={`${inputClass} !pl-10`} placeholder={modalConfig.type === 'edit' ? t('users.password_edit_placeholder') : "••••••••"} dir={form.password ? 'ltr' : 'rtl'} />
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface outline-none flex items-center justify-center">
-                                            <span className="material-symbols-outlined text-xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
+                                        <input type={showPassword ? "text" : "password"} required={modalConfig.type === 'add'} minLength={6} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={`${inputClass} !pl-12`} placeholder={modalConfig.type === 'edit' ? t('users.password_edit_placeholder') : "••••••••"} dir={form.password ? 'ltr' : 'rtl'} />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface outline-none flex items-center justify-center p-1">
+                                            <span className="material-symbols-outlined text-2xl">{showPassword ? 'visibility_off' : 'visibility'}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -546,7 +551,7 @@ const UsersPage = () => {
                             <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-4 mt-2">
                                 <div className="flex items-center gap-2 mb-2 text-[#a855f7]">
                                     <span className="material-symbols-outlined text-xl">account_balance</span>
-                                    <h4 className="font-label-md text-label-md">{t('users.financial_record')}</h4>
+                                    <h4 className="font-extrabold text-base">{t('users.financial_record')}</h4>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -566,7 +571,7 @@ const UsersPage = () => {
                             </div>
                         )}
 
-                        <button type="submit" disabled={formLoading} className="w-full bg-primary text-on-primary font-label-md hover:bg-primary/90 py-3 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6">
+                        <button type="submit" disabled={formLoading} className="w-full bg-primary text-on-primary font-extrabold text-base md:text-lg hover:bg-primary/90 py-3.5 rounded-xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6">
                             {formLoading ? t('common.processing') : t('common.save_confirm')}
                         </button>
                     </form>

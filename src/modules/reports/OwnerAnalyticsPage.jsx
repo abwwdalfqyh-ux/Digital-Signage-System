@@ -36,13 +36,8 @@ const S = {
 
 /* ─── KPI Card ─── */
 const KpiCard = ({
-    label, sublabel, value, suffix = '', note, noteIcon: NoteIcon, noteColor,
-    accentColor, iconBg, iconColor, Icon, borderAccent, index, highlight,
-    togglable = false, // ← NEW: enable eye toggle
+    label, value, suffix = '', accentColor, index,
 }) => {
-    const [hidden, setHidden] = useState(false);
-    const { t } = useTranslation();
-
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -50,131 +45,26 @@ const KpiCard = ({
             transition={{ duration: 0.4, delay: index * 0.08 }}
             whileHover={{ y: -4, boxShadow: '0 10px 30px -6px rgba(0,74,198,0.18)' }}
             style={{
-                background: highlight ? `linear-gradient(135deg, ${highlight}18, ${highlight}05)` : S.surfaceContainerLowest,
-                border: `1px solid ${borderAccent || S.outlineVariant}`,
-                borderRadius: '18px',
-                padding: '22px 22px 18px',
-                minHeight: '138px',
-                borderRight: borderAccent ? `4px solid ${borderAccent}` : `1px solid ${S.outlineVariant}`,
-                
+                background: S.surfaceContainerLowest,
+                border: `1px solid ${S.outlineVariant}`,
+                borderRadius: '24px',
+                padding: '24px 20px',
                 position: 'relative',
                 overflow: 'hidden',
                 cursor: 'default',
                 transition: 'box-shadow 0.3s ease',
             }}
+            className="flex flex-col items-center justify-center text-center gap-1.5 transition-all hover:shadow-md"
         >
-            {/* Subtle background shape */}
-            <div style={{
-                position: 'absolute', bottom: -20, left: -20,
-                width: 90, height: 90, borderRadius: '50%',
-                background: iconBg || S.surfaceContainer,
-                opacity: 0.35,
-            }} />
+            <h3 className="text-xl md:text-2xl font-black text-[#141b2b] m-0 text-center">
+                {label}
+            </h3>
 
-            <div className="flex justify-between items-start mb-4 relative">
-                <div>
-                    <p className="m-0 text-[13px] font-bold" style={{ color: S.onSurfaceVariant }}>{label}</p>
-                    {sublabel && <p className="mt-0.5 text-[11px] font-medium" style={{ color: S.outline }}>{sublabel}</p>}
-                </div>
-
-                {/* Icon or togglable eye button */}
-                {togglable ? (
-                    <button
-                        onClick={() => setHidden(h => !h)}
-                        title={hidden ? t('analytics.show_value') : t('analytics.hide_value')}
-                        style={{
-                            width: 40, height: 40, borderRadius: '50%',
-                            background: hidden ? S.surfaceContainerHigh : (iconBg || S.surfaceContainer),
-                            border: `1.5px solid ${hidden ? S.outlineVariant : 'transparent'}`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', transition: 'all 0.2s ease',
-                            flexShrink: 0,
-                        }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.background = S.surfaceContainerHigh;
-                            e.currentTarget.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.background = hidden ? S.surfaceContainerHigh : (iconBg || S.surfaceContainer);
-                            e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                    >
-                        <AnimatePresence mode="wait">
-                            {hidden ? (
-                                <motion.span key="off"
-                                    initial={{ opacity: 0, rotate: -15, scale: 0.7 }}
-                                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                                    exit={{ opacity: 0, rotate: 15, scale: 0.7 }}
-                                    transition={{ duration: 0.2 }}>
-                                    <EyeOff style={{ color: S.outline, width: 18, height: 18 }} />
-                                </motion.span>
-                            ) : (
-                                <motion.span key="on"
-                                    initial={{ opacity: 0, rotate: 15, scale: 0.7 }}
-                                    animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                                    exit={{ opacity: 0, rotate: -15, scale: 0.7 }}
-                                    transition={{ duration: 0.2 }}>
-                                    <Eye style={{ color: iconColor || S.primaryContainer, width: 18, height: 18 }} />
-                                </motion.span>
-                            )}
-                        </AnimatePresence>
-                    </button>
-                ) : (
-                    Icon && (
-                        <div style={{ background: iconBg || S.surfaceContainer }} className="w-11 h-11 rounded-full flex items-center justify-center shrink-0">
-                            <Icon style={{ color: iconColor || S.primaryContainer }} className="w-5 h-5" />
-                        </div>
-                    )
-                )}
-            </div>
-
-            <div className="relative">
-                <AnimatePresence mode="wait">
-                    {hidden ? (
-                        <motion.div key="hidden"
-                            initial={{ opacity: 0, y: 4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.18 }}
-                            className="flex items-center gap-1.5"
-                            dir="ltr"
-                        >
-                            {/* Blurred dots placeholder */}
-                            {[...Array(5)].map((_, i) => (
-                                <div key={i} style={{
-                                    width: 10, height: 10, borderRadius: '50%',
-                                    background: accentColor || S.onBackground,
-                                    opacity: 0.35,
-                                }} />
-                            ))}
-                        </motion.div>
-                    ) : (
-                        <motion.div key="visible"
-                            initial={{ opacity: 0, y: 4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: 0.18 }}>
-                            <div className="flex items-baseline gap-1" dir="ltr">
-                                <span className="text-[34px] font-black leading-none" style={{ color: accentColor || S.onBackground, letterSpacing: '-0.02em' }}>
-                                    {value}
-                                </span>
-                                {suffix && <span className="text-lg font-bold" style={{ color: accentColor || S.outline }}>{suffix}</span>}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {note && !hidden && (
-                    <div className="flex items-center gap-1.5 mt-2" style={{ color: noteColor || S.primaryContainer }}>
-                        {NoteIcon && <NoteIcon className="w-3.5 h-3.5" />}
-                        <span className="text-[11px] font-bold">{note}</span>
-                    </div>
-                )}
-                {hidden && (
-                    <p className="text-[11px] font-bold mt-2" style={{ color: S.outline }}>
-                        {t('analytics.click_to_show')}
-                    </p>
-                )}
+            <div className="flex items-baseline justify-center gap-1 text-center" dir="ltr">
+                <span className="text-lg md:text-xl font-bold text-center" style={{ color: accentColor || S.onBackground }}>
+                    {value}
+                </span>
+                {suffix && <span className="text-base font-bold text-center" style={{ color: accentColor || S.outline }}>{suffix}</span>}
             </div>
         </motion.div>
     );
@@ -333,14 +223,14 @@ const ScreenRow = ({ screen, index }) => {
             style={{ borderBottom: `1px solid ${S.outlineVariant}` }}
             className="hover:bg-blue-50/40 transition-colors"
         >
-            <td className="py-3 px-4 text-[13px] font-bold" style={{ color: S.onBackground }}>{screen.screen_name}</td>
-            <td className="py-3 px-4 text-[12px]" style={{ color: S.onSurfaceVariant }}>
+            <td className="py-4 px-5 text-base md:text-lg font-extrabold" style={{ color: S.onBackground }}>{screen.screen_name}</td>
+            <td className="py-4 px-5 text-base font-bold text-gray-700">
                 {screen.location || t('analytics.unspecified')}
             </td>
-            <td className="py-3 px-4 text-center">
+            <td className="py-4 px-5 text-center">
                 <div className="flex items-center gap-2 justify-center">
                     <div style={{
-                        flex: 1, height: 7, background: S.outlineVariant,
+                        flex: 1, height: 8, background: S.outlineVariant,
                         borderRadius: 99, maxWidth: 80, overflow: 'hidden'
                     }}>
                         <div style={{
@@ -349,26 +239,26 @@ const ScreenRow = ({ screen, index }) => {
                             transition: 'width 0.8s ease',
                         }} />
                     </div>
-                    <span className="text-[12px] font-black min-w-[40px]" style={{ color: fillColor }}>
+                    <span className="text-base md:text-lg font-black min-w-[44px]" style={{ color: fillColor }}>
                         {fillPct.toFixed(1)}%
                     </span>
                 </div>
             </td>
-            <td className="py-3 px-4 text-center text-[13px] font-bold" style={{ color: S.primary }}>
+            <td className="py-4 px-5 text-center text-base md:text-lg font-black" style={{ color: S.primary }}>
                 {(screen.impressions || 0).toLocaleString()}
             </td>
-            <td className="py-3 px-4 text-center text-[13px] font-bold" style={{ color: S.success }}>
+            <td className="py-4 px-5 text-center text-base md:text-lg font-black" style={{ color: S.success }}>
                 ${parseFloat(screen.revenue || 0).toFixed(2)}
             </td>
-            <td className="py-3 px-4 text-center">
+            <td className="py-4 px-5 text-center">
                 <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 4,
-                    padding: '3px 10px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+                    padding: '4px 12px', borderRadius: 99, fontSize: 13, fontWeight: 800,
                     background: screen.status === 'online' ? S.successContainer : S.errorContainer,
                     color: screen.status === 'online' ? S.success : S.error,
                 }}>
                     <span style={{
-                        width: 6, height: 6, borderRadius: '50%',
+                        width: 8, height: 8, borderRadius: '50%',
                         background: screen.status === 'online' ? S.success : S.error,
                         display: 'inline-block',
                     }} />
@@ -550,12 +440,9 @@ const OwnerAnalyticsPage = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
                 className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
                 <div>
-                    <h1 className="text-3xl font-black m-0 mb-1 tracking-tight" style={{ color: S.onBackground }}>
+                    <h1 className="text-3xl md:text-4xl font-black m-0 tracking-tight" style={{ color: S.onBackground }}>
                         {t('analytics.page_title')}
                     </h1>
-                    <p className="text-sm font-medium m-0" style={{ color: S.onSurfaceVariant }}>
-                        {t('analytics.page_desc')}
-                    </p>
                 </div>
 
                 {/* Controls */}
@@ -566,7 +453,7 @@ const OwnerAnalyticsPage = () => {
                         <select
                             value={selectedScreen}
                             onChange={e => setSelectedScreen(e.target.value)}
-                            className="h-10 pr-9 pl-4 rounded-xl text-sm font-medium outline-none transition-all"
+                            className="h-10 pr-9 pl-4 rounded-xl text-sm font-medium outline-none transition-all cursor-pointer"
                             style={{
                                 border: `1px solid ${S.outlineVariant}`, background: S.surfaceContainerLowest,
                                 color: S.onSurface, minWidth: 180,
@@ -585,21 +472,21 @@ const OwnerAnalyticsPage = () => {
                         <Calendar className="w-4 h-4" style={{ color: S.outline }} />
                         <input type="date" value={dateRange.start}
                             onChange={e => setDateRange(p => ({ ...p, start: e.target.value }))}
-                            className="outline-none bg-transparent text-sm" style={{ color: S.onSurface }} />
+                            className="outline-none bg-transparent text-sm cursor-pointer" style={{ color: S.onSurface }} />
                         <span style={{ color: S.outline }}>—</span>
                         <input type="date" value={dateRange.end}
                             onChange={e => setDateRange(p => ({ ...p, end: e.target.value }))}
-                            className="outline-none bg-transparent text-sm" style={{ color: S.onSurface }} />
+                            className="outline-none bg-transparent text-sm cursor-pointer" style={{ color: S.onSurface }} />
                     </div>
 
                     {/* Export dropdown */}
                     <div ref={exportRef} className="relative">
                         <button
                             onClick={() => setIsExportMenuOpen(p => !p)}
-                            className="flex items-center gap-2 h-10 px-4 rounded-xl font-semibold text-sm transition-all"
+                            className="flex items-center gap-2 h-10 px-4 rounded-xl font-semibold text-sm transition-all cursor-pointer"
                             style={{
                                 background: S.primary, color: '#fff',
-                                border: 'none', cursor: 'pointer',
+                                border: 'none',
                             }}
                         >
                             <Download className="w-4 h-4" />
@@ -622,15 +509,15 @@ const OwnerAnalyticsPage = () => {
                                     }}
                                 >
                                     <button onClick={handleExportExcel}
-                                        className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-green-50"
-                                        style={{ color: S.success, background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                                        className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-green-50 cursor-pointer"
+                                        style={{ color: S.success, background: 'transparent', border: 'none' }}>
                                         <FileSpreadsheet className="w-4 h-4" />
                                         {t('analytics.download_excel')}
                                     </button>
                                     <div style={{ height: 1, background: S.outlineVariant }} />
                                     <button onClick={handleExportPDF}
-                                        className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-blue-50"
-                                        style={{ color: S.primary, background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                                        className="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold transition-colors hover:bg-blue-50 cursor-pointer"
+                                        style={{ color: S.primary, background: 'transparent', border: 'none' }}>
                                         <Printer className="w-4 h-4" />
                                         {t('analytics.print_pdf')}
                                     </button>
@@ -660,44 +547,24 @@ const OwnerAnalyticsPage = () => {
                 {/* ══ KPI Grid ══ */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     <KpiCard
-                        index={0} label={t('analytics.overall_fill_rate')} sublabel="Overall Fill Rate"
+                        index={0} label={t('analytics.overall_fill_rate')}
                         value={displayedAnalytics.avgFillRate.toFixed(1)} suffix="%"
-                        Icon={Percent} iconBg="#f0fdf4" iconColor={S.success}
                         accentColor={displayedAnalytics.avgFillRate >= 75 ? S.success : displayedAnalytics.avgFillRate >= 40 ? S.warning : S.error}
-                        borderAccent={displayedAnalytics.avgFillRate >= 40 ? S.success : S.error}
-                        highlight={S.success}
-                        note={displayedAnalytics.avgFillRate >= 75 ? t('analytics.excellent_fill_note') : t('analytics.room_for_improvement')}
-                        noteIcon={TrendingUp}
-                        noteColor={displayedAnalytics.avgFillRate >= 40 ? S.success : S.error}
                     />
                     <KpiCard
-                        index={1} label={t('analytics.total_impressions_lbl')} sublabel="Total Impressions"
+                        index={1} label={t('analytics.total_impressions_lbl')}
                         value={displayedAnalytics.totalImpressions.toLocaleString()}
-                        togglable={true}
-                        iconBg={S.surfaceContainer} iconColor={S.primaryContainer}
                         accentColor={S.primary}
-                        note={t('analytics.total_impressions_note')}
-                        noteIcon={BarChart2} noteColor={S.primaryContainer}
                     />
                     <KpiCard
-                        index={2} label={t('analytics.est_revenue')} sublabel="Est. Revenue (Period)"
+                        index={2} label={t('analytics.est_revenue')}
                         value={`$${displayedAnalytics.totalRevenue.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                        togglable={true}
-                        iconBg="#f0fdf4" iconColor={S.success}
-                        accentColor={S.success} borderAccent={S.success}
-                        note={t('analytics.from_screens_count', { count: displayedScreens.length })}
-                        noteIcon={Monitor} noteColor={S.success}
+                        accentColor={S.success}
                     />
                     <KpiCard
-                        index={3} label={t('analytics.idle_screens')} sublabel="Idle / No Active Campaign"
+                        index={3} label={t('analytics.idle_screens')}
                         value={analytics?.offlineCount || 0}
-                        Icon={AlertCircle}
-                        iconBg={analytics?.offlineCount > 0 ? S.errorContainer : S.successContainer}
-                        iconColor={analytics?.offlineCount > 0 ? S.error : S.success}
                         accentColor={analytics?.offlineCount > 0 ? S.error : S.success}
-                        borderAccent={analytics?.offlineCount > 0 ? S.error : null}
-                        note={analytics?.offlineCount > 0 ? t('analytics.no_active_campaigns') : t('analytics.all_screens_active')}
-                        noteColor={analytics?.offlineCount > 0 ? S.error : S.success}
                     />
                 </div>
 
@@ -714,14 +581,7 @@ const OwnerAnalyticsPage = () => {
                         }}>
                         <div className="mb-5 flex items-center justify-between">
                             <div>
-                                <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.daily_impressions')}</h3>
-                                <p className="text-xs font-medium mt-0.5 m-0" style={{ color: S.outline }}>
-                                    {t('analytics.last_7_days_desc')}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: S.surfaceContainerLow }}>
-                                <div className="w-3 h-3 rounded-full" style={{ background: S.primaryContainer }} />
-                                <span className="text-[11px] font-bold" style={{ color: S.onSurfaceVariant }}>{t('analytics.impressions_lbl')}</span>
+                                <h3 className="m-0 text-xl md:text-2xl font-black text-[#141b2b]">{t('analytics.daily_impressions')}</h3>
                             </div>
                         </div>
                         <ImpressionsBarChart data={analytics?.dailyData || []} />
@@ -736,8 +596,7 @@ const OwnerAnalyticsPage = () => {
                             display: 'flex', flexDirection: 'column', alignItems: 'center',
                         }}>
                         <div className="w-full mb-4 text-center">
-                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.fill_rate_lbl')}</h3>
-                            <p className="text-xs font-medium mt-0.5 m-0" style={{ color: S.outline }}>{t('analytics.fill_rate_desc')}</p>
+                            <h3 className="m-0 text-xl md:text-2xl font-black text-[#141b2b]">{t('analytics.fill_rate_lbl')}</h3>
                         </div>
                         <FillRateGauge value={displayedAnalytics.avgFillRate} />
 
@@ -765,16 +624,13 @@ const OwnerAnalyticsPage = () => {
                         border: `1px solid ${S.outlineVariant}`,
                         borderRadius: 20, overflow: 'hidden',
                     }}>
-                    <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: `1px solid ${S.outlineVariant}` }}>
-                        <div>
-                            <h3 className="m-0 text-lg font-bold" style={{ color: S.onBackground }}>{t('analytics.screen_performance')}</h3>
-                            <p className="text-[12px] font-medium mt-1 m-0" style={{ color: S.outline }}>
-                                {t('analytics.screen_performance_desc')}
-                            </p>
+                    <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-5 gap-3" style={{ borderBottom: `1px solid ${S.outlineVariant}` }}>
+                        <div className="w-full text-center">
+                            <h3 className="m-0 text-2xl md:text-3xl font-black text-[#141b2b] text-center w-full">{t('analytics.screen_performance')}</h3>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-bold"
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm md:text-base font-extrabold shrink-0"
                             style={{ background: S.surfaceContainerLow, color: S.onSurfaceVariant }}>
-                            <Filter className="w-3.5 h-3.5" />
+                            <Filter className="w-4 h-4" />
                             {displayedScreens.length} {t('analytics.screen_count')}
                         </div>
                     </div>
@@ -785,7 +641,7 @@ const OwnerAnalyticsPage = () => {
                                 <tr style={{ background: S.surfaceContainerLow }}>
                                     {[t('analytics.screen_name_col'), t('analytics.location_col'), t('analytics.fill_rate_col_short'), t('analytics.impressions_col'), t('analytics.revenue_col'), t('analytics.status_col')].map((h, i) => (
                                         <th key={i}
-                                            className={`py-3 px-4 text-sm font-black ${i >= 2 ? 'text-center' : 'text-right'}`}
+                                            className={`py-4 px-5 text-base md:text-lg font-black ${i >= 2 ? 'text-center' : 'text-right'}`}
                                             style={{ color: S.onSurfaceVariant }}>
                                             {h}
                                         </th>
@@ -795,7 +651,7 @@ const OwnerAnalyticsPage = () => {
                             <tbody>
                                 {displayedScreens.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="py-12 text-center text-sm font-bold" style={{ color: S.outline }}>
+                                        <td colSpan={6} className="py-12 text-center text-base font-bold" style={{ color: S.outline }}>
                                             {t('analytics.no_screens')}
                                         </td>
                                     </tr>
@@ -808,16 +664,16 @@ const OwnerAnalyticsPage = () => {
                             {displayedScreens.length > 0 && (
                                 <tfoot>
                                     <tr style={{ background: S.surfaceContainerLow, borderTop: `2px solid ${S.outlineVariant}` }}>
-                                        <td colSpan={2} className="py-3 px-4 text-sm font-black" style={{ color: S.onSurfaceVariant }}>
+                                        <td colSpan={2} className="py-4 px-5 text-base md:text-lg font-black" style={{ color: S.onSurfaceVariant }}>
                                             {t('analytics.grand_total')}
                                         </td>
-                                        <td className="py-3 px-4 text-center text-sm font-black" style={{ color: S.primary }}>
+                                        <td className="py-4 px-5 text-center text-base md:text-lg font-black" style={{ color: S.primary }}>
                                             {displayedAnalytics.avgFillRate.toFixed(1)}% {t('analytics.average')}
                                         </td>
-                                        <td className="py-3 px-4 text-center text-sm font-black" style={{ color: S.primary }}>
+                                        <td className="py-4 px-5 text-center text-base md:text-lg font-black" style={{ color: S.primary }}>
                                             {displayedAnalytics.totalImpressions.toLocaleString()}
                                         </td>
-                                        <td className="py-3 px-4 text-center text-sm font-black" style={{ color: S.success }}>
+                                        <td className="py-4 px-5 text-center text-base md:text-lg font-black" style={{ color: S.success }}>
                                             ${displayedAnalytics.totalRevenue.toFixed(2)}
                                         </td>
                                         <td />

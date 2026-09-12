@@ -70,18 +70,15 @@ const ReportsHubPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 style={{ marginBottom: '0' }}
             >
-                <div style={{ paddingBottom: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-                        <div style={{ width: 40, height: 40, borderRadius: '12px', background: meta?.bg || S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <FileText style={{ width: 20, height: 20, color: meta?.color || S.primaryContainer }} />
+                <div style={{ paddingBottom: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '4px' }}>
+                        <div style={{ width: 46, height: 46, borderRadius: '14px', background: meta?.bg || S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <FileText style={{ width: 24, height: 24, color: meta?.color || S.primaryContainer }} />
                         </div>
                         <div>
-                            <h1 style={{ margin: 0, fontSize: '22px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 800, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                 {t('reports.reports_hub')}
                             </h1>
-                            <p style={{ margin: 0, fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                                {t('reports.reports_hub_desc')}
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -93,7 +90,7 @@ const ReportsHubPage = () => {
                 borderBottom: `1px solid ${S.outlineVariant}`,
                 borderTop: `1px solid ${S.outlineVariant}`,
                 position: 'sticky', top: 0, zIndex: 10,
-                marginBottom: '24px',
+                marginBottom: '28px',
             }}>
                 <div style={{ display: 'flex', gap: '0', overflowX: 'auto' }}>
                     {tabs.map(tab => {
@@ -105,12 +102,12 @@ const ReportsHubPage = () => {
                                 key={tab.path}
                                 to={tab.path}
                                 style={({ isActive: ia }) => ({
-                                    display: 'flex', alignItems: 'center', gap: '7px',
-                                    padding: '14px 20px',
+                                    display: 'flex', alignItems: 'center', gap: '10px',
+                                    padding: '16px 24px',
                                     borderBottom: `3px solid ${ia ? (m?.color || S.primaryContainer) : 'transparent'}`,
                                     color: ia ? (m?.color || S.primaryContainer) : S.onSurfaceVariant,
-                                    fontWeight: ia ? 700 : 500,
-                                    fontSize: '13px',
+                                    fontWeight: ia ? 800 : 600,
+                                    fontSize: '16px',
                                     whiteSpace: 'nowrap',
                                     textDecoration: 'none',
                                     transition: 'all 0.15s ease',
@@ -119,11 +116,11 @@ const ReportsHubPage = () => {
                                 })}
                             >
                                 <div style={{
-                                    width: 26, height: 26, borderRadius: '7px',
+                                    width: 30, height: 30, borderRadius: '8px',
                                     background: isActive ? (m?.bg || S.surfaceContainer) : 'transparent',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
                                 }}>
-                                    <Icon style={{ width: 14, height: 14 }} />
+                                    <Icon style={{ width: 18, height: 18 }} />
                                 </div>
                                 {tab.label}
                             </NavLink>

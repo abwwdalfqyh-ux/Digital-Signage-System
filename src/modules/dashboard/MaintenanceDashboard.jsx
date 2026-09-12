@@ -23,30 +23,30 @@ import { useSupportTickets, useUpdateSupportTicket } from '../../hooks/api/useSu
    STITCH DESIGN TOKENS  (NOC — Status-forward palette)
 ────────────────────────────────────────────────────────────── */
 const S = {
-    primary:                '#004ac6',
-    primaryContainer:       '#2563eb',
-    onPrimary:              '#ffffff',
-    surface:                '#f9f9ff',
+    primary: '#004ac6',
+    primaryContainer: '#2563eb',
+    onPrimary: '#ffffff',
+    surface: '#f9f9ff',
     surfaceContainerLowest: '#ffffff',
-    surfaceContainerLow:    '#f1f3ff',
-    surfaceContainer:       '#e9edff',
-    surfaceContainerHigh:   '#e1e8fd',
-    surfaceContainerHighest:'#dce2f7',
-    onBackground:           '#141b2b',
-    onSurface:              '#141b2b',
-    onSurfaceVariant:       '#434655',
-    outline:                '#737686',
-    outlineVariant:         '#c3c6d7',
+    surfaceContainerLow: '#f1f3ff',
+    surfaceContainer: '#e9edff',
+    surfaceContainerHigh: '#e1e8fd',
+    surfaceContainerHighest: '#dce2f7',
+    onBackground: '#141b2b',
+    onSurface: '#141b2b',
+    onSurfaceVariant: '#434655',
+    outline: '#737686',
+    outlineVariant: '#c3c6d7',
 
     // Status palette
-    online:      '#16a34a',
+    online: '#16a34a',
     onlineLight: '#dcfce7',
-    offline:     '#dc2626',
-    offlineLight:'#fee2e2',
-    warning:     '#d97706',
-    warningLight:'#fef3c7',
-    info:        '#0284c7',
-    infoLight:   '#e0f2fe',
+    offline: '#dc2626',
+    offlineLight: '#fee2e2',
+    warning: '#d97706',
+    warningLight: '#fef3c7',
+    info: '#0284c7',
+    infoLight: '#e0f2fe',
 };
 
 /* ──────────────────────────────────────────────────────────────
@@ -76,27 +76,27 @@ const deriveScreenStatus = (screen) => {
 
 /* Demo fallback screens with real Yemen lat/lng coordinates */
 const MOCK_SCREENS_GEO = [
-    { id: 1,  name: 'صنعاء – التحرير',    city: 'صنعاء',    lat: 15.3694, lng: 44.1910, status: 'broken',       is_online: false, last_heartbeat: new Date(Date.now()-8*60000).toISOString() },
-    { id: 2,  name: 'صنعاء – هائل',       city: 'صنعاء',    lat: 15.3800, lng: 44.2060, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-1*60000).toISOString() },
-    { id: 3,  name: 'عدن – المعلا',        city: 'عدن',      lat: 12.7855, lng: 44.9970, status: 'maintenance',  is_online: false, last_heartbeat: new Date(Date.now()-2*60000).toISOString() },
-    { id: 4,  name: 'عدن – كريتر',         city: 'عدن',      lat: 12.7722, lng: 45.0240, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-2*60000).toISOString() },
-    { id: 5,  name: 'تعز – جمال',          city: 'تعز',      lat: 13.5790, lng: 44.0217, status: 'broken',       is_online: false, last_heartbeat: new Date(Date.now()-6*60000).toISOString() },
-    { id: 6,  name: 'تعز – المركز',        city: 'تعز',      lat: 13.5720, lng: 44.0270, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-3*60000).toISOString() },
-    { id: 7,  name: 'مأرب – مركزي',        city: 'مأرب',     lat: 15.4650, lng: 45.3270, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-1*60000).toISOString() },
-    { id: 8,  name: 'حضرموت – المكلا',     city: 'حضرموت',  lat: 14.5328, lng: 49.1269, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-4*60000).toISOString() },
-    { id: 9,  name: 'حضرموت – سيئون',      city: 'حضرموت',  lat: 15.9380, lng: 48.7820, status: 'maintenance',  is_online: false, last_heartbeat: new Date(Date.now()-5*60000).toISOString() },
-    { id: 10, name: 'إب – المركز',          city: 'إب',       lat: 13.9760, lng: 44.1760, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-2*60000).toISOString() },
-    { id: 11, name: 'الحديدة – رئيسي',      city: 'الحديدة', lat: 14.7980, lng: 42.9530, status: 'disconnected', is_online: false, last_heartbeat: null },
-    { id: 12, name: 'ذمار – الوسط',         city: 'ذمار',    lat: 14.5420, lng: 44.4030, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-1*60000).toISOString() },
-    { id: 13, name: 'الحديدة – الميناء',    city: 'الحديدة', lat: 14.8260, lng: 42.9440, status: 'disconnected', is_online: false, last_heartbeat: null },
-    { id: 14, name: 'صعدة – المركز',        city: 'صعدة',    lat: 16.9380, lng: 43.7630, status: 'online',       is_online: true,  last_heartbeat: new Date(Date.now()-3*60000).toISOString() },
+    { id: 1, name: 'صنعاء – التحرير', city: 'صنعاء', lat: 15.3694, lng: 44.1910, status: 'broken', is_online: false, last_heartbeat: new Date(Date.now() - 8 * 60000).toISOString() },
+    { id: 2, name: 'صنعاء – هائل', city: 'صنعاء', lat: 15.3800, lng: 44.2060, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 1 * 60000).toISOString() },
+    { id: 3, name: 'عدن – المعلا', city: 'عدن', lat: 12.7855, lng: 44.9970, status: 'maintenance', is_online: false, last_heartbeat: new Date(Date.now() - 2 * 60000).toISOString() },
+    { id: 4, name: 'عدن – كريتر', city: 'عدن', lat: 12.7722, lng: 45.0240, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 2 * 60000).toISOString() },
+    { id: 5, name: 'تعز – جمال', city: 'تعز', lat: 13.5790, lng: 44.0217, status: 'broken', is_online: false, last_heartbeat: new Date(Date.now() - 6 * 60000).toISOString() },
+    { id: 6, name: 'تعز – المركز', city: 'تعز', lat: 13.5720, lng: 44.0270, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 3 * 60000).toISOString() },
+    { id: 7, name: 'مأرب – مركزي', city: 'مأرب', lat: 15.4650, lng: 45.3270, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 1 * 60000).toISOString() },
+    { id: 8, name: 'حضرموت – المكلا', city: 'حضرموت', lat: 14.5328, lng: 49.1269, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 4 * 60000).toISOString() },
+    { id: 9, name: 'حضرموت – سيئون', city: 'حضرموت', lat: 15.9380, lng: 48.7820, status: 'maintenance', is_online: false, last_heartbeat: new Date(Date.now() - 5 * 60000).toISOString() },
+    { id: 10, name: 'إب – المركز', city: 'إب', lat: 13.9760, lng: 44.1760, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 2 * 60000).toISOString() },
+    { id: 11, name: 'الحديدة – رئيسي', city: 'الحديدة', lat: 14.7980, lng: 42.9530, status: 'disconnected', is_online: false, last_heartbeat: null },
+    { id: 12, name: 'ذمار – الوسط', city: 'ذمار', lat: 14.5420, lng: 44.4030, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 1 * 60000).toISOString() },
+    { id: 13, name: 'الحديدة – الميناء', city: 'الحديدة', lat: 14.8260, lng: 42.9440, status: 'disconnected', is_online: false, last_heartbeat: null },
+    { id: 14, name: 'صعدة – المركز', city: 'صعدة', lat: 16.9380, lng: 43.7630, status: 'online', is_online: true, last_heartbeat: new Date(Date.now() - 3 * 60000).toISOString() },
 ];
 
 const getStatusConfig = (t) => ({
-    online:       { color: '#16a34a', light: '#dcfce7', label: t('maintenance.status_online'),         icon: '🟢', pulse: true,  speed: 'slow' },
-    broken:       { color: '#dc2626', light: '#fee2e2', label: t('maintenance.status_broken'),     icon: '🔴', pulse: true,  speed: 'fast' },
-    maintenance:  { color: '#d97706', light: '#fef3c7', label: t('maintenance.status_maintenance'),    icon: '🟠', pulse: false, speed: null  },
-    disconnected: { color: '#6b7280', light: '#f3f4f6', label: t('maintenance.status_disconnected'),         icon: '⚫', pulse: false, speed: null  },
+    online: { color: '#16a34a', light: '#dcfce7', label: t('maintenance.status_online'), icon: '🟢', pulse: true, speed: 'slow' },
+    broken: { color: '#dc2626', light: '#fee2e2', label: t('maintenance.status_broken'), icon: '🔴', pulse: true, speed: 'fast' },
+    maintenance: { color: '#d97706', light: '#fef3c7', label: t('maintenance.status_maintenance'), icon: '🟠', pulse: false, speed: null },
+    disconnected: { color: '#6b7280', light: '#f3f4f6', label: t('maintenance.status_disconnected'), icon: '⚫', pulse: false, speed: null },
 });
 
 /* ──────────────────────────────────────────────────────────────
@@ -104,30 +104,30 @@ const getStatusConfig = (t) => ({
 ────────────────────────────────────────────────────────────── */
 const statusDot = (type) => {
     const map = {
-        online:   S.online,
-        offline:  S.offline,
-        warning:  S.warning,
+        online: S.online,
+        offline: S.offline,
+        warning: S.warning,
         resolved: S.online,
-        info:     S.info,
+        info: S.info,
     };
     return map[type] ?? S.outline;
 };
 
 const priorityBadge = (p, t) => {
     const map = {
-        critical: { bg: S.offlineLight, color: S.offline,  label: t('maintenance.priority_critical') },
-        high:     { bg: S.warningLight, color: S.warning,  label: t('maintenance.priority_high') },
-        medium:   { bg: S.infoLight,    color: S.info,     label: t('maintenance.priority_medium') },
-        low:      { bg: S.surfaceContainerHigh, color: S.outline, label: t('maintenance.priority_low') },
+        critical: { bg: S.offlineLight, color: S.offline, label: t('maintenance.priority_critical') },
+        high: { bg: S.warningLight, color: S.warning, label: t('maintenance.priority_high') },
+        medium: { bg: S.infoLight, color: S.info, label: t('maintenance.priority_medium') },
+        low: { bg: S.surfaceContainerHigh, color: S.outline, label: t('maintenance.priority_low') },
     };
     return map[p] ?? map.low;
 };
 
 const statusBadge = (s, t) => {
     const map = {
-        open:       { bg: S.offlineLight, color: S.offline,  label: t('maintenance.status_open') },
-        inprogress: { bg: S.warningLight, color: S.warning,  label: t('maintenance.status_inprogress') },
-        resolved:   { bg: S.onlineLight,  color: S.online,   label: t('maintenance.status_resolved') },
+        open: { bg: S.offlineLight, color: S.offline, label: t('maintenance.status_open') },
+        inprogress: { bg: S.warningLight, color: S.warning, label: t('maintenance.status_inprogress') },
+        resolved: { bg: S.onlineLight, color: S.online, label: t('maintenance.status_resolved') },
     };
     return map[s] ?? map.open;
 };
@@ -175,7 +175,7 @@ const MaintKpiCard = ({ icon: Icon, label, value, sub, color, bgColor, borderCol
             transition: 'all 0.2s ease',
             position: 'relative',
             overflow: 'hidden',
-            
+
         }}
     >
         {/* subtle bg circle */}
@@ -232,8 +232,8 @@ const UptimeBar = ({ pct = 0 }) => {
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
 /* ── Create custom SVG DivIcon for each status ── */
@@ -248,14 +248,14 @@ const buildMarkerIcon = (status, isHovered = false) => {
     const inner = status === 'maintenance'
         ? `<text x="${size}" y="${size + 6}" text-anchor="middle" font-size="${size * 0.75}" fill="white">🔧</text>`
         : status === 'disconnected'
-        ? `<line x1="${size * 0.55}" y1="${size * 0.55}" x2="${size * 1.45}" y2="${size * 1.45}" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="${size * 1.45}" y1="${size * 0.55}" x2="${size * 0.55}" y2="${size * 1.45}" stroke="white" stroke-width="2" stroke-linecap="round"/>`
-        : `<circle cx="${size}" cy="${size}" r="${size * 0.32}" fill="white" opacity="0.9"/>`;
+            ? `<line x1="${size * 0.55}" y1="${size * 0.55}" x2="${size * 1.45}" y2="${size * 1.45}" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="${size * 1.45}" y1="${size * 0.55}" x2="${size * 0.55}" y2="${size * 1.45}" stroke="white" stroke-width="2" stroke-linecap="round"/>`
+            : `<circle cx="${size}" cy="${size}" r="${size * 0.32}" fill="white" opacity="0.9"/>`;
 
     const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="${size * 2}" height="${size * 2}" viewBox="0 0 ${size * 2} ${size * 2}">
         <style>
-            @keyframes mapPulseSlow { 0%{r:${size*0.8};opacity:0.5} 70%{r:${size*1.6};opacity:0} 100%{r:${size*0.8};opacity:0} }
-            @keyframes mapPulseFast { 0%{r:${size*0.8};opacity:0.7} 50%{r:${size*1.5};opacity:0} 100%{r:${size*0.8};opacity:0} }
+            @keyframes mapPulseSlow { 0%{r:${size * 0.8};opacity:0.5} 70%{r:${size * 1.6};opacity:0} 100%{r:${size * 0.8};opacity:0} }
+            @keyframes mapPulseFast { 0%{r:${size * 0.8};opacity:0.7} 50%{r:${size * 1.5};opacity:0} 100%{r:${size * 0.8};opacity:0} }
         </style>
         ${ring}
         <circle cx="${size}" cy="${size}" r="${size * 0.75}" fill="${cfg.color}" stroke="white" stroke-width="2"
@@ -307,18 +307,18 @@ const YemenStatusMap = ({ screenData }) => {
     const filtered = filterStatus === 'all' ? pins : pins.filter(p => p.status === filterStatus);
 
     const counts = {
-        online:       pins.filter(p => p.status === 'online').length,
-        broken:       pins.filter(p => p.status === 'broken').length,
-        maintenance:  pins.filter(p => p.status === 'maintenance').length,
+        online: pins.filter(p => p.status === 'online').length,
+        broken: pins.filter(p => p.status === 'broken').length,
+        maintenance: pins.filter(p => p.status === 'maintenance').length,
         disconnected: pins.filter(p => p.status === 'disconnected').length,
     };
 
     const filterOpts = [
-        { key: 'all',          label: t('maintenance.filter_all', { count: pins.length }),                color: S.primaryContainer },
-        { key: 'online',       label: t('maintenance.filter_online', { count: counts.online }),             color: STATUS_CONFIG.online.color },
-        { key: 'broken',       label: t('maintenance.filter_broken', { count: counts.broken }),               color: STATUS_CONFIG.broken.color },
-        { key: 'maintenance',  label: t('maintenance.filter_maintenance', { count: counts.maintenance }),         color: STATUS_CONFIG.maintenance.color },
-        { key: 'disconnected', label: t('maintenance.filter_disconnected', { count: counts.disconnected }),       color: STATUS_CONFIG.disconnected.color },
+        { key: 'all', label: t('maintenance.filter_all', { count: pins.length }), color: S.primaryContainer },
+        { key: 'online', label: t('maintenance.filter_online', { count: counts.online }), color: STATUS_CONFIG.online.color },
+        { key: 'broken', label: t('maintenance.filter_broken', { count: counts.broken }), color: STATUS_CONFIG.broken.color },
+        { key: 'maintenance', label: t('maintenance.filter_maintenance', { count: counts.maintenance }), color: STATUS_CONFIG.maintenance.color },
+        { key: 'disconnected', label: t('maintenance.filter_disconnected', { count: counts.disconnected }), color: STATUS_CONFIG.disconnected.color },
     ];
 
     return (
@@ -437,8 +437,8 @@ const YemenStatusMap = ({ screenData }) => {
                                                 <Clock style={{ width: 11, height: 11, display: 'inline', marginLeft: '4px' }} />
                                                 {minsSince !== null
                                                     ? minsSince < 1 ? t('maintenance.last_seen_moments')
-                                                    : minsSince < 60 ? t('maintenance.last_seen_minutes', { mins: minsSince })
-                                                    : t('maintenance.last_seen_hours', { hours: Math.round(minsSince/60) })
+                                                        : minsSince < 60 ? t('maintenance.last_seen_minutes', { mins: minsSince })
+                                                            : t('maintenance.last_seen_hours', { hours: Math.round(minsSince / 60) })
                                                     : t('maintenance.no_connection_record')
                                                 }
                                             </div>
@@ -561,7 +561,7 @@ const MaintenanceDashboard = () => {
 
     /* State */
     const [incidentFilter, setIncidentFilter] = useState('all');
-    const [isLive, setIsLive]         = useState(true);
+    const [isLive, setIsLive] = useState(true);
 
     const screens = screensData || [];
     const tickets = ticketsData || [];
@@ -569,13 +569,13 @@ const MaintenanceDashboard = () => {
 
     /* Derived from screens — 4 states */
     const screenStatusList = screens.map(deriveScreenStatus);
-    const onlineCount       = screens.filter((s, i) => screenStatusList[i] === 'online').length;
-    const brokenCount       = screens.filter((s, i) => screenStatusList[i] === 'broken').length;
-    const maintenanceCount  = screens.filter((s, i) => screenStatusList[i] === 'maintenance').length;
+    const onlineCount = screens.filter((s, i) => screenStatusList[i] === 'online').length;
+    const brokenCount = screens.filter((s, i) => screenStatusList[i] === 'broken').length;
+    const maintenanceCount = screens.filter((s, i) => screenStatusList[i] === 'maintenance').length;
     const disconnectedCount = screens.filter((s, i) => screenStatusList[i] === 'disconnected').length;
-    const totalScreens      = screens.length;
-    const uptimePct         = totalScreens > 0 ? Math.round((onlineCount / totalScreens) * 100) : 0;
-    
+    const totalScreens = screens.length;
+    const uptimePct = totalScreens > 0 ? Math.round((onlineCount / totalScreens) * 100) : 0;
+
     // Merge real tickets into incidents
     const realIncidents = tickets.map((t, idx) => {
         return {
@@ -676,15 +676,15 @@ const MaintenanceDashboard = () => {
     /* ── Screen table rows ── */
     const tableScreens = screens.slice(0, 12);
 
-    const mockOnline       = onlineCount;
-    const mockBroken       = brokenCount;
-    const mockMaintenance  = maintenanceCount;
+    const mockOnline = onlineCount;
+    const mockBroken = brokenCount;
+    const mockMaintenance = maintenanceCount;
     const mockDisconnected = disconnectedCount;
-    const mockTotal        = totalScreens;
-    const mockUptime       = uptimePct;
+    const mockTotal = totalScreens;
+    const mockUptime = uptimePct;
 
     return (
-        <div style={{  paddingBottom: '48px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <div style={{ paddingBottom: '48px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
 
             {/* ── Pulse animation keyframe ── */}
             <style>{`
@@ -701,25 +701,12 @@ const MaintenanceDashboard = () => {
 
             {/* ══════ PAGE HEADER ══════ */}
             <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-                style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}
+                style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}
             >
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                        <div style={{
-                            width: 40, height: 40, borderRadius: '12px',
-                            background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
-                        }}>
-                            <Wrench style={{ width: 20, height: 20, color: '#fff' }} />
-                        </div>
-                        <div>
-                            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 800, color: S.onBackground, lineHeight: 1.1 }}>
-                                {t('maintenance.page_title')}
-                            </h1>
-                            <p style={{ margin: 0, fontSize: '12px', color: S.outline }}>{t('maintenance.page_desc')}</p>
-                        </div>
-                    </div>
+                    <h1 style={{ margin: 0, fontSize: '32px', fontWeight: 900, color: S.onBackground, lineHeight: 1.1, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                        {t('maintenance.page_title')}
+                    </h1>
                 </div>
 
                 {/* ── Header controls ── */}
@@ -846,8 +833,8 @@ const MaintenanceDashboard = () => {
                 <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                     {[
                         { label: t('maintenance.24_hours'), pct: mockUptime },
-                        { label: t('maintenance.7_days'),  pct: Math.min(mockUptime + 8, 99) },
-                        { label: t('maintenance.30_days'),  pct: Math.min(mockUptime + 15, 99) },
+                        { label: t('maintenance.7_days'), pct: Math.min(mockUptime + 8, 99) },
+                        { label: t('maintenance.30_days'), pct: Math.min(mockUptime + 15, 99) },
                     ].map((item) => (
                         <div key={item.label} style={{ textAlign: 'center' }}>
                             <p style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: item.pct >= 90 ? S.online : S.warning }}>{item.pct}%</p>
@@ -1134,7 +1121,7 @@ const MaintenanceDashboard = () => {
                     padding: '10px 22px', background: S.surfaceContainerLow,
                     borderBottom: `1px solid ${S.outlineVariant}`,
                 }}>
-                    {[{label: t('maintenance.screen_name')}, {label: t('maintenance.location')}, {label: t('maintenance.status')}, {label: t('maintenance.last_seen')}, {label: ''}].map((h, i) => (
+                    {[{ label: t('maintenance.screen_name') }, { label: t('maintenance.location') }, { label: t('maintenance.status') }, { label: t('maintenance.last_seen') }, { label: '' }].map((h, i) => (
                         <span key={i} style={{ fontSize: '11px', fontWeight: 700, color: S.outline, textAlign: i > 1 ? 'center' : 'start' }}>{h.label}</span>
                     ))}
                 </div>
@@ -1146,15 +1133,15 @@ const MaintenanceDashboard = () => {
                     const uptimePctRow = scrStatus === 'online'
                         ? Math.floor(Math.random() * 20 + 79)
                         : scrStatus === 'maintenance'
-                        ? Math.floor(Math.random() * 20 + 50)
-                        : Math.floor(Math.random() * 30 + 5);
+                            ? Math.floor(Math.random() * 20 + 50)
+                            : Math.floor(Math.random() * 30 + 5);
                     const minsSinceHb = scr.last_heartbeat
                         ? Math.round((Date.now() - new Date(scr.last_heartbeat).getTime()) / 60000)
                         : null;
                     const lastSeenLabel = minsSinceHb === null ? t('maintenance.unknown')
-                        : minsSinceHb < 1   ? t('maintenance.now')
-                        : minsSinceHb < 60  ? `${minsSinceHb} ${t('maintenance.minutes_short')}`
-                        : `${Math.round(minsSinceHb / 60)} ${t('maintenance.hours_short')}`;
+                        : minsSinceHb < 1 ? t('maintenance.now')
+                            : minsSinceHb < 60 ? `${minsSinceHb} ${t('maintenance.minutes_short')}`
+                                : `${Math.round(minsSinceHb / 60)} ${t('maintenance.hours_short')}`;
                     return (
                         <motion.div
                             key={scr.id ?? idx}

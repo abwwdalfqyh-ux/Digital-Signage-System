@@ -79,9 +79,8 @@ const MaintenanceReportsPage = () => {
                 <div>
                     <h1 className="text-3xl font-bold text-on-background flex items-center gap-3">
                         <Activity className="w-8 h-8 text-primary" />
-                        {t('reports.maintenance_report_header')}
+                        {t('reports.technical_maintenance_report')}
                     </h1>
-                    <p className="text-on-surface-variant mt-2 text-sm">{t('reports.maintenance_report_desc')}</p>
                 </div>
             </div>
 
@@ -323,7 +322,6 @@ const MaintenanceReportsPage = () => {
                         <Activity className="w-10 h-10 text-primary/40" />
                     </div>
                     <h3 className="text-xl font-bold text-on-background mb-2 whitespace-nowrap">{t('reports.technical_reports_ready')}</h3>
-                    <p className="text-on-surface-variant min-w-[min(100%,400px)] max-w-[500px] w-full mx-auto leading-relaxed">{t('reports.technical_reports_instructions')}</p>
                 </div>
             )}
         </div>

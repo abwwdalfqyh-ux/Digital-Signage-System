@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    HeadphonesIcon,
     Plus,
     X,
     Send,
@@ -152,40 +151,40 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-[95%] sm:w-[500px] shrink-0 bg-white border border-[#c3c6d7] rounded-3xl overflow-hidden"
+                className="w-[95%] sm:w-[680px] shrink-0 bg-white border border-[#c3c6d7] rounded-3xl overflow-hidden shadow-2xl"
                 dir="rtl"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-[#c3c6d7]">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#e9edff] flex items-center justify-center">
-                            <Plus className="w-4 h-4 text-[#004ac6]" />
+                <div className="flex items-center justify-between px-7 py-6 border-b border-[#c3c6d7]">
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-11 h-11 rounded-2xl bg-[#e9edff] flex items-center justify-center">
+                            <Plus className="w-6 h-6 text-[#004ac6] stroke-[3]" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-black text-[#141b2b]">{t('support.new_ticket')}</h2>
-                            <p className="text-xs text-[#737686]">{t('support.tell_us_problem')}</p>
+                            <h2 className="text-xl md:text-2xl font-black text-[#141b2b]">{t('support.new_ticket')}</h2>
+                            <p className="text-sm text-[#737686] font-bold mt-0.5">{t('support.tell_us_problem')}</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-xl bg-[#f1f3ff] hover:bg-[#e9edff] flex items-center justify-center transition-colors"
+                        className="w-10 h-10 rounded-2xl bg-[#f1f3ff] hover:bg-[#e9edff] flex items-center justify-center transition-colors cursor-pointer"
                     >
-                        <X className="w-4 h-4 text-[#434655]" />
+                        <X className="w-5 h-5 text-[#434655]" />
                     </button>
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-7 space-y-5">
                     {/* Screen Selection */}
                     <div>
-                        <label className="block text-xs font-bold text-[#434655] mb-1.5">
+                        <label className="block text-sm md:text-base font-extrabold text-[#141b2b] mb-2">
                             {t('support.related_screen')}
                         </label>
                         <div className="relative">
                             <select
                                 value={form.screen_id}
                                 onChange={e => handleChange('screen_id', e.target.value)}
-                                className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
+                                className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl px-5 py-3.5 text-base md:text-lg font-bold text-[#141b2b] focus:outline-none focus:border-[#004ac6] transition-colors"
                             >
                                 <option value="" style={{ background: '#ffffff' }}>-- {t('support.general_issue')} --</option>
                                 {screens.map(s => (
@@ -194,14 +193,14 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                                     </option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute left-3 top-3 w-4 h-4 text-[#737686] pointer-events-none" />
+                            <ChevronDown className="absolute left-4 top-4.5 w-5 h-5 text-[#737686] pointer-events-none" />
                         </div>
                     </div>
 
                     {/* Subject */}
                     <div>
-                        <label className="block text-xs font-bold text-[#434655] mb-1.5">
-                            {t('support.issue_title')} <span className="text-red-400">*</span>
+                        <label className="block text-sm md:text-base font-extrabold text-[#141b2b] mb-2">
+                            {t('support.issue_title')}
                         </label>
                         <input
                             type="text"
@@ -209,19 +208,19 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                             value={form.subject}
                             onChange={e => handleChange('subject', e.target.value)}
                             maxLength={120}
-                            className="w-full bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] placeholder-gray-600 focus:outline-none focus:border-[#004ac6]/50 transition-colors"
+                            className="w-full bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl px-5 py-3.5 text-base md:text-lg font-bold text-[#141b2b] placeholder-gray-500 focus:outline-none focus:border-[#004ac6] transition-colors"
                         />
                     </div>
 
                     {/* Category + Priority */}
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-bold text-[#434655] mb-1.5">{t('support.issue_type')}</label>
+                            <label className="block text-sm md:text-base font-extrabold text-[#141b2b] mb-2">{t('support.issue_type')}</label>
                             <div className="relative">
                                 <select
                                     value={form.category}
                                     onChange={e => handleChange('category', e.target.value)}
-                                    className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
+                                    className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl px-5 py-3.5 text-base md:text-lg font-bold text-[#141b2b] focus:outline-none focus:border-[#004ac6] transition-colors"
                                 >
                                     {getCategories(t).map(c => (
                                         <option key={c.value} value={c.value} style={{ background: '#ffffff' }}>
@@ -229,16 +228,16 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                                         </option>
                                     ))}
                                 </select>
-                                <ChevronDown className="absolute left-3 top-3 w-4 h-4 text-[#737686] pointer-events-none" />
+                                <ChevronDown className="absolute left-4 top-4.5 w-5 h-5 text-[#737686] pointer-events-none" />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-[#434655] mb-1.5">{t('support.priority')}</label>
+                            <label className="block text-sm md:text-base font-extrabold text-[#141b2b] mb-2">{t('support.priority')}</label>
                             <div className="relative">
                                 <select
                                     value={form.priority}
                                     onChange={e => handleChange('priority', e.target.value)}
-                                    className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] focus:outline-none focus:border-[#004ac6]/50 transition-colors"
+                                    className="w-full appearance-none bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl px-5 py-3.5 text-base md:text-lg font-bold text-[#141b2b] focus:outline-none focus:border-[#004ac6] transition-colors"
                                 >
                                     {Object.entries(getPriorityMap(t)).map(([val, cfg]) => (
                                         <option key={val} value={val} style={{ background: '#ffffff' }}>
@@ -246,22 +245,22 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                                         </option>
                                     ))}
                                 </select>
-                                <ChevronDown className="absolute left-3 top-3 w-4 h-4 text-[#737686] pointer-events-none" />
+                                <ChevronDown className="absolute left-4 top-4.5 w-5 h-5 text-[#737686] pointer-events-none" />
                             </div>
                         </div>
                     </div>
 
                     {/* Description */}
                     <div>
-                        <label className="block text-xs font-bold text-[#434655] mb-1.5">
-                            {t('support.issue_description')} <span className="text-red-400">*</span>
+                        <label className="block text-sm md:text-base font-extrabold text-[#141b2b] mb-2">
+                            {t('support.issue_description')}
                         </label>
                         <textarea
                             placeholder={t('support.issue_description_placeholder')}
                             value={form.description}
                             onChange={e => handleChange('description', e.target.value)}
                             rows={4}
-                            className="w-full bg-[#f1f3ff] border border-[#c3c6d7] rounded-xl px-4 py-2.5 text-sm text-[#141b2b] placeholder-gray-600 focus:outline-none focus:border-[#004ac6]/50 transition-colors resize-none"
+                            className="w-full bg-[#f1f3ff] border border-[#c3c6d7] rounded-2xl px-5 py-3.5 text-base md:text-lg font-bold text-[#141b2b] placeholder-gray-500 focus:outline-none focus:border-[#004ac6] transition-colors resize-none"
                         />
                     </div>
 
@@ -270,30 +269,30 @@ const NewTicketModal = ({ onClose, onSuccess }) => {
                         <motion.p
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2.5"
+                            className="text-sm font-bold text-red-500 bg-red-500/10 border border-red-500/20 rounded-2xl px-5 py-3"
                         >
                             {error}
                         </motion.p>
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center gap-3 pt-1">
+                    <div className="flex items-center gap-4 pt-2">
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#004ac6] hover:bg-[#2563eb] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-sm font-black text-white transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2.5 py-3.5 bg-[#004ac6] hover:bg-[#2563eb] disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl text-base md:text-lg font-black text-white transition-colors shadow-lg shadow-[#004ac6]/20 cursor-pointer"
                         >
                             {loading ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                <RefreshCw className="w-5 h-5 animate-spin" />
                             ) : (
-                                <Send className="w-4 h-4" />
+                                <Send className="w-5 h-5" />
                             )}
                             {loading ? t('support.submitting') : t('support.submit_ticket')}
                         </button>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-5 py-2.5 bg-[#f1f3ff] hover:bg-[#e9edff] rounded-xl text-sm font-bold text-[#434655] transition-colors"
+                            className="px-6 py-3.5 bg-[#f1f3ff] hover:bg-[#e9edff] rounded-2xl text-base md:text-lg font-extrabold text-[#434655] transition-colors cursor-pointer"
                         >
                             {t('common.cancel')}
                         </button>
@@ -420,10 +419,11 @@ const StatCard = ({ label, value, color, delay = 0 }) => (
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="bg-white border border-[#c3c6d7] shadow-sm rounded-2xl p-5"
+        whileHover={{ y: -3 }}
+        className="bg-white border border-[#c3c6d7] shadow-sm rounded-3xl p-5 md:p-6 flex flex-col items-center justify-center text-center gap-1.5 transition-all"
     >
-        <p className="text-xs font-bold text-[#737686] mb-1">{label}</p>
-        <p className="text-2xl font-black" style={{ color }}>{value}</p>
+        <h3 className="text-xl md:text-2xl font-black text-[#141b2b] m-0 text-center">{label}</h3>
+        <p className="text-lg md:text-xl font-bold text-center m-0" style={{ color: color === '#ffffff' ? '#141b2b' : color }}>{value}</p>
     </motion.div>
 );
 
@@ -492,24 +492,22 @@ const SupportPage = () => {
             {/* ── Page Header ── */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-black text-[#141b2b] tracking-tight flex items-center gap-3">
-                        <HeadphonesIcon className="w-7 h-7 text-[#004ac6]" />
+                    <h1 className="text-3xl md:text-4xl font-black text-[#141b2b] tracking-tight">
                         {t('support.support_and_maintenance')}
                     </h1>
-                    <p className="text-sm text-[#737686] font-bold mt-1">
-                        {t('support.track_support_tickets')}
-                    </p>
                 </div>
-                <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => setShowNewModal(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-[#004ac6] hover:bg-[#2563eb] rounded-xl text-sm font-black text-white transition-colors shadow-lg shadow-[#004ac6]/20"
-                >
-                    <Plus className="w-4 h-4" />
-                    {t('support.new_ticket_btn')}
-                </motion.button>
             </div>
+
+            {/* ── Full-Width New Ticket Button ── */}
+            <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowNewModal(true)}
+                className="w-full py-4 px-6 bg-[#004ac6] hover:bg-[#2563eb] rounded-2xl text-lg md:text-xl font-black text-white transition-all shadow-lg shadow-[#004ac6]/25 flex items-center justify-center gap-3 cursor-pointer"
+            >
+                <Plus className="w-6 h-6 stroke-[3]" />
+                {t('support.new_ticket_btn')}
+            </motion.button>
 
             {/* ── Stats ── */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -520,20 +518,20 @@ const SupportPage = () => {
             </div>
 
             {/* ── Filter Tabs ── */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 w-full">
                 {getFilters(t).map(f => (
                     <button
                         key={f.key}
                         onClick={() => setActiveFilter(f.key)}
-                        className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                        className={`w-full py-3.5 px-3 rounded-2xl text-base md:text-lg font-black transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                             activeFilter === f.key
                                 ? 'bg-[#004ac6] text-white shadow-lg shadow-[#004ac6]/20'
-                                : 'bg-[#f1f3ff] text-[#737686] hover:bg-[#e9edff] hover:text-gray-300'
+                                : 'bg-[#f1f3ff] text-[#737686] hover:bg-[#e9edff] hover:text-[#141b2b]'
                         }`}
                     >
-                        {f.label}
+                        <span>{f.label}</span>
                         {f.key !== 'all' && tickets.filter(t => t.status === f.key).length > 0 && (
-                            <span className="mr-1.5 text-[10px] opacity-70">
+                            <span className="text-xs md:text-sm opacity-85 font-extrabold">
                                 ({tickets.filter(t => t.status === f.key).length})
                             </span>
                         )}
@@ -552,21 +550,12 @@ const SupportPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col items-center justify-center py-20 text-center"
                 >
-                    <div className="w-16 h-16 rounded-3xl bg-[#f1f3ff] flex items-center justify-center mb-4">
-                        <HeadphonesIcon className="w-8 h-8 text-[#434655]" />
-                    </div>
-                    <p className="text-base font-black text-[#737686]">{t('support.no_tickets')}</p>
-                    <p className="text-xs text-[#434655] mt-1">
-                        {activeFilter === 'all'
-                            ? t('support.no_tickets_opened_yet')
-                            : `${t('support.no_tickets_in_status')} "${getFilters(t).find(f => f.key === activeFilter)?.label}".`}
-                    </p>
                     {activeFilter === 'all' && (
                         <button
                             onClick={() => setShowNewModal(true)}
-                            className="mt-4 flex items-center gap-2 px-4 py-2 bg-[#004ac6]/20 hover:bg-[#004ac6]/30 border border-indigo-500/30 rounded-xl text-sm font-bold text-[#004ac6] transition-colors"
+                            className="flex items-center gap-2 px-6 py-3 bg-[#004ac6] hover:bg-[#2563eb] rounded-xl text-base font-black text-white transition-colors shadow-lg shadow-[#004ac6]/20 cursor-pointer"
                         >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-5 h-5" />
                             {t('support.open_first_ticket')}
                         </button>
                     )}

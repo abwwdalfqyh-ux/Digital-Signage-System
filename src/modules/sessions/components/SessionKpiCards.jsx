@@ -13,38 +13,21 @@ const itemVariants = {
 };
 
 /* ─── Single KPI Card ─── */
-const KpiCard = ({ title, value, icon, colorClass, isProgress, secScore }) => (
+const KpiCard = ({ title, value }) => (
     <motion.div
         variants={itemVariants}
-        className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-row items-center justify-between gap-4"
+        className="bg-surface-container-lowest border border-outline-variant rounded-xl py-3 px-4 shadow-sm flex flex-col items-center justify-center text-center gap-1"
     >
-        <div>
-            <p className="font-label-md text-label-md text-on-surface-variant">{title}</p>
-            <p className="font-headline-lg text-headline-lg text-on-surface font-bold mt-sm">{value ?? '—'}</p>
-        </div>
-        {isProgress ? (
-            <div className="relative w-12 h-12 flex-shrink-0">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <path className="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3"></path>
-                    <path className="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeDasharray={`${secScore}, 100`} strokeWidth="3"></path>
-                </svg>
-            </div>
-        ) : (
-            <div className={`p-sm rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`}>
-                <span className="material-symbols-outlined">{icon}</span>
-            </div>
-        )}
+        <p className="text-base sm:text-lg font-bold text-on-surface">{title}</p>
+        <p className="text-lg font-normal text-on-surface-variant">{value ?? '—'}</p>
     </motion.div>
 );
 
 /* ─── Skeleton Card  ─── */
 const KpiSkeleton = () => (
-    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-row items-center justify-between animate-pulse">
-        <div className="space-y-2">
-            <div className="h-4 bg-surface-variant rounded-lg w-24"></div>
-            <div className="h-8 bg-surface-variant rounded-lg w-12"></div>
-        </div>
-        <div className="w-12 h-12 rounded-full bg-surface-variant shrink-0 mt-4 md:mt-0"></div>
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-xl py-3 px-4 shadow-sm flex flex-col items-center justify-center text-center gap-2 animate-pulse">
+        <div className="h-4 bg-surface-variant rounded-lg w-28"></div>
+        <div className="h-5 bg-surface-variant rounded-lg w-12"></div>
     </div>
 );
 
@@ -71,8 +54,8 @@ const SessionKpiCards = ({ sessions = [], loading = false }) => {
 
     if (loading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
-                {Array.from({ length: 4 }).map((_, i) => <KpiSkeleton key={i} />)}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => <KpiSkeleton key={i} />)}
             </div>
         );
     }
@@ -82,31 +65,19 @@ const SessionKpiCards = ({ sessions = [], loading = false }) => {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
         >
             <KpiCard
                 title={t('sessions.total_sessions')}
                 value={sessions.length}
-                icon="devices"
-                colorClass="bg-primary-container/10 text-primary"
-            />
-            <KpiCard
-                title={t('sessions.other_sessions_kpi')}
-                value={otherSessions.length}
-                icon="multiple_stop"
-                colorClass="bg-secondary-container/20 text-secondary"
             />
             <KpiCard
                 title={t('sessions.device_types')}
                 value={deviceTypes}
-                icon="laptop_mac"
-                colorClass="bg-surface-variant text-on-surface-variant"
             />
             <KpiCard
                 title={t('sessions.security_level')}
                 value={`${secScore}%`}
-                isProgress={true}
-                secScore={secScore}
             />
         </motion.div>
     );

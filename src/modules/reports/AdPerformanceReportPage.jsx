@@ -57,7 +57,6 @@ const AdPerformanceReportPage = () => {
                         <MonitorPlay className="w-8 h-8 text-primary" />
                         {t('reports.ad_performance_report_title', 'Ad Performance Report')}
                     </h1>
-                    <p className="text-on-surface-variant mt-2 text-sm">{t('reports.ad_performance_desc', 'Analyze ad statuses, durations, and geographical distribution.')}</p>
                 </div>
             </div>
 
@@ -323,7 +322,6 @@ const AdPerformanceReportPage = () => {
                         <FileText className="w-10 h-10 text-primary/40" />
                     </div>
                     <h3 className="text-xl font-bold text-on-background mb-2 whitespace-nowrap">{t('reports.reports_ready')}</h3>
-                    <p className="text-on-surface-variant min-w-[min(100%,400px)] max-w-[500px] w-full mx-auto leading-relaxed">{t('reports.reports_ready_desc')}</p>
                 </div>
             )}
         </div>

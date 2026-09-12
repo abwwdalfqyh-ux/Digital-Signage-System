@@ -85,15 +85,14 @@ const RolesPage = () => {
         }
     };
 
-    const inputClass = "w-full bg-background border border-outline-variant rounded-lg py-2.5 px-4 font-body-md text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary focus:bg-surface transition-all text-right";
-    const labelClass = "font-label-md text-label-md text-on-surface-variant mb-1.5 block px-1";
+    const inputClass = "w-full bg-background border border-outline-variant rounded-xl py-3.5 px-4 text-lg font-medium text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary focus:bg-surface transition-all text-right";
+    const labelClass = "text-lg font-bold text-on-surface mb-2 block px-1";
 
     return (
         <div className="space-y-8 animate-fade-in pb-12" dir="rtl">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="font-headline-lg text-headline-lg font-semibold text-on-surface mb-2">{t('admin.roles_title')}</h1>
-                    <p className="text-on-surface-variant font-body-md text-body-md">{t('admin.roles_subtitle')}</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-on-surface">{t('admin.roles_title')}</h1>
                 </div>
             </div>
 
@@ -106,8 +105,8 @@ const RolesPage = () => {
                     <div className="flex flex-col items-center justify-center p-12 text-center my-auto">
                         <div className="bg-surface-container-lowest p-12 text-center rounded-3xl border border-outline-variant">
                             <span className="material-symbols-outlined text-[48px] text-on-surface-variant mb-4 opacity-50">security</span>
-                            <h4 className="font-headline-md text-headline-md text-on-surface mb-2">{t('common.no_data')}</h4>
-                            <p className="font-body-md text-body-md text-on-surface-variant">{t('admin.no_roles_added')}</p>
+                            <h4 className="text-xl font-bold text-on-surface mb-2">{t('common.no_data')}</h4>
+                            <p className="text-lg text-on-surface-variant">{t('admin.no_roles_added')}</p>
                         </div>
                     </div>
                 ) : (
@@ -115,12 +114,12 @@ const RolesPage = () => {
                         <table className="w-full text-right border-collapse">
                             <thead className="bg-surface-container-low border-b border-outline-variant">
                                 <tr>
-                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-start">{t('admin.role_name')}</th>
-                                    <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-center">{t('admin.role_type')}</th>
-                                    {can('manage_all') && <th className="py-4 px-6 font-title-lg text-title-lg text-on-surface font-semibold whitespace-nowrap text-left">{t('admin.actions')}</th>}
+                                    <th className="py-4 px-6 text-lg text-on-surface font-bold whitespace-nowrap text-start">{t('admin.role_name')}</th>
+                                    <th className="py-4 px-6 text-lg text-on-surface font-bold whitespace-nowrap text-center">{t('admin.role_type')}</th>
+                                    {can('manage_all') && <th className="py-4 px-6 text-lg text-on-surface font-bold whitespace-nowrap text-left">{t('admin.actions')}</th>}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-outline-variant font-body-md text-body-md">
+                            <tbody className="divide-y divide-outline-variant text-base font-medium">
                                 {roles.map((row, index) => {
                                     const id = row.role_id || row.id || index;
                                     const isProtected = PROTECTED_ROLES.includes(id);
@@ -129,16 +128,16 @@ const RolesPage = () => {
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center">
-                                                        <span className="material-symbols-outlined">shield</span>
+                                                        <span className="material-symbols-outlined text-2xl">shield</span>
                                                     </div>
-                                                    <span className="font-medium">{row.role_name}</span>
+                                                    <span className="font-bold text-lg text-on-surface">{row.role_name}</span>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6 text-center">
                                                 {isProtected ? (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#fef3c7] text-[#92400e] font-caption text-caption border border-[#fde68a]">{t('admin.core_role')}</span>
+                                                    <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-[#fef3c7] text-[#92400e] text-sm font-bold border border-[#fde68a]">{t('admin.core_role')}</span>
                                                 ) : (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant font-caption text-caption">{t('admin.custom_role')}</span>
+                                                    <span className="inline-flex items-center px-4 py-1.5 rounded-full bg-surface-variant text-on-surface-variant text-sm font-bold">{t('admin.custom_role')}</span>
                                                 )}
                                             </td>
                                             {can('manage_all') && (
@@ -147,10 +146,10 @@ const RolesPage = () => {
                                                         <button
                                                             type="button"
                                                             onClick={(e) => { e.stopPropagation(); openModal(row); }}
-                                                            className="p-2 text-primary hover:bg-surface-container-high rounded-full transition-colors"
+                                                            className="p-2.5 text-primary hover:bg-surface-container-high rounded-full transition-colors"
                                                             title={t('common.edit')}
                                                         >
-                                                            <span className="material-symbols-outlined">edit</span>
+                                                            <span className="material-symbols-outlined text-2xl">edit</span>
                                                         </button>
                                                     </div>
                                                 </td>
@@ -172,7 +171,7 @@ const RolesPage = () => {
             >
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className={labelClass}>{t('admin.role_name')} <span className="text-error">*</span></label>
+                        <label className={labelClass}>{t('admin.role_name')}</label>
                         <input
                             type="text"
                             required
@@ -188,14 +187,14 @@ const RolesPage = () => {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 shadow-sm transition-colors disabled:opacity-50"
+                            className="flex-1 bg-primary text-on-primary py-3.5 rounded-xl text-lg font-bold hover:bg-primary/90 shadow-sm transition-colors disabled:opacity-50"
                         >
                             {isSubmitting ? t('common.saving') : t('common.save')}
                         </button>
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="flex-1 bg-surface-variant text-on-surface-variant py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest border border-outline-variant transition-colors"
+                            className="flex-1 bg-surface-variant text-on-surface-variant py-3.5 rounded-xl text-lg font-bold hover:bg-surface-container-highest border border-outline-variant transition-colors"
                         >
                             {t('common.cancel')}
                         </button>

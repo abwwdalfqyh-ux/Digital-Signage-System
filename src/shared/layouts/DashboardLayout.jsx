@@ -711,10 +711,10 @@ const DashboardLayout = () => {
                     {/* ── Center: App brand ── */}
                     <div
                         onClick={() => navigate('/dashboard')}
-                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
+                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
                     >
                         <div style={{
-                            width: 36, height: 36, borderRadius: '10px',
+                            width: 40, height: 40, borderRadius: '12px',
                             background: S.primaryContainer,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             overflow: 'hidden',
@@ -727,19 +727,19 @@ const DashboardLayout = () => {
                                 onError={e => {
                                     e.target.onerror = null;
                                     e.target.style.display = 'none';
-                                    e.target.parentNode.innerHTML = '<span style="color:#fff;font-size:12px;font-weight:800">SC</span>';
+                                    e.target.parentNode.innerHTML = '<span style="color:#fff;font-size:14px;font-weight:900">SC</span>';
                                 }}
                             />
                         </div>
                         <div>
                             <p style={{
-                                margin: 0, fontSize: '15px', fontWeight: 700,
+                                margin: 0, fontSize: '18px', fontWeight: 900,
                                 color: S.primary,
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                 lineHeight: 1.1,
                             }}>SabaControl</p>
                             <p style={{
-                                margin: 0, fontSize: '9px',
+                                margin: 0, fontSize: '11px', fontWeight: 700,
                                 color: S.outline, textTransform: 'uppercase', letterSpacing: '0.1em',
                                 fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                             }}>Smart Advertising</p>
@@ -747,7 +747,7 @@ const DashboardLayout = () => {
                     </div>
 
                     {/* ── Left side: action buttons ── */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', }}>
 
                         {/* 🌙 Dark / Light mode toggle */}
                         <button
@@ -756,7 +756,7 @@ const DashboardLayout = () => {
                             style={{
                                 background: isDark ? 'rgba(180,197,255,0.12)' : S.surfaceContainerLow,
                                 border: `1px solid ${isDark ? 'rgba(180,197,255,0.22)' : S.outlineVariant}`,
-                                borderRadius: '10px',
+                                borderRadius: '12px',
                                 width: 44, height: 44,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 cursor: 'pointer',
@@ -768,8 +768,8 @@ const DashboardLayout = () => {
                             onMouseLeave={e => e.currentTarget.style.background = isDark ? 'rgba(180,197,255,0.12)' : S.surfaceContainerLow}
                         >
                             {isDark
-                                ? <Sun style={{ width: 17, height: 17 }} />
-                                : <Moon style={{ width: 17, height: 17 }} />
+                                ? <Sun style={{ width: 19, height: 19 }} />
+                                : <Moon style={{ width: 19, height: 19 }} />
                             }
                         </button>
 
@@ -779,7 +779,7 @@ const DashboardLayout = () => {
                             alignItems: 'center',
                             background: S.surfaceContainerLow,
                             border: `1px solid ${S.outlineVariant}`,
-                            borderRadius: '10px',
+                            borderRadius: '12px',
                             overflow: 'hidden',
                             flexShrink: 0,
                         }}>
@@ -787,14 +787,14 @@ const DashboardLayout = () => {
                             <button
                                 onClick={() => setLanguage('en')}
                                 style={{
-                                    height: 38,
-                                    padding: '0 11px',
+                                    height: 42,
+                                    padding: '0 14px',
                                     border: 'none',
                                     borderRight: `1px solid ${S.outlineVariant}`,
                                     background: language === 'en' ? S.primary : 'transparent',
                                     color: language === 'en' ? '#ffffff' : S.onSurfaceVariant,
-                                    fontSize: '12px',
-                                    fontWeight: 700,
+                                    fontSize: '14px',
+                                    fontWeight: 800,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     cursor: language === 'en' ? 'default' : 'pointer',
                                     transition: 'all 0.2s ease',
@@ -820,17 +820,16 @@ const DashboardLayout = () => {
                             <button
                                 onClick={() => setLanguage('ar')}
                                 style={{
-                                    height: 38,
-                                    padding: '0 11px',
+                                    height: 42,
+                                    padding: '0 14px',
                                     border: 'none',
                                     background: language === 'ar' ? S.primary : 'transparent',
                                     color: language === 'ar' ? '#ffffff' : S.onSurfaceVariant,
-                                    fontSize: '12px',
-                                    fontWeight: 700,
+                                    fontSize: '15px',
+                                    fontWeight: 800,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     cursor: language === 'ar' ? 'default' : 'pointer',
                                     transition: 'all 0.2s ease',
-                                    
                                 }}
                                 onMouseEnter={e => {
                                     if (language !== 'ar') {
@@ -851,13 +850,13 @@ const DashboardLayout = () => {
 
                         {/* Notifications */}
                         <IconBtn onClick={() => navigate('/dashboard/notifications')} title={lbl.notifications}>
-                            <Bell style={{ width: 19, height: 19 }} />
+                            <Bell style={{ width: 21, height: 21 }} />
                             {unreadCount > 0 && (
                                 <span style={{
                                     position: 'absolute', top: 4, right: 4,
-                                    minWidth: 16, height: 16, borderRadius: 8,
+                                    minWidth: 18, height: 18, borderRadius: 9,
                                     background: S.error, color: '#fff',
-                                    fontSize: '10px', fontWeight: 'bold',
+                                    fontSize: '11px', fontWeight: '900',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     border: `1.5px solid ${S.surfaceContainerLowest}`,
                                     padding: '0 4px',
@@ -870,8 +869,15 @@ const DashboardLayout = () => {
 
                         <style>{`
                             @keyframes launcherIn {
-                                from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+                                from { opacity: 0; transform: scale(0.92) translateY(-10px); }
                                 to   { opacity: 1; transform: scale(1)   translateY(0); }
+                            }
+                            .quick-access-scroll::-webkit-scrollbar {
+                                width: 4px;
+                            }
+                            .quick-access-scroll::-webkit-scrollbar-thumb {
+                                background: rgba(100, 116, 139, 0.3);
+                                borderRadius: 4px;
                             }
                         `}</style>
 
@@ -882,29 +888,56 @@ const DashboardLayout = () => {
                                 title={t('common.quick_access')}
                             >
                                 <Grid style={{
-                                    width: 17, height: 17,
+                                    width: 20, height: 20,
                                     color: isLauncherOpen ? S.primaryContainer : S.onSurfaceVariant,
                                     transition: 'color 0.2s',
                                 }} />
                             </IconBtn>
                             {isLauncherOpen && (
                                 <div style={{
-                                    position: 'absolute', top: 'calc(100% + 8px)', [isRTL ? 'left' : 'right']: 0,
-                                    width: '280px', background: S.surfaceContainerLowest, border: `1px solid ${S.outlineVariant}`,
-                                    borderRadius: '16px', padding: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                                    position: 'absolute', top: 'calc(100% + 10px)', [isRTL ? 'left' : 'right']: 0,
+                                    width: '330px', 
+                                    background: S.surfaceContainerLowest, 
+                                    border: `1px solid ${S.outlineVariant}`,
+                                    borderRadius: '24px', 
+                                    padding: '20px', 
+                                    boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.5)' : '0 20px 50px rgba(0,74,198,0.12)',
                                     zIndex: 999,
-                                    animation: 'launcherIn 0.18s cubic-bezier(0.4,0,0.2,1)',
+                                    animation: 'launcherIn 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
                                 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                        <span style={{ fontSize: '13px', fontWeight: 700, color: S.onSurface, fontFamily: "'IBM Plex Sans Arabic'" }}>
-                                            {t('common.quick_access')}
-                                        </span>
+                                    {/* Header */}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{
+                                                width: 28, height: 28, borderRadius: '8px',
+                                                background: S.primaryContainer + '20',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                            }}>
+                                                <Grid style={{ width: 16, height: 16, color: S.primaryContainer }} />
+                                            </div>
+                                            <span style={{ fontSize: '15px', fontWeight: 900, color: S.onSurface, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                                {t('common.quick_access')}
+                                            </span>
+                                        </div>
+
                                         {activeLaunchItems.length < maxItems && (
                                             <button
                                                 onClick={() => setIsAddingShortcut(!isAddingShortcut)}
-                                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: S.primaryContainer, fontSize: '12px', fontWeight: 600, padding: 0 }}
+                                                style={{
+                                                    border: 'none',
+                                                    background: isAddingShortcut ? S.surfaceContainerHigh : S.primaryContainer,
+                                                    color: isAddingShortcut ? S.onSurface : '#ffffff',
+                                                    cursor: 'pointer',
+                                                    borderRadius: '999px',
+                                                    fontSize: '12px',
+                                                    fontWeight: 800,
+                                                    padding: '5px 14px',
+                                                    fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                                                    boxShadow: isAddingShortcut ? 'none' : '0 3px 10px rgba(37,99,235,0.3)',
+                                                    transition: 'all 0.2s ease'
+                                                }}
                                             >
-                                                + {t('common.add')}
+                                                {isAddingShortcut ? t('common.cancel') : `+ ${t('common.add')}`}
                                             </button>
                                         )}
                                     </div>
@@ -916,38 +949,104 @@ const DashboardLayout = () => {
                                                     <button
                                                         onClick={() => { navigate(item.path); setIsLauncherOpen(false); }}
                                                         style={{
-                                                            width: '100%', height: '70px',
-                                                            background: S.surfaceContainerLow, border: 'none', borderRadius: '12px',
-                                                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                                            cursor: 'pointer', transition: 'all 0.15s ease'
+                                                            width: '100%', height: '82px',
+                                                            background: S.surfaceContainerLow, 
+                                                            border: `1px solid ${S.outlineVariant + '40'}`, 
+                                                            borderRadius: '16px',
+                                                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                                                            cursor: 'pointer', 
+                                                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                            padding: '8px'
                                                         }}
-                                                        onMouseEnter={e => e.currentTarget.style.background = S.surfaceContainer}
-                                                        onMouseLeave={e => e.currentTarget.style.background = S.surfaceContainerLow}
+                                                        onMouseEnter={e => {
+                                                            e.currentTarget.style.background = S.surfaceContainerHigh;
+                                                            e.currentTarget.style.transform = 'translateY(-3px)';
+                                                            e.currentTarget.style.borderColor = S.primaryContainer + '80';
+                                                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
+                                                        }}
+                                                        onMouseLeave={e => {
+                                                            e.currentTarget.style.background = S.surfaceContainerLow;
+                                                            e.currentTarget.style.transform = 'translateY(0)';
+                                                            e.currentTarget.style.borderColor = S.outlineVariant + '40';
+                                                            e.currentTarget.style.boxShadow = 'none';
+                                                        }}
                                                     >
-                                                        <item.icon style={{ width: 22, height: 22, color: S.primary }} />
+                                                        <div style={{
+                                                            width: 38, height: 38, borderRadius: '12px',
+                                                            background: isDark ? 'rgba(59,99,232,0.22)' : 'rgba(37,99,235,0.10)',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                        }}>
+                                                            <item.icon style={{ width: 20, height: 20, color: S.primaryContainer }} />
+                                                        </div>
+                                                        <span style={{
+                                                            display: 'block', 
+                                                            fontSize: '12px', 
+                                                            fontWeight: 800, 
+                                                            color: S.onSurface, 
+                                                            textAlign: 'center', 
+                                                            whiteSpace: 'nowrap', 
+                                                            overflow: 'hidden', 
+                                                            textOverflow: 'ellipsis',
+                                                            width: '100%',
+                                                            fontFamily: "'IBM Plex Sans Arabic', sans-serif"
+                                                        }}>
+                                                            {item.label}
+                                                        </span>
                                                     </button>
-                                                    <span style={{ display: 'block', fontSize: '10px', fontWeight: 600, color: S.onSurfaceVariant, textAlign: 'center', marginTop: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                        {item.label}
-                                                    </span>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setSavedPaths(savedPaths.filter(p => p !== item.path)); }}
-                                                        style={{ position: 'absolute', top: -5, right: -5, width: 20, height: 20, borderRadius: '50%', background: S.error, color: '#fff', border: `2px solid ${S.surfaceContainerLowest}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', display: 'flex' }}
+                                                        style={{
+                                                            position: 'absolute', top: -5, [isRTL ? 'left' : 'right']: -5, 
+                                                            width: 22, height: 22, borderRadius: '50%', 
+                                                            background: S.error, color: '#fff', 
+                                                            border: `2px solid ${S.surfaceContainerLowest}`, 
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                                            cursor: 'pointer',
+                                                            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                                                            transition: 'transform 0.15s ease'
+                                                        }}
+                                                        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+                                                        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                                                        title={t('common.delete')}
                                                     >
-                                                        <X style={{ width: 10, height: 10 }} />
+                                                        <X style={{ width: 11, height: 11, strokeWidth: 3 }} />
                                                     </button>
                                                 </div>
                                             ))}
                                             {/* Empty placeholders */}
                                             {Array.from({ length: maxItems - activeLaunchItems.length }).map((_, idx) => (
-                                                <div key={`empty-${idx}`} style={{ width: '100%', height: '70px', border: `2px dashed ${S.outlineVariant}`, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <Plus style={{ width: 16, height: 16, color: S.outlineVariant }} />
+                                                <div 
+                                                    key={`empty-${idx}`} 
+                                                    onClick={() => setIsAddingShortcut(true)}
+                                                    style={{
+                                                        width: '100%', height: '82px', 
+                                                        border: `2px dashed ${S.outlineVariant}`, 
+                                                        borderRadius: '16px', 
+                                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px',
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.2s ease',
+                                                        background: 'transparent'
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        e.currentTarget.style.borderColor = S.primaryContainer;
+                                                        e.currentTarget.style.background = S.surfaceContainerLow;
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        e.currentTarget.style.borderColor = S.outlineVariant;
+                                                        e.currentTarget.style.background = 'transparent';
+                                                    }}
+                                                >
+                                                    <Plus style={{ width: 20, height: 20, color: S.outline }} />
+                                                    <span style={{ fontSize: '10px', fontWeight: 700, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                                        {t('common.add')}
+                                                    </span>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        <div className="quick-access-scroll" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '260px', overflowY: 'auto', paddingRight: '4px' }}>
                                             {availableLaunchItems.length === 0 && (
-                                                <div style={{ fontSize: '12px', color: S.outline, textAlign: 'center' }}>
+                                                <div style={{ fontSize: '13px', fontWeight: 700, color: S.outline, textAlign: 'center', padding: '20px 0' }}>
                                                     {t('common.all interfaces added')}
                                                 </div>
                                             )}
@@ -955,10 +1054,30 @@ const DashboardLayout = () => {
                                                 <button
                                                     key={item.path}
                                                     onClick={() => { setSavedPaths([...savedPaths, item.path]); setIsAddingShortcut(false); }}
-                                                    style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', border: 'none', background: S.surfaceContainerLow, cursor: 'pointer', direction: isRTL ? 'rtl' : 'ltr' }}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', 
+                                                        borderRadius: '14px', border: `1px solid ${S.outlineVariant + '40'}`, 
+                                                        background: S.surfaceContainerLow, cursor: 'pointer', 
+                                                        direction: isRTL ? 'rtl' : 'ltr',
+                                                        transition: 'all 0.15s ease'
+                                                    }}
+                                                    onMouseEnter={e => {
+                                                        e.currentTarget.style.background = S.surfaceContainerHigh;
+                                                        e.currentTarget.style.borderColor = S.primaryContainer + '80';
+                                                    }}
+                                                    onMouseLeave={e => {
+                                                        e.currentTarget.style.background = S.surfaceContainerLow;
+                                                        e.currentTarget.style.borderColor = S.outlineVariant + '40';
+                                                    }}
                                                 >
-                                                    <item.icon style={{ width: 16, height: 16, color: S.primaryContainer }} />
-                                                    <span style={{ fontSize: '12px', fontWeight: 600, color: S.onSurface, fontFamily: "'IBM Plex Sans Arabic'" }}>
+                                                    <div style={{
+                                                        width: 32, height: 32, borderRadius: '10px',
+                                                        background: S.primaryContainer + '15',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                    }}>
+                                                        <item.icon style={{ width: 18, height: 18, color: S.primaryContainer }} />
+                                                    </div>
+                                                    <span style={{ fontSize: '14px', fontWeight: 800, color: S.onSurface, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                                         {item.label}
                                                     </span>
                                                 </button>
@@ -977,7 +1096,7 @@ const DashboardLayout = () => {
                                     title={t('common.switch role preview')}
                                 >
                                     <Users style={{
-                                        width: 17, height: 17,
+                                        width: 20, height: 20,
                                         color: impersonatedRole ? S.error : (isRoleMenuOpen ? S.primaryContainer : S.onSurfaceVariant),
                                         transition: 'color 0.2s',
                                     }} />
@@ -988,7 +1107,7 @@ const DashboardLayout = () => {
                                         position: 'absolute',
                                         top: 'calc(100% + 8px)',
                                         [isRTL ? 'left' : 'right']: 0,
-                                        width: '200px',
+                                        width: '210px',
                                         background: S.surfaceContainerLowest,
                                         border: `1px solid ${S.outlineVariant}`,
                                         borderRadius: '16px',
@@ -1003,7 +1122,7 @@ const DashboardLayout = () => {
                                             background: S.surfaceContainerLow,
                                             textAlign: 'center'
                                         }}>
-                                            <span style={{ fontSize: '13px', fontWeight: 800, color: S.primary, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                                            <span style={{ fontSize: '14px', fontWeight: 800, color: S.primary, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                                 {t('common.preview_system_as')}
                                             </span>
                                         </div>
@@ -1028,7 +1147,7 @@ const DashboardLayout = () => {
                                                         background: (impersonatedRole === r.id || (r.id === null && !impersonatedRole)) ? S.primaryContainer : 'transparent',
                                                         color: (impersonatedRole === r.id || (r.id === null && !impersonatedRole)) ? '#fff' : S.onSurface,
                                                         textAlign: 'center',
-                                                        fontSize: '13px', fontWeight: 600,
+                                                        fontSize: '14px', fontWeight: 700,
                                                         cursor: 'pointer', transition: 'all 0.2s',
                                                         direction: isRTL ? 'rtl' : 'ltr',
                                                         fontFamily: "'IBM Plex Sans Arabic', sans-serif"
@@ -1050,18 +1169,18 @@ const DashboardLayout = () => {
                         )}
 
                         {/* Divider */}
-                        <div style={{ width: 1, height: 26, background: S.outlineVariant, margin: '0 4px' }} />
+                        <div style={{ width: 1, height: 28, background: S.outlineVariant, margin: '0 6px' }} />
 
                         {/* Profile chip */}
                         <button
                             onClick={() => navigate('/dashboard/profile')}
                             title={lbl.profile}
                             style={{
-                                display: 'flex', alignItems: 'center', gap: '9px',
+                                display: 'flex', alignItems: 'center', gap: '10px',
                                 background: 'transparent',
                                 border: `1px solid ${S.outlineVariant}`,
                                 borderRadius: '999px',
-                                padding: '4px 12px 4px 4px',
+                                padding: '5px 14px 5px 6px',
                                 cursor: 'pointer',
                                 transition: 'background 0.15s',
                                 direction: isRTL ? 'rtl' : 'ltr',
@@ -1071,7 +1190,7 @@ const DashboardLayout = () => {
                         >
                             <div style={{ textAlign: isRTL ? 'right' : 'left' }}>
                                 <p style={{
-                                    margin: 0, fontSize: '13px', fontWeight: 600,
+                                    margin: 0, fontSize: '15px', fontWeight: 800,
                                     color: S.onSurface,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                     lineHeight: 1.2,
@@ -1079,20 +1198,20 @@ const DashboardLayout = () => {
                                     {user?.full_name || t('common.system admin')}
                                 </p>
                                 <p style={{
-                                    margin: 0, fontSize: '10px', color: S.onSurfaceVariant,
+                                    margin: 0, fontSize: '12px', fontWeight: 700, color: S.onSurfaceVariant,
                                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                 }}>
                                     {roleName || 'Admin'}
                                 </p>
                             </div>
                             <div style={{
-                                width: 30, height: 30, borderRadius: '50%',
+                                width: 34, height: 34, borderRadius: '50%',
                                 background: S.surfaceContainerHigh,
                                 border: `1.5px solid ${S.outlineVariant}`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 flexShrink: 0,
                             }}>
-                                <UserIcon style={{ width: 15, height: 15, color: S.primary }} />
+                                <UserIcon style={{ width: 17, height: 17, color: S.primary }} />
                             </div>
                         </button>
                     </div>

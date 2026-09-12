@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layers, Plus, Edit2, Trash2, RefreshCw, Clock, Zap, TrendingUp, ToggleLeft, ToggleRight, Search, X, CheckCircle } from 'lucide-react';
+import { Layers, Plus, Edit2, Trash2, RefreshCw, Clock, Zap, TrendingUp, ToggleLeft, ToggleRight, Search, X, CheckCircle, Folder } from 'lucide-react';
 import axiosClient from '../../core/api/axiosClient';
 import { ENDPOINTS } from '../../core/api/endpoints';
 import useToastStore from '../../store/useToastStore';
@@ -24,40 +25,32 @@ const S = {
     outline: '#737686',
     outlineVariant: '#c3c6d7',
     error: '#ba1a1a',
-    errorContainer: '#ffdad6',
-    success: '#16a34a',
     successContainer: '#dcfce7',
 };
 
 /* ─── KPI Card ─── */
-const KpiCard = ({ label, value, icon: Icon, iconBg, iconColor, accentColor, index }) => (
+const KpiCard = ({ label, value, index }) => (
     <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.08 }}
-        whileHover={{ y: -3, boxShadow: '0 8px 24px -4px rgba(0,74,198,0.12)' }}
         style={{
             background: S.surfaceContainerLowest,
             border: `1px solid ${S.outlineVariant}`,
-            borderRight: `4px solid ${accentColor || S.primaryContainer}`,
             borderRadius: '16px',
-            padding: '22px',
+            padding: '16px 20px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            gap: '8px',
             cursor: 'default',
-            transition: 'all 0.2s ease',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         }}
     >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <p style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111111', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
-            {Icon && (
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: iconBg || S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon style={{ width: 20, height: 20, color: iconColor || S.primaryContainer }} />
-                </div>
-            )}
-        </div>
-        <span style={{ fontSize: '30px', fontWeight: 500, lineHeight: 1, color: '#555555', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+        <p style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{label}</p>
+        <span style={{ fontSize: '20px', fontWeight: 400, color: S.onSurfaceVariant, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
             {value}
         </span>
     </motion.div>
@@ -71,86 +64,76 @@ const PackageCard = ({ pkg, onEdit, onDelete, onToggle, dir, index, t }) => {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            whileHover={{ y: -4, boxShadow: '0 12px 32px -8px rgba(0,74,198,0.15)' }}
+            whileHover={{ y: -4, boxShadow: '0 8px 24px rgba(0,0,0,0.06)' }}
             style={{
                 background: S.surfaceContainerLowest,
-                border: `1px solid ${isActive ? S.outlineVariant : '#e5e7eb'}`,
+                border: `1px solid ${S.outlineVariant}`,
                 borderRadius: '20px',
-                padding: '24px',
+                padding: '28px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '16px',
+                gap: '18px',
                 opacity: isActive ? 1 : 0.7,
                 transition: 'all 0.25s ease',
                 position: 'relative',
                 overflow: 'hidden',
             }}
         >
-            {/* Top accent line */}
-            <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
-                background: isActive
-                    ? 'linear-gradient(90deg, #004ac6, #2563eb)'
-                    : `linear-gradient(90deg, ${S.outlineVariant}, ${S.outline})`,
-                borderRadius: '20px 20px 0 0',
-            }} />
-
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif", lineHeight: 1.3 }}>
-                        {dir === 'rtl' ? pkg.name_ar : pkg.name_en}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{
+                        margin: 0, fontSize: '18px', fontWeight: 700, color: S.onBackground,
+                        fontFamily: "'IBM Plex Sans Arabic', sans-serif", lineHeight: 1.3,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                        {pkg.name_ar}
                     </h3>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                        {dir === 'rtl' ? pkg.name_en : pkg.name_ar}
-                    </p>
                 </div>
                 <span style={{
-                    padding: '4px 12px',
+                    padding: '5px 12px',
                     borderRadius: '999px',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     fontWeight: 600,
                     background: isActive ? S.successContainer : '#f3f4f6',
                     color: isActive ? S.success : S.outline,
                     border: `1px solid ${isActive ? '#86efac' : S.outlineVariant}`,
                     whiteSpace: 'nowrap',
                     fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                    flexShrink: 0,
                 }}>
                     {isActive ? t('packages_page.active') : t('packages_page.inactive')}
                 </span>
             </div>
 
             {/* Stats Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ background: S.surfaceContainerLow, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '6px' }}>
-                        <Clock style={{ width: 15, height: 15, color: S.primaryContainer }} />
-                        <span style={{ fontSize: '11px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.time_interval')}</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div style={{ background: S.surfaceContainerLow, borderRadius: '14px', padding: '18px 14px', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '8px' }}>
+                        <span style={{ fontSize: '15px', fontWeight: 600, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.time_interval')}</span>
                     </div>
-                    <span style={{ fontSize: '24px', fontWeight: 700, color: S.primaryContainer, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                    <span style={{ fontSize: '24px', fontWeight: 700, color: S.primaryContainer, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginBottom: '4px' }}>
                         {pkg.interval_minutes}
                     </span>
-                    <span style={{ fontSize: '12px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block' }}>{t('packages_page.minute')}</span>
+                    <span style={{ fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block' }}>{t('packages_page.minute')}</span>
                 </div>
-                <div style={{ background: S.surfaceContainerLow, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '6px' }}>
-                        <TrendingUp style={{ width: 15, height: 15, color: '#16a34a' }} />
-                        <span style={{ fontSize: '11px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.price_multiplier')}</span>
+                <div style={{ background: S.surfaceContainerLow, borderRadius: '14px', padding: '18px 14px', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '8px' }}>
+                        <span style={{ fontSize: '15px', fontWeight: 600, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.price_multiplier')}</span>
                     </div>
-                    <span style={{ fontSize: '24px', fontWeight: 700, color: '#16a34a', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                    <span style={{ fontSize: '24px', fontWeight: 700, color: '#16a34a', fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginBottom: '4px' }}>
                         ×{parseFloat(pkg.price_multiplier).toFixed(1)}
                     </span>
-                    <span style={{ fontSize: '12px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block' }}>
+                    <span style={{ fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block' }}>
                         {parseFloat(pkg.price_multiplier) === 1 ? t('packages_page.normal_price') : parseFloat(pkg.price_multiplier) > 1 ? t('packages_page.high_price') : t('packages_page.discount')}
                     </span>
                 </div>
             </div>
 
             {/* Frequency visual */}
-            <div style={{ padding: '12px', background: S.surfaceContainerLow, borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Zap style={{ width: 16, height: 16, color: S.primaryContainer, flexShrink: 0 }} />
+            <div style={{ padding: '16px', background: S.surfaceContainerLow, borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ flex: 1 }}>
-                    <div style={{ height: '6px', background: S.surfaceContainerHigh, borderRadius: '999px', overflow: 'hidden', marginBottom: '4px' }}>
+                    <div style={{ height: '8px', background: S.surfaceContainerHigh, borderRadius: '999px', overflow: 'hidden', marginBottom: '6px' }}>
                         <div style={{
                             height: '100%',
                             width: `${Math.min(100, Math.round((60 / (pkg.interval_minutes || 1)) * 100 / 60))}%`,
@@ -158,7 +141,7 @@ const PackageCard = ({ pkg, onEdit, onDelete, onToggle, dir, index, t }) => {
                             borderRadius: '999px',
                         }} />
                     </div>
-                    <span style={{ fontSize: '11px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                         {pkg.interval_minutes <= 5 ? t('packages_page.very_high_freq') :
                             pkg.interval_minutes <= 15 ? t('packages_page.high_freq') :
                                 pkg.interval_minutes <= 30 ? t('packages_page.medium_freq') : t('packages_page.low_freq')}
@@ -167,46 +150,46 @@ const PackageCard = ({ pkg, onEdit, onDelete, onToggle, dir, index, t }) => {
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: '8px', borderTop: `1px solid ${S.outlineVariant}`, paddingTop: '14px' }}>
+            <div style={{ display: 'flex', gap: '10px', borderTop: `1px solid ${S.outlineVariant}`, paddingTop: '16px' }}>
                 <button
                     onClick={() => onEdit(pkg)}
                     style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                        padding: '9px', borderRadius: '10px', border: `1px solid ${S.outlineVariant}`,
+                        padding: '11px', borderRadius: '12px', border: `1px solid ${S.outlineVariant}`,
                         background: S.surfaceContainerLow, color: S.onSurfaceVariant, cursor: 'pointer',
-                        fontSize: '13px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                        fontSize: '15px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                         transition: 'all 0.15s',
                     }}
                     onMouseEnter={e => { e.target.style.background = S.surfaceContainer; e.target.style.color = S.onBackground; }}
                     onMouseLeave={e => { e.target.style.background = S.surfaceContainerLow; e.target.style.color = S.onSurfaceVariant; }}
                 >
-                    <Edit2 style={{ width: 14, height: 14 }} /> {t('packages_page.edit')}
+                    <Edit2 style={{ width: 16, height: 16 }} /> {t('packages_page.edit')}
                 </button>
                 <button
                     onClick={() => onToggle(pkg)}
                     style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                        padding: '9px', borderRadius: '10px', border: `1px solid ${isActive ? '#fde68a' : '#86efac'}`,
+                        padding: '11px', borderRadius: '12px', border: `1px solid ${isActive ? '#fde68a' : '#86efac'}`,
                         background: isActive ? '#fef9c3' : '#dcfce7', color: isActive ? '#b45309' : '#16a34a',
-                        cursor: 'pointer', fontSize: '13px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                        cursor: 'pointer', fontSize: '15px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                         transition: 'all 0.15s',
                     }}
                 >
-                    {isActive ? <ToggleRight style={{ width: 14, height: 14 }} /> : <ToggleLeft style={{ width: 14, height: 14 }} />}
+                    {isActive ? <ToggleRight style={{ width: 16, height: 16 }} /> : <ToggleLeft style={{ width: 14, height: 14 }} />}
                     {isActive ? t('packages_page.deactivate') : t('packages_page.activate')}
                 </button>
                 <button
                     onClick={() => onDelete(pkg.package_id)}
                     style={{
-                        width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        borderRadius: '10px', border: `1px solid ${S.errorContainer}`,
+                        width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        borderRadius: '12px', border: `1px solid ${S.errorContainer}`,
                         background: S.errorContainer, color: S.error, cursor: 'pointer', transition: 'all 0.15s',
                         flexShrink: 0,
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = S.error; e.currentTarget.style.color = '#fff'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = S.errorContainer; e.currentTarget.style.color = S.error; }}
                 >
-                    <Trash2 style={{ width: 15, height: 15 }} />
+                    <Trash2 style={{ width: 16, height: 16 }} />
                 </button>
             </div>
         </motion.div>
@@ -214,18 +197,18 @@ const PackageCard = ({ pkg, onEdit, onDelete, onToggle, dir, index, t }) => {
 };
 
 /* ─── Form Field ─── */
-const Field = ({ label, required, children }) => (
+const Field = ({ label, children }) => (
     <div>
-        <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-            {label} {required && <span style={{ color: S.error }}>*</span>}
+        <label style={{ display: 'block', fontSize: '15px', fontWeight: 600, color: '#374151', marginBottom: '8px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+            {label}
         </label>
         {children}
     </div>
 );
 
 const inputStyle = {
-    width: '100%', border: `1px solid ${S.outlineVariant}`, borderRadius: '10px',
-    padding: '10px 14px', fontSize: '14px', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+    width: '100%', height: '46px', border: `1px solid ${S.outlineVariant}`, borderRadius: '12px',
+    padding: '12px 16px', fontSize: '16px', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
     background: S.surfaceContainerLowest, color: S.onBackground, outline: 'none',
     transition: 'border-color 0.15s',
     boxSizing: 'border-box',
@@ -235,6 +218,7 @@ const inputStyle = {
    MAIN PAGE
 ══════════════════════════════════════════════════════ */
 const FrequencyPackagesPage = () => {
+    const navigate = useNavigate();
     const { t, dir } = useTranslation();
     const addToast = useToastStore(state => state.addToast);
     const { can } = usePermission();
@@ -380,75 +364,69 @@ const FrequencyPackagesPage = () => {
             <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}
             >
-                <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-                        <div style={{ width: 44, height: 44, borderRadius: '14px', background: S.surfaceContainer, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Layers style={{ width: 22, height: 22, color: S.primaryContainer }} />
-                        </div>
-                        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                            {t('packages_page.title')}
-                        </h1>
-                    </div>
-                    <p style={{ margin: 0, fontSize: '14px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                        {t('packages_page.subtitle')}
-                    </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 700, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                        {t('packages_page.title')}
+                    </h1>
                 </div>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+
+                {can('manage_all') && (
                     <button
-                        onClick={() => fetchPackages()}
-                        title={t('packages_page.refresh')}
+                        onClick={() => openModal()}
                         style={{
-                            width: '40px', height: '40px', borderRadius: '10px', border: `1px solid ${S.outlineVariant}`,
-                            background: S.surfaceContainerLowest, color: S.onSurfaceVariant, cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            width: '100%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                            padding: '10px 20px', height: '46px', borderRadius: '12px',
+                            background: S.primaryContainer, color: '#fff',
+                            border: 'none', fontSize: '20px', fontWeight: 700,
+                            cursor: 'pointer', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                            boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
+                            transition: 'all 0.2s',
                         }}
                     >
-                        <RefreshCw style={{ width: 16, height: 16 }} />
+                        <Plus style={{ width: 22, height: 22 }} />
+                        {t('packages_page.add_new')}
                     </button>
-                    {can('manage_all') && (
-                        <button
-                            onClick={() => openModal()}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '8px',
-                                padding: '10px 20px', borderRadius: '12px',
-                                background: S.primaryContainer, color: '#fff',
-                                border: 'none', fontSize: '14px', fontWeight: 600,
-                                cursor: 'pointer', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
-                                boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
-                                transition: 'all 0.2s',
-                            }}
-                        >
-                            <Plus style={{ width: 18, height: 18 }} />
-                            {t('packages_page.add_new')}
-                        </button>
-                    )}
-                </div>
+                )}
             </motion.div>
 
             {/* ─── KPI Cards ─── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-                <KpiCard label={t('packages_page.total_packages')} value={packages.length} icon={Layers} iconBg={S.surfaceContainer} iconColor={S.primaryContainer} accentColor={S.primaryContainer} index={0} />
-                <KpiCard label={t('packages_page.active_packages')} value={activeCount} icon={CheckCircle} iconBg="#dcfce7" iconColor="#16a34a" accentColor="#16a34a" index={1} />
-                <KpiCard label={t('packages_page.avg_interval')} value={`${avgInterval} ${t('packages_page.minute')}`} icon={Clock} iconBg={S.surfaceContainerHigh} iconColor="#6366f1" accentColor="#6366f1" index={2} />
+                <KpiCard label={t('packages_page.total_packages')} value={packages.length} index={0} />
+                <KpiCard label={t('packages_page.active_packages')} value={activeCount} index={1} />
+                <KpiCard label={t('packages_page.avg_interval')} value={`${avgInterval} ${t('packages_page.minute')}`} index={2} />
             </div>
 
-            {/* ─── Search Bar ─── */}
-            <div style={{ marginBottom: '24px', position: 'relative', maxWidth: '400px' }}>
-                <Search style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: dir === 'rtl' ? '14px' : 'auto', left: dir === 'ltr' ? '14px' : 'auto', width: 16, height: 16, color: S.outline }} />
-                <input
-                    type="text"
-                    placeholder={t('packages_page.search_placeholder')}
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    style={{ ...inputStyle, paddingRight: dir === 'rtl' ? '42px' : '14px', paddingLeft: dir === 'ltr' ? '42px' : '14px' }}
-                />
-                {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: dir === 'rtl' ? '14px' : 'auto', right: dir === 'ltr' ? '14px' : 'auto', background: 'none', border: 'none', cursor: 'pointer', color: S.outline }}>
-                        <X style={{ width: 14, height: 14 }} />
-                    </button>
-                )}
+            {/* ─── Search Bar & Refresh ─── */}
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '24px', width: '100%' }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                    <Search style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: dir === 'rtl' ? '14px' : 'auto', left: dir === 'ltr' ? '14px' : 'auto', width: 16, height: 16, color: S.outline }} />
+                    <input
+                        type="text"
+                        placeholder={t('packages_page.search_placeholder')}
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                        style={{ ...inputStyle, paddingRight: dir === 'rtl' ? '42px' : '14px', paddingLeft: dir === 'ltr' ? '42px' : '14px' }}
+                    />
+                    {searchTerm && (
+                        <button onClick={() => setSearchTerm('')} style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: dir === 'rtl' ? '14px' : 'auto', right: dir === 'ltr' ? '14px' : 'auto', background: 'none', border: 'none', cursor: 'pointer', color: S.outline }}>
+                            <X style={{ width: 14, height: 14 }} />
+                        </button>
+                    )}
+                </div>
+                <button
+                    onClick={() => fetchPackages()}
+                    title={t('packages_page.refresh')}
+                    style={{
+                        width: '46px', height: '46px', borderRadius: '12px', border: `1px solid ${S.outlineVariant}`,
+                        background: S.surfaceContainerLowest, color: S.onSurfaceVariant, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    }}
+                >
+                    <RefreshCw style={{ width: 18, height: 18 }} />
+                </button>
             </div>
 
             {/* ─── Packages Grid ─── */}
@@ -474,24 +452,28 @@ const FrequencyPackagesPage = () => {
                                 onClick={() => openModal()}
                                 style={{
                                     display: 'inline-flex', alignItems: 'center', gap: '8px',
-                                    padding: '10px 22px', borderRadius: '12px',
+                                    padding: '12px 24px', borderRadius: '12px',
                                     background: S.primaryContainer, color: '#fff',
                                     border: 'none', fontSize: '14px', fontWeight: 600,
                                     cursor: 'pointer', fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                                    boxShadow: '0 4px 14px rgba(37,99,235,0.35)',
                                 }}
                             >
-                                <Plus style={{ width: 16, height: 16 }} /> {t('packages_page.add_package')}
+                                <Plus style={{ width: 18, height: 18 }} />
+                                {t('packages_page.add_new')}
                             </button>
                         )}
                     </motion.div>
                 ) : (
                     <motion.div
                         key="grid"
-                        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}
                     >
                         {filtered.map((pkg, idx) => (
                             <PackageCard
-                                key={pkg.package_id}
+                                key={pkg.package_id || idx}
                                 pkg={pkg}
                                 dir={dir}
                                 index={idx}
@@ -506,48 +488,47 @@ const FrequencyPackagesPage = () => {
             </AnimatePresence>
 
             {/* ─── Add/Edit Modal ─── */}
-            <Modal isOpen={isModalOpen} onClose={closeModal} title={editingPkg ? t('packages_page.edit_package') : t('packages_page.add_new')} size="md">
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={editingPkg ? t('packages_page.edit_package') : t('packages_page.add_new')} maxWidth="max-w-[780px]">
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '22px', padding: '8px 0' }}>
 
                     {/* Preview Card */}
-                    <div style={{ background: 'linear-gradient(135deg, #004ac6, #2563eb)', borderRadius: '16px', padding: '20px', color: '#fff', marginBottom: '4px' }}>
-                        <div style={{ fontSize: '12px', opacity: 0.75, marginBottom: '6px', fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.package_preview')}</div>
-                        <div style={{ fontSize: '22px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                    <div style={{ background: 'linear-gradient(135deg, #004ac6, #2563eb)', borderRadius: '18px', padding: '24px', color: '#fff', marginBottom: '4px' }}>
+                        <div style={{ fontSize: '24px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                             {form.name_ar || t('packages_page.pkg_name_ar_preview')}
                         </div>
-                        <div style={{ display: 'flex', gap: '24px', marginTop: '12px', fontSize: '13px', opacity: 0.85, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                            <span>🕐 {t('packages_page.every')} {form.interval_minutes || '?'} {t('packages_page.minute')}</span>
-                            <span>📈 ×{parseFloat(form.price_multiplier || 1).toFixed(1)} {t('packages_page.price')}</span>
+                        <div style={{ display: 'flex', gap: '28px', marginTop: '14px', fontSize: '15px', opacity: 0.9, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            <span>{t('packages_page.every')} {form.interval_minutes || '?'} {t('packages_page.minute')}</span>
+                            <span>×{parseFloat(form.price_multiplier || 1).toFixed(1)} {t('packages_page.price')}</span>
                         </div>
                     </div>
 
                     {/* Names */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                        <Field label={t('packages_page.name_ar')} required>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <Field label={t('packages_page.name_ar')}>
                             <input type="text" value={form.name_ar} onChange={e => setForm(p => ({ ...p, name_ar: e.target.value }))}
                                 placeholder={t('packages_page.name_ar_placeholder')} style={inputStyle} dir="rtl" />
                         </Field>
-                        <Field label={t('packages_page.name_en')} required>
+                        <Field label={t('packages_page.name_en')}>
                             <input type="text" value={form.name_en} onChange={e => setForm(p => ({ ...p, name_en: e.target.value }))}
                                 placeholder={t('packages_page.name_en_placeholder')} style={inputStyle} dir="ltr" />
                         </Field>
                     </div>
 
                     {/* Interval & Multiplier */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                        <Field label={t('packages_page.interval_minutes')} required>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <Field label={t('packages_page.interval_minutes')}>
                             <input type="number" min="1" max="1440" value={form.interval_minutes}
                                 onChange={e => setForm(p => ({ ...p, interval_minutes: e.target.value }))}
                                 style={{ ...inputStyle, fontWeight: 700 }} dir="ltr" />
-                            <span style={{ fontSize: '11px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginTop: '4px' }}>
+                            <span style={{ fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginTop: '6px' }}>
                                 {t('packages_page.once_every')} {form.interval_minutes} {t('packages_page.minute')} = {form.interval_minutes > 0 ? Math.round(60 / form.interval_minutes) : 0} {t('packages_page.times_per_hour')}
                             </span>
                         </Field>
-                        <Field label={t('packages_page.price_multiplier')} required>
+                        <Field label={t('packages_page.price_multiplier')}>
                             <input type="number" min="0.1" step="0.1" value={form.price_multiplier}
                                 onChange={e => setForm(p => ({ ...p, price_multiplier: e.target.value }))}
                                 style={{ ...inputStyle, fontWeight: 700 }} dir="ltr" />
-                            <span style={{ fontSize: '11px', color: parseFloat(form.price_multiplier) > 1 ? '#ea580c' : parseFloat(form.price_multiplier) < 1 ? '#16a34a' : S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginTop: '4px' }}>
+                            <span style={{ fontSize: '13px', color: parseFloat(form.price_multiplier) > 1 ? '#ea580c' : parseFloat(form.price_multiplier) < 1 ? '#16a34a' : S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif", display: 'block', marginTop: '6px' }}>
                                 {parseFloat(form.price_multiplier) === 1 ? t('packages_page.normal_price_no_increase')
                                     : parseFloat(form.price_multiplier) > 1 ? t('packages_page.increase_by').replace('{percent}', Math.round((parseFloat(form.price_multiplier) - 1) * 100))
                                         : t('packages_page.discount_by').replace('{percent}', Math.round((1 - parseFloat(form.price_multiplier)) * 100))}
@@ -556,10 +537,10 @@ const FrequencyPackagesPage = () => {
                     </div>
 
                     {/* Active toggle */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px', background: S.surfaceContainerLow, borderRadius: '12px', border: `1px solid ${S.outlineVariant}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px', background: S.surfaceContainerLow, borderRadius: '14px', border: `1px solid ${S.outlineVariant}` }}>
                         <div>
-                            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.package_status')}</p>
-                            <p style={{ margin: '2px 0 0', fontSize: '12px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            <p style={{ margin: 0, fontSize: '16px', fontWeight: 600, color: S.onBackground, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>{t('packages_page.package_status')}</p>
+                            <p style={{ margin: '4px 0 0', fontSize: '13px', color: S.outline, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                                 {form.is_active ? t('packages_page.available_to_advertisers') : t('packages_page.hidden_from_advertisers')}
                             </p>
                         </div>
@@ -567,34 +548,34 @@ const FrequencyPackagesPage = () => {
                             type="button"
                             onClick={() => setForm(p => ({ ...p, is_active: !p.is_active }))}
                             style={{
-                                width: '52px', height: '28px', borderRadius: '999px', border: 'none', cursor: 'pointer',
+                                width: '56px', height: '30px', borderRadius: '999px', border: 'none', cursor: 'pointer',
                                 background: form.is_active ? S.primaryContainer : S.outlineVariant,
                                 position: 'relative', transition: 'background 0.2s',
                             }}
                         >
                             <span style={{
-                                position: 'absolute', top: '4px', width: '20px', height: '20px', borderRadius: '50%',
+                                position: 'absolute', top: '4px', width: '22px', height: '22px', borderRadius: '50%',
                                 background: '#fff', transition: 'all 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                                left: form.is_active ? 'calc(100% - 24px)' : '4px',
+                                left: form.is_active ? 'calc(100% - 26px)' : '4px',
                             }} />
                         </button>
                     </div>
 
                     {/* Actions */}
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', paddingTop: '4px' }}>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', paddingTop: '8px' }}>
                         <button type="button" onClick={closeModal}
-                            style={{ padding: '10px 20px', borderRadius: '10px', border: `1px solid ${S.outlineVariant}`, background: S.surfaceContainerLowest, color: S.onSurfaceVariant, cursor: 'pointer', fontSize: '14px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                            style={{ padding: '12px 24px', borderRadius: '12px', border: `1px solid ${S.outlineVariant}`, background: S.surfaceContainerLowest, color: S.onSurfaceVariant, cursor: 'pointer', fontSize: '16px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
                             {t('packages_page.cancel')}
                         </button>
                         <button type="submit" disabled={isSubmitting}
                             style={{
-                                padding: '10px 24px', borderRadius: '10px', border: 'none',
+                                padding: '12px 28px', borderRadius: '12px', border: 'none',
                                 background: isSubmitting ? S.outlineVariant : S.primaryContainer,
                                 color: '#fff', cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                                fontSize: '14px', fontWeight: 600, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+                                fontSize: '16px', fontWeight: 700, fontFamily: "'IBM Plex Sans Arabic', sans-serif",
                                 display: 'flex', alignItems: 'center', gap: '8px',
                             }}>
-                            {isSubmitting && <RefreshCw style={{ width: 14, height: 14, animation: 'spin 1s linear infinite' }} />}
+                            {isSubmitting && <RefreshCw style={{ width: 16, height: 16, animation: 'spin 1s linear infinite' }} />}
                             {editingPkg ? t('packages_page.save_changes') : t('packages_page.create_package')}
                         </button>
                     </div>

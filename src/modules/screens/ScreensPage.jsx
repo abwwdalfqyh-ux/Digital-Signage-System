@@ -447,7 +447,7 @@ const ScreensPage = () => {
   return (
     <div className="w-full max-w-[1440px] mx-auto p-[24px] space-y-[32px] font-sans text-right" dir="rtl" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
       {/* ── Page Header ── */}
-      <div className="text-center mb-6 pt-2">
+      <div className="text-right mb-6 pt-2">
         <h1 style={{
           fontSize: '32px',
           fontWeight: 800,
@@ -458,56 +458,10 @@ const ScreensPage = () => {
         }}>
           {t('screens.screens_and_devices')}
         </h1>
-        <div style={{ width: '60px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '10px auto 0' }} />
+        <div style={{ width: '60px', height: '3px', background: '#004ac6', borderRadius: '99px', margin: '10px 0 0' }} />
       </div>
 
-      {/* ── Stats Row ── */}
-      {!loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
-          {/* Total */}
-          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[20px] flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[18px] font-bold text-[#141b2b] mb-2">{t('screens.total_screens')}</p>
-              <p className="text-[28px] font-light text-[#141b2b] leading-[36px]">{stats.total}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-[#dbe1ff] flex items-center justify-center text-[#004ac6]">
-              <Monitor className="w-6 h-6" />
-            </div>
-          </div>
-          {/* Active */}
-          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[20px] flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[18px] font-bold text-[#141b2b] mb-2">{t('screens.online_now')}</p>
-              <p className="text-[28px] font-light text-[#166534] leading-[36px]">{stats.online}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-[#dcfce7] flex items-center justify-center text-[#166534]">
-              <Activity className="w-6 h-6" />
-            </div>
-          </div>
-          {/* Disconnected */}
-          <div className="bg-[#ffffff] border border-[#E5E7EB] border-l-4 border-l-[#ba1a1a] rounded-xl p-[20px] flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[18px] font-bold text-[#141b2b] mb-2">{t('screens.offline_now')}</p>
-              <p className="text-[28px] font-light text-[#ba1a1a] leading-[36px]">{stats.offline}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-[#ffdad6] flex items-center justify-center text-[#ba1a1a]">
-              <AlertCircle className="w-6 h-6" />
-            </div>
-          </div>
-          {/* Maintenance */}
-          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl p-[20px] flex items-center justify-between shadow-sm">
-            <div>
-              <p className="text-[18px] font-bold text-[#141b2b] mb-2">{t('screens.under_maintenance')}</p>
-              <p className="text-[28px] font-light text-[#854d0e] leading-[36px]">{stats.maintenance}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full bg-[#fef9c3] flex items-center justify-center text-[#854d0e]">
-              <Wrench className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Add New Screen Action Button - Full Width under Stats Cards ── */}
+      {/* ── Add New Screen Action Button - Full Width above Stats Cards ── */}
       {(can('manage_all') || can('manage_screens')) && (
         <button
           onClick={() => handleOpenModal(false)}
@@ -516,6 +470,32 @@ const ScreensPage = () => {
           <Plus className="w-6 h-6 stroke-[2.5]" />
           <span>{t('screens.add_new_screen')}</span>
         </button>
+      )}
+
+      {/* ── Stats Row ── */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+          {/* Total */}
+          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl py-4 px-4 flex flex-col items-center justify-center text-center shadow-sm">
+            <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('screens.total_screens')}</p>
+            <p className="text-base md:text-lg font-normal text-[#141b2b]">{stats.total}</p>
+          </div>
+          {/* Active */}
+          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl py-4 px-4 flex flex-col items-center justify-center text-center shadow-sm">
+            <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('screens.online_now')}</p>
+            <p className="text-base md:text-lg font-normal text-[#166534]">{stats.online}</p>
+          </div>
+          {/* Disconnected */}
+          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl py-4 px-4 flex flex-col items-center justify-center text-center shadow-sm">
+            <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('screens.offline_now')}</p>
+            <p className="text-base md:text-lg font-normal text-[#ba1a1a]">{stats.offline}</p>
+          </div>
+          {/* Maintenance */}
+          <div className="bg-[#ffffff] border border-[#E5E7EB] rounded-xl py-4 px-4 flex flex-col items-center justify-center text-center shadow-sm">
+            <p className="text-lg md:text-xl font-black text-[#141b2b] mb-1">{t('screens.under_maintenance')}</p>
+            <p className="text-base md:text-lg font-normal text-[#854d0e]">{stats.maintenance}</p>
+          </div>
+        </div>
       )}
 
       {/* ── Map & List Section ── */}

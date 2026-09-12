@@ -229,99 +229,98 @@ const OwnerEarningsPage = () => {
             </style>
             
             {/* ── Page Header ── */}
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-black text-[#141b2b] m-0 mb-2 tracking-tight flex items-center gap-3">
-                        {t('financial.e_wallet')} <Wallet className="w-8 h-8 text-blue-600" />
+                    <h1 className="text-3xl md:text-4xl font-black text-[#141b2b] m-0 tracking-tight">
+                        {t('financial.e_wallet')}
                     </h1>
-                    <p className="text-sm font-medium text-gray-500 m-0">{t('financial.e_wallet_desc')}</p>
                 </div>
+            </motion.div>
+
+            {/* ── Full-Width Request Payout Button ── */}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
                 <button
                     onClick={() => setPayoutModalOpen(true)}
-                    className="flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-white shadow-lg shadow-blue-600/30 hover:-translate-y-1 transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-3 px-8 py-4 md:py-5 rounded-2xl font-black text-xl md:text-2xl text-white shadow-xl shadow-blue-600/20 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-600/30 transition-all duration-300 cursor-pointer"
                     style={{ background: 'linear-gradient(135deg, #2563eb 0%, #004ac6 100%)' }}
                 >
-                    <Landmark className="w-5 h-5" />
+                    <Landmark className="w-7 h-7" />
                     {t('financial.request_payout')}
                 </button>
             </motion.div>
 
             {/* ── 1. WALLET CARDS ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                {/* Available Balance (Hero Card) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                {/* Available Balance */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                    className="relative overflow-hidden p-8 rounded-3xl text-white shadow-xl flex flex-col justify-between min-h-[220px]"
-                    style={{ background: 'linear-gradient(135deg, #141b2b 0%, #1e293b 100%)' }}
+                    className="p-5 md:p-6 rounded-3xl border border-gray-200 bg-white shadow-sm flex flex-col items-center justify-center text-center gap-1.5 transition-all hover:shadow-md"
                 >
-                    {/* Decorative abstract shapes */}
-                    <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl" />
-                    <div className="absolute right-10 top-10 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
-                    
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-2 opacity-80">
-                            <Wallet className="w-5 h-5" />
-                            <span className="text-sm font-bold uppercase tracking-wider">{t('financial.available_balance')}</span>
-                        </div>
-                        <h2 className="text-5xl font-black mb-1 tracking-tight" dir="ltr" style={{ textAlign: 'right' }}>
-                            ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                        </h2>
-                    </div>
+                    <h3 className="text-xl md:text-2xl font-black text-[#141b2b] m-0">
+                        {t('financial.available_balance')}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-blue-600 m-0" dir="ltr">
+                        ${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </p>
                 </motion.div>
 
                 {/* Total Earned */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    className="p-8 rounded-3xl border shadow-sm flex flex-col justify-center"
-                    style={{ background: '#ffffff', borderColor: S.outlineVariant }}
+                    className="p-5 md:p-6 rounded-3xl border border-gray-200 bg-white shadow-sm flex flex-col items-center justify-center text-center gap-1.5 transition-all hover:shadow-md"
                 >
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-green-50 text-green-600">
-                            <Banknote className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 mb-1">{t('financial.total_accumulated_earnings')}</p>
-                            <h3 className="text-2xl font-black text-[#141b2b]" dir="ltr" style={{ textAlign: 'right' }}>
-                                ${totalEarned.toLocaleString()}
-                            </h3>
-                        </div>
-                    </div>
+                    <h3 className="text-xl md:text-2xl font-black text-[#141b2b] m-0">
+                        {t('financial.total_accumulated_earnings')}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-green-600 m-0" dir="ltr">
+                        ${totalEarned.toLocaleString()}
+                    </p>
                 </motion.div>
 
                 {/* Pending Payouts */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                    className="p-8 rounded-3xl border shadow-sm flex flex-col justify-center"
-                    style={{ background: '#ffffff', borderColor: S.outlineVariant }}
+                    className="p-5 md:p-6 rounded-3xl border border-gray-200 bg-white shadow-sm flex flex-col items-center justify-center text-center gap-1.5 transition-all hover:shadow-md"
                 >
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-amber-50 text-amber-600">
-                            <Clock className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-gray-400 mb-1">{t('financial.pending_amounts')}</p>
-                            <h3 className="text-2xl font-black text-[#141b2b]" dir="ltr" style={{ textAlign: 'right' }}>
-                                ${pendingPayouts.toLocaleString()}
-                            </h3>
-                        </div>
-                    </div>
+                    <h3 className="text-xl md:text-2xl font-black text-[#141b2b] m-0">
+                        {t('financial.pending_amounts')}
+                    </h3>
+                    <p className="text-lg md:text-xl font-bold text-amber-600 m-0" dir="ltr">
+                        ${pendingPayouts.toLocaleString()}
+                    </p>
                 </motion.div>
             </div>
             {/* ── 2. Filters & Table ── */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm relative overflow-hidden hide-on-print">
                 
-                {/* Filters Row */}
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6 border-b border-gray-100 pb-8">
-                    <div>
-                        <h2 className="text-2xl font-black text-[#141b2b] mb-1 flex items-center gap-2">
-                            <ListFilter className="w-6 h-6 text-blue-600" />
+                {/* Filters Header with Title & Export Buttons */}
+                <div className="flex flex-col gap-5 mb-8 border-b border-gray-100 pb-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h2 className="text-2xl md:text-3xl font-black text-[#141b2b] m-0">
                             {t('financial.transactions_and_earnings')}
                         </h2>
-                        <p className="text-gray-500 text-sm font-medium">{t('financial.transactions_desc')}</p>
+
+                        {/* Export & Print Buttons (Moved Above Tabs Row) */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <button onClick={handleExportStatement}
+                                className="flex items-center gap-2 px-5 py-3 bg-blue-50 text-blue-600 rounded-xl text-base font-black hover:bg-blue-100 transition-colors border border-blue-100 shadow-sm cursor-pointer"
+                            >
+                                <Download className="w-5 h-5" />
+                                {t('financial.export_statement')}
+                            </button>
+                            
+                            <button onClick={handlePrintReport}
+                                className="flex items-center gap-2 px-5 py-3 bg-gray-800 text-white rounded-xl text-base font-black hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
+                            >
+                                <Printer className="w-5 h-5" />
+                                {t('financial.print_pdf')}
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200">
+                    {/* Dedicated Row for Full-Width Filter Buttons (الكل - الأرباح فقط - المسحوبات فقط) */}
+                    <div className="w-full bg-gray-50 rounded-2xl p-1.5 border border-gray-200 shadow-inner">
+                        <div className="flex items-center w-full justify-between gap-1.5">
                             {['all', 'earnings', 'payouts'].map(tab => (
                                 <button key={tab} onClick={() => setActiveTab(tab)}
-                                    className={`px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === tab ? 'bg-white shadow-sm text-blue-600 border border-gray-200/60' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`flex-1 py-3.5 px-4 rounded-xl text-base md:text-lg font-black transition-all text-center cursor-pointer ${activeTab === tab ? 'bg-white shadow-md text-blue-600 border border-gray-200' : 'text-gray-500 hover:text-gray-800'}`}
                                 >
                                     {tab === 'all' ? t('common.all') : tab === 'earnings' ? t('financial.earnings_only') : t('financial.payouts_only')}
                                 </button>
@@ -333,24 +332,24 @@ const OwnerEarningsPage = () => {
                 {/* Advanced Filters: Date & Screen */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.from_date')}</label>
+                        <label className="block text-sm font-extrabold text-gray-700 mb-2">{t('financial.from_date')}</label>
                         <input type="date" 
                             value={startDate} onChange={e => setStartDate(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-blue-500 outline-none"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base font-bold focus:border-blue-500 outline-none"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.to_date')}</label>
+                        <label className="block text-sm font-extrabold text-gray-700 mb-2">{t('financial.to_date')}</label>
                         <input type="date" 
                             value={endDate} onChange={e => setEndDate(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-blue-500 outline-none"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base font-bold focus:border-blue-500 outline-none"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.screen')}</label>
+                        <label className="block text-sm font-extrabold text-gray-700 mb-2">{t('financial.screen')}</label>
                         <select 
                             value={selectedScreen} onChange={e => setSelectedScreen(e.target.value)}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-blue-500 outline-none"
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-base font-bold focus:border-blue-500 outline-none cursor-pointer"
                         >
                             <option value="all">{t('financial.all_screens')}</option>
                             {uniqueScreens.map(s => (
@@ -360,40 +359,23 @@ const OwnerEarningsPage = () => {
                     </div>
                 </div>
 
-                {/* Export Buttons */}
-                <div className="flex flex-wrap justify-end gap-3 mb-6">
-                    <button onClick={handleExportStatement}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold hover:bg-blue-100 transition-colors border border-blue-100 shadow-sm"
-                    >
-                        <Download className="w-4 h-4" />
-                        {t('financial.export_statement')}
-                    </button>
-                    
-                    <button onClick={handlePrintReport}
-                        className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-xl font-bold hover:bg-gray-700 transition-colors shadow-sm"
-                    >
-                        <Printer className="w-4 h-4" />
-                        {t('financial.print_pdf')}
-                    </button>
-                </div>
-
                 {/* Table */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-right border-collapse min-w-[800px]">
                         <thead>
-                            <tr className="bg-white text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100">
-                                <th className="p-5 font-bold">{t('financial.transaction')}</th>
-                                <th className="p-5 font-bold">{t('financial.date_and_time')}</th>
-                                <th className="p-5 font-bold">{t('financial.source')}</th>
-                                <th className="p-5 font-bold">{t('financial.status')}</th>
-                                <th className="p-5 font-bold text-left">{t('financial.amount')}</th>
+                            <tr className="bg-gray-50 text-gray-800 text-base font-black uppercase tracking-wider border-b border-gray-200">
+                                <th className="p-5 font-black">{t('financial.transaction')}</th>
+                                <th className="p-5 font-black">{t('financial.date_and_time')}</th>
+                                <th className="p-5 font-black">{t('financial.source')}</th>
+                                <th className="p-5 font-black">{t('financial.status')}</th>
+                                <th className="p-5 font-black text-left">{t('financial.amount')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 bg-white">
                             <AnimatePresence mode="popLayout">
                                 {filteredTransactions.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="p-16 text-center text-gray-400">
+                                        <td colSpan="5" className="p-16 text-center text-gray-500 font-extrabold text-base">
                                             <ListFilter className="w-12 h-12 mx-auto mb-3 opacity-20" />
                                             {t('financial.no_matching_transactions')}
                                         </td>
@@ -409,26 +391,26 @@ const OwnerEarningsPage = () => {
                                                         {trx.type === 'earning' ? <ArrowDownRight className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-sm text-[#141b2b] m-0">{trx.type === 'earning' ? t('financial.screen_earnings') : t('financial.withdrawal')}</p>
-                                                        <p className="text-[11px] font-mono text-gray-400 m-0 mt-0.5">{trx.id}</p>
+                                                        <p className="font-extrabold text-base text-[#141b2b] m-0">{trx.type === 'earning' ? t('financial.screen_earnings') : t('financial.withdrawal')}</p>
+                                                        <p className="text-xs font-mono text-gray-400 m-0 mt-0.5">{trx.id}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-5 text-sm font-medium text-gray-600 whitespace-nowrap">{trx.date}</td>
-                                            <td className="p-5 text-sm font-bold text-gray-700">{trx.source}</td>
+                                            <td className="p-5 text-base font-bold text-gray-700 whitespace-nowrap">{trx.date}</td>
+                                            <td className="p-5 text-base font-extrabold text-gray-800">{trx.source}</td>
                                             <td className="p-5">
                                                 {trx.status === 'completed' ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-bold">
-                                                        <CheckCircle2 className="w-3.5 h-3.5" /> {t('financial.completed')}
+                                                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-green-50 text-green-700 border border-green-200 text-sm font-extrabold">
+                                                        <CheckCircle2 className="w-4 h-4" /> {t('financial.completed')}
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold">
-                                                        <Clock className="w-3.5 h-3.5" /> {t('financial.under_review')}
+                                                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-sm font-extrabold">
+                                                        <Clock className="w-4 h-4" /> {t('financial.under_review')}
                                                     </span>
                                                 )}
                                             </td>
                                             <td className="p-5 text-left whitespace-nowrap">
-                                                <span className={`text-lg font-black ${trx.type === 'earning' ? 'text-green-600' : 'text-[#141b2b]'}`} dir="ltr">
+                                                <span className={`text-xl font-black ${trx.type === 'earning' ? 'text-green-600' : 'text-[#141b2b]'}`} dir="ltr">
                                                     {trx.type === 'earning' ? '+' : '-'}${trx.amount.toLocaleString()}
                                                 </span>
                                             </td>
@@ -442,41 +424,33 @@ const OwnerEarningsPage = () => {
             </motion.div>
 
             {/* ── 3. PAYOUT MODAL ── */}
-            <Modal isOpen={isPayoutModalOpen} onClose={() => setPayoutModalOpen(false)} title={t('financial.payout_request_title')}>
-                <div dir={dir} style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
-                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 mb-6 flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                            <AlertCircle className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-blue-900 m-0 mb-1">{t('financial.payout_info')}</h4>
-                            <p className="text-xs text-blue-700 m-0 leading-relaxed">
-                                {t('financial.payout_desc')}
-                            </p>
-                        </div>
+            <Modal isOpen={isPayoutModalOpen} onClose={() => setPayoutModalOpen(false)} title={t('financial.payout_request_title')} maxWidth="max-w-[780px]">
+                <div dir={dir} className="p-2" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}>
+                    <div className="mb-6 border-b border-gray-100 pb-3">
+                        <h4 className="text-xl font-black text-[#141b2b] m-0">{t('financial.payout_info')}</h4>
                     </div>
 
-                    <form onSubmit={handleRequestPayout} className="space-y-5">
+                    <form onSubmit={handleRequestPayout} className="space-y-6">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.amount_to_withdraw')}</label>
+                            <label className="block text-sm md:text-base font-extrabold text-gray-700 mb-2">{t('financial.amount_to_withdraw')}</label>
                             <input type="number" required min="50" max={balance} step="0.5"
                                 value={payoutForm.amount} onChange={e => setPayoutForm({ ...payoutForm, amount: e.target.value })}
                                 placeholder={t('financial.amount_placeholder')}
-                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg font-bold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors"
+                                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 text-lg md:text-xl font-extrabold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors"
                             />
-                            <p className="text-[11px] font-bold text-gray-400 mt-2 flex justify-between">
+                            <p className="text-sm font-bold text-gray-500 mt-2.5 flex justify-between items-center">
                                 <span>{t('financial.min_withdrawal')}: $50</span>
-                                <button type="button" onClick={() => setPayoutForm({ ...payoutForm, amount: balance })} className="text-blue-600 hover:underline cursor-pointer">{t('financial.withdraw_full_balance')}</button>
+                                <button type="button" onClick={() => setPayoutForm({ ...payoutForm, amount: balance })} className="text-blue-600 font-extrabold hover:underline cursor-pointer">{t('financial.withdraw_full_balance')}</button>
                             </p>
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.bank_to_transfer')}</label>
+                            <label className="block text-sm md:text-base font-extrabold text-gray-700 mb-2">{t('financial.bank_to_transfer')}</label>
                             <div className="relative">
                                 <select required
                                     value={payoutForm.bank} onChange={e => setPayoutForm({ ...payoutForm, bank: e.target.value })}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors appearance-none cursor-pointer"
-                                    style={{ paddingRight: '40px' }}
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 text-base md:text-lg font-bold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors appearance-none cursor-pointer"
+                                    style={{ paddingRight: '44px' }}
                                 >
                                     <option value="">-- {t('financial.select_bank')} --</option>
                                     <option value="kuraimi">{t('financial.bank_kuraimi')}</option>
@@ -484,29 +458,29 @@ const OwnerEarningsPage = () => {
                                     <option value="yemen_kuwait">{t('financial.bank_yemen_kuwait')}</option>
                                     <option value="cac">{t('financial.bank_cac')}</option>
                                 </select>
-                                <Building className="absolute right-3 top-[14px] w-5 h-5 text-gray-400 pointer-events-none" />
-                                <ChevronDown className="absolute left-4 top-[14px] w-5 h-5 text-gray-400 pointer-events-none" />
+                                <Building className="absolute right-3.5 top-[16px] w-5 h-5 text-gray-400 pointer-events-none" />
+                                <ChevronDown className="absolute left-4 top-[16px] w-5 h-5 text-gray-400 pointer-events-none" />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-2">{t('financial.bank_account_iban')}</label>
+                            <label className="block text-sm md:text-base font-extrabold text-gray-700 mb-2">{t('financial.bank_account_iban')}</label>
                             <div className="relative">
                                 <input type="text" required
                                     value={payoutForm.account_number} onChange={e => setPayoutForm({ ...payoutForm, account_number: e.target.value })}
                                     placeholder={t('financial.account_placeholder')}
-                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors"
-                                    style={{ paddingRight: '40px' }}
+                                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3.5 text-base md:text-lg font-bold text-[#141b2b] focus:border-blue-600 focus:ring-0 outline-none transition-colors"
+                                    style={{ paddingRight: '44px' }}
                                 />
-                                <CreditCard className="absolute right-3 top-[14px] w-5 h-5 text-gray-400 pointer-events-none" />
+                                <CreditCard className="absolute right-3.5 top-[16px] w-5 h-5 text-gray-400 pointer-events-none" />
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-100 flex gap-3">
-                            <button type="button" onClick={() => setPayoutModalOpen(false)} className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-colors">
+                        <div className="pt-5 border-t border-gray-100 flex gap-4">
+                            <button type="button" onClick={() => setPayoutModalOpen(false)} className="px-6 py-3.5 rounded-xl text-base md:text-lg font-bold text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer">
                                 {t('common.cancel')}
                             </button>
-                            <button type="submit" disabled={loading} className={`flex-1 flex justify-center items-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all shadow-md ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-xl'}`}>
+                            <button type="submit" disabled={loading} className={`flex-1 flex justify-center items-center gap-2 px-6 py-3.5 rounded-xl text-base md:text-lg font-black text-white transition-all shadow-md cursor-pointer ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-xl'}`}>
                                 {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Landmark className="w-5 h-5" />}
                                 {t('financial.confirm_payout')}
                             </button>

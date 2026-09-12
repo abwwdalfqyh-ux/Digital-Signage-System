@@ -161,74 +161,62 @@ const NotificationsPage = () => {
         <div className="p-margin-mobile md:p-gutter max-w-7xl mx-auto w-full font-sans pb-20" dir={dir}>
             {/* Header Section */}
             <div className="mb-xl text-right">
-                <h2 className="text-2xl md:text-3xl font-bold text-on-surface mb-xs">{t('notifications.page_title')}</h2>
+                <h2 className="text-3xl md:text-4xl font-black text-on-surface mb-xs">{t('notifications.page_title')}</h2>
             </div>
 
             {/* Summary Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                 {/* Total */}
-                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center mb-sm text-primary">
-                        <span className="material-symbols-outlined text-3xl" data-icon="mark_email_read">mark_email_read</span>
-                    </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('sessions.total_sessions')}</p>
-                    <p className="text-3xl md:text-4xl font-bold text-on-surface">{totalNotifications}</p>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-4 shadow-sm flex flex-col items-center justify-center text-center">
+                    <p className="text-lg md:text-xl font-black text-on-surface mb-1">{t('notifications.page_title') || t('sessions.total_sessions')}</p>
+                    <p className="text-base md:text-lg font-normal text-on-surface-variant">{totalNotifications}</p>
                 </div>
                 
                 {/* New/Unread */}
-                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
-                    <div className="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mb-sm text-error relative">
-                        <span className="material-symbols-outlined text-3xl" data-icon="mail">mail</span>
-                        {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-error rounded-full border-2 border-white animate-pulse"></span>
-                        )}
-                    </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('notifications.unread')}</p>
-                    <p className="text-3xl md:text-4xl font-bold text-error">{unreadCount}</p>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-4 shadow-sm flex flex-col items-center justify-center text-center">
+                    <p className="text-lg md:text-xl font-black text-on-surface mb-1">{t('notifications.unread')}</p>
+                    <p className="text-base md:text-lg font-normal text-error">{unreadCount}</p>
                 </div>
                 
                 {/* Archived/Read */}
-                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-sm flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-sm text-on-surface-variant">
-                        <span className="material-symbols-outlined text-3xl" data-icon="archive">archive</span>
-                    </div>
-                    <p className="text-sm md:text-base text-on-surface-variant mb-xs font-semibold">{t('notifications.read')}</p>
-                    <p className="text-3xl md:text-4xl font-bold text-on-surface">{readNotifications}</p>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl py-3.5 px-4 shadow-sm flex flex-col items-center justify-center text-center">
+                    <p className="text-lg md:text-xl font-black text-on-surface mb-1">{t('notifications.read')}</p>
+                    <p className="text-base md:text-lg font-normal text-on-surface-variant">{readNotifications}</p>
                 </div>
             </div>
 
             {/* Notification List Area */}
             <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden min-h-[400px]">
                 <div className="px-lg py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-on-surface">{t('notifications.latest_notifications')}</h3>
+                    <h3 className="text-2xl font-black text-on-surface">{t('notifications.latest_notifications')}</h3>
                     <div className="flex flex-wrap items-center gap-2">
                         {unreadCount > 0 && (
                             <button 
                                 onClick={markAllAsRead} 
-                                className="text-primary hover:bg-primary-container/20 px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
+                                className="text-primary hover:bg-primary-container/20 px-4 py-2.5 rounded-xl font-extrabold text-base md:text-lg transition-colors flex items-center gap-xs"
                                 title={t('notifications.mark_all_read')}
                             >
-                                <span className="material-symbols-outlined text-xl" data-icon="done_all">done_all</span>
+                                <span className="material-symbols-outlined text-2xl" data-icon="done_all">done_all</span>
                                 <span className="hidden sm:inline">{t('notifications.mark_all_read')}</span>
                             </button>
                         )}
                         {readNotifications > 0 && (
                             <button 
                                 onClick={deleteReadNotifications} 
-                                className="text-error hover:bg-error-container/20 px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
+                                className="text-error hover:bg-error-container/20 px-4 py-2.5 rounded-xl font-extrabold text-base md:text-lg transition-colors flex items-center gap-xs"
                                 title={t('notifications.delete_read')}
                             >
-                                <span className="material-symbols-outlined text-xl" data-icon="delete_sweep">delete_sweep</span>
+                                <span className="material-symbols-outlined text-2xl" data-icon="delete_sweep">delete_sweep</span>
                                 <span className="hidden sm:inline">{t('notifications.delete_read')}</span>
                             </button>
                         )}
                         {notifications.length > 0 && (
                             <button 
                                 onClick={() => setIsArchiveModalOpen(true)} 
-                                className="text-on-surface-variant hover:bg-surface-container-high px-3 py-2 rounded-lg font-semibold text-sm md:text-base transition-colors flex items-center gap-xs"
+                                className="text-on-surface-variant hover:bg-surface-container-high px-4 py-2.5 rounded-xl font-extrabold text-base md:text-lg transition-colors flex items-center gap-xs"
                                 title={t('notifications.archive_old')}
                             >
-                                <span className="material-symbols-outlined text-xl" data-icon="auto_delete">auto_delete</span>
+                                <span className="material-symbols-outlined text-2xl" data-icon="auto_delete">auto_delete</span>
                                 <span className="hidden sm:inline">{t('notifications.archive_old')}</span>
                             </button>
                         )}
@@ -240,15 +228,15 @@ const NotificationsPage = () => {
                     <div className="px-lg pb-md border-b border-outline-variant bg-surface-bright flex gap-2">
                         <button 
                             onClick={() => setFilterTab('all')} 
-                            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${filterTab === 'all' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
+                            className={`px-5 py-2.5 rounded-xl font-extrabold text-base transition-colors ${filterTab === 'all' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
                         >
                             {t('notifications.all')}
                         </button>
                         <button 
                             onClick={() => setFilterTab('screens')} 
-                            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors flex items-center gap-1 ${filterTab === 'screens' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
+                            className={`px-5 py-2.5 rounded-xl font-extrabold text-base transition-colors flex items-center gap-1.5 ${filterTab === 'screens' ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}
                         >
-                            <span className="material-symbols-outlined text-lg" data-icon="monitor">monitor</span>
+                            <span className="material-symbols-outlined text-xl" data-icon="monitor">monitor</span>
                             {t('notifications.my_screens_notifs')}
                         </button>
                     </div>
@@ -269,12 +257,12 @@ const NotificationsPage = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15 }}
                                     transition={{ duration: 0.3, ease: 'easeOut' }}
-                                    className="text-lg md:text-xl font-bold text-on-surface absolute top-0"
+                                    className="text-xl md:text-2xl font-black text-on-surface absolute top-0"
                                 >
                                     {loadingMessages[loadingMessageIdx]}
                                 </motion.p>
                             </AnimatePresence>
-                            <p className="text-sm font-medium text-outline mt-8 md:mt-10">{t('common.loading_wait')}</p>
+                            <p className="text-base font-bold text-outline mt-8 md:mt-10">{t('common.loading_wait')}</p>
                         </div>
                         <div className="w-full max-w-2xl space-y-4 pt-4 opacity-40 pointer-events-none hidden md:block">
                             <div className="w-full h-24 bg-surface-variant rounded-2xl animate-pulse"></div>
@@ -288,8 +276,8 @@ const NotificationsPage = () => {
                             <span className="material-symbols-outlined text-5xl text-outline-variant absolute -top-2 -right-2 rotate-12">sparkles</span>
                             <span className="material-symbols-outlined text-6xl text-primary opacity-80">inbox</span>
                         </div>
-                        <h3 className="text-2xl font-bold text-on-surface mb-2">{t('notifications.no_notifications')}</h3>
-                        <p className="text-base text-on-surface-variant font-medium whitespace-nowrap">
+                        <h3 className="text-3xl font-black text-on-surface mb-3">{t('notifications.no_notifications')}</h3>
+                        <p className="text-lg text-on-surface-variant font-bold whitespace-nowrap">
                             {t('notifications.no_notifications_desc')}
                         </p>
                     </motion.div>
@@ -313,34 +301,34 @@ const NotificationsPage = () => {
                                         }`}
                                     >
                                         {/* Status Icon (Right flex position in RTL) */}
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mt-1 shadow-sm ${
+                                        <div className={`w-13 h-13 rounded-full flex items-center justify-center flex-shrink-0 mt-1 shadow-sm ${
                                             isUnread 
                                                 ? 'bg-primary-container/20 text-primary border border-primary/10' 
                                                 : 'bg-surface-container text-on-surface-variant border border-outline-variant/30'
                                         }`}>
-                                            <Icon className="w-6 h-6" />
+                                            <Icon className="w-7 h-7" />
                                         </div>
 
                                         {/* Content */}
                                         <div className="flex-1 text-right pt-1">
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-1 gap-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className={`text-lg font-bold ${isUnread ? 'text-[#141b2b]' : 'text-[#737686]'}`}>
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 sm:mb-1.5 gap-1.5">
+                                                <div className="flex items-center gap-2.5">
+                                                    <h4 className={`text-xl font-extrabold ${isUnread ? 'text-[#141b2b]' : 'text-[#737686]'}`}>
                                                         {parseNotificationContent(notif.title)}
                                                     </h4>
                                                     {isUnread && (
-                                                        <span className="bg-[#e1e8fd] text-[#004ac6] text-[11px] font-black px-2 py-0.5 rounded-full block self-center whitespace-nowrap">
+                                                        <span className="bg-[#e1e8fd] text-[#004ac6] text-xs font-black px-2.5 py-1 rounded-full block self-center whitespace-nowrap">
                                                             {t('notifications.new')}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="text-sm font-medium text-outline shrink-0 order-first sm:order-last" dir="ltr" style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                                                <span className="text-base font-bold text-outline shrink-0 order-first sm:order-last" dir="ltr" style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                                                     <span>{new Date(notif.created_at).getFullYear()}/{new Date(notif.created_at).getMonth() + 1}/{new Date(notif.created_at).getDate()}</span>
                                                     <span>-</span>
                                                     <span>{new Date(notif.created_at).toLocaleTimeString(dir === 'rtl' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' })}</span>
                                                 </span>
                                             </div>
-                                            <p className={`text-base leading-relaxed ${isUnread ? 'text-on-surface-variant font-medium' : 'text-outline font-normal'}`}>
+                                            <p className={`text-lg leading-relaxed ${isUnread ? 'text-on-surface-variant font-bold' : 'text-outline font-semibold'}`}>
                                                 {parseNotificationContent(notif.message)}
                                             </p>
                                         </div>
@@ -356,7 +344,7 @@ const NotificationsPage = () => {
                                                     className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/10" 
                                                     title={t('notifications.mark_read')}
                                                 >
-                                                    <span className="material-symbols-outlined text-xl" data-icon="visibility">visibility</span>
+                                                    <span className="material-symbols-outlined text-2xl" data-icon="visibility">visibility</span>
                                                 </button>
                                             )}
                                             <button 
@@ -364,7 +352,7 @@ const NotificationsPage = () => {
                                                 className="text-on-surface-variant hover:text-error transition-colors p-2 rounded-lg hover:bg-error-container/50" 
                                                 title={t('common.delete')}
                                             >
-                                                <span className="material-symbols-outlined text-xl" data-icon="delete">delete</span>
+                                                <span className="material-symbols-outlined text-2xl" data-icon="delete">delete</span>
                                             </button>
                                         </div>
                                     </motion.li>
@@ -379,19 +367,19 @@ const NotificationsPage = () => {
             <Modal isOpen={isArchiveModalOpen} onClose={() => setIsArchiveModalOpen(false)} title={t('notifications.archive_modal_title')}>
                 <div className="space-y-4" dir={dir}>
                     <div className="bg-warning-container text-on-warning-container p-4 rounded-xl flex items-start gap-3">
-                        <span className="material-symbols-outlined shrink-0">warning</span>
-                        <div className="text-sm">
-                            <p className="font-bold mb-1">{t('notifications.warning')}</p>
-                            <p>{t('notifications.archive_warning_desc')}</p>
+                        <span className="material-symbols-outlined shrink-0 text-2xl">warning</span>
+                        <div className="text-base">
+                            <p className="font-black mb-1">{t('notifications.warning')}</p>
+                            <p className="font-semibold">{t('notifications.archive_warning_desc')}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-on-surface mb-2">{t('notifications.select_archive_duration')}</label>
+                        <label className="block text-base font-bold text-on-surface mb-2">{t('notifications.select_archive_duration')}</label>
                         <select 
                             value={archiveMonths}
                             onChange={(e) => setArchiveMonths(e.target.value)}
-                            className="w-full bg-surface-container-highest border border-outline-variant rounded-xl p-3 outline-none"
+                            className="w-full bg-surface-container-highest border border-outline-variant rounded-xl p-3.5 text-base font-bold outline-none"
                         >
                             <option value="1">{t('notifications.month_1')}</option>
                             <option value="3">{t('notifications.month_3')}</option>
@@ -405,18 +393,18 @@ const NotificationsPage = () => {
                         <button 
                             onClick={handleArchive}
                             disabled={isArchiving}
-                            className="flex-1 bg-error text-white py-2.5 rounded-xl font-bold hover:bg-error/90 transition-colors flex justify-center items-center gap-2 disabled:opacity-70"
+                            className="flex-1 bg-error text-white py-3 rounded-xl font-bold text-base hover:bg-error/90 transition-colors flex justify-center items-center gap-2 disabled:opacity-70"
                         >
                             {isArchiving ? (
                                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
                             ) : (
-                                <span className="material-symbols-outlined text-[20px]">auto_delete</span>
+                                <span className="material-symbols-outlined text-[22px]">auto_delete</span>
                             )}
                             {t('notifications.archive_btn')}
                         </button>
                         <button 
                             onClick={() => setIsArchiveModalOpen(false)}
-                            className="flex-1 bg-surface-container-high text-on-surface py-2.5 rounded-xl font-bold hover:bg-surface-container-highest transition-colors"
+                            className="flex-1 bg-surface-container-high text-on-surface py-3 rounded-xl font-bold text-base hover:bg-surface-container-highest transition-colors"
                         >
                             {t('common.cancel')}
                         </button>

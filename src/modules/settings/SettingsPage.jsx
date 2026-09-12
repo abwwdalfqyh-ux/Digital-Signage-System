@@ -155,17 +155,17 @@ const SettingsPage = () => {
     return (
         <div className="space-y-6 pb-8 font-sans w-full max-w-5xl mx-auto" dir={dir}>
             <div className="flex items-center gap-4 mb-2">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white shadow-lg">
-                    <span className="material-symbols-outlined text-[26px]">manage_accounts</span>
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white shadow-lg shrink-0">
+                    <span className="material-symbols-outlined text-[30px]">manage_accounts</span>
                 </div>
-                <h1 className="text-2xl font-black text-on-surface">{user?.role_id === 1 || user?.role_id === 7 ? t('settings.title_admin') : t('settings.title_personal')}</h1>
+                <h1 className="text-3xl font-black text-on-surface">{user?.role_id === 1 || user?.role_id === 7 ? t('settings.title_admin') : t('settings.title_personal')}</h1>
             </div>
 
             {(user?.role_id === 1 || user?.role_id === 7) && (
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container'}`}>
-                            <span className="material-symbols-outlined text-[20px]">{tab.icon}</span>{tab.label}
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-extrabold transition-all whitespace-nowrap ${activeTab === tab.id ? 'bg-primary text-white shadow-md' : 'text-on-surface-variant hover:bg-surface-container'}`}>
+                            <span className="material-symbols-outlined text-[22px]">{tab.icon}</span>{tab.label}
                         </button>
                     ))}
                 </div>
@@ -177,40 +177,40 @@ const SettingsPage = () => {
                     {activeTab === 'profile' && (
                         <div className="space-y-6">
                             <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 space-y-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary">person</span>{t('settings.identity_security')}</h3>
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary text-[24px]">person</span>{t('settings.identity_security')}</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div><label className="block text-sm font-bold text-on-surface mb-2">{t('settings.full_name')}</label><input type="text" name="full_name" value={formData.full_name} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
-                                    <div><label className="block text-sm font-bold text-on-surface mb-2">{t('settings.phone')}</label><input type="text" dir="ltr" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
-                                    <div className="md:col-span-2"><label className="block text-sm font-bold text-on-surface mb-2">{t('settings.email')}</label><input type="email" dir="ltr" name="email" value={formData.email} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.full_name')}</label><input type="text" name="full_name" value={formData.full_name} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.phone')}</label><input type="text" dir="ltr" name="phone" value={formData.phone} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                    <div className="md:col-span-2"><label className="block text-base font-bold text-on-surface mb-2">{t('settings.email')}</label><input type="email" dir="ltr" name="email" value={formData.email} onChange={handleChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
                                 </div>
-                                <div className="flex justify-end mt-4"><button disabled={!isProfileDirty} onClick={handleSaveProfile} className={`px-8 py-3 rounded-xl font-bold text-white transition-all ${!isProfileDirty ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-primary hover:bg-primary/90 shadow-md'}`}>{t('settings.save_profile')}</button></div>
+                                <div className="flex justify-end mt-4"><button disabled={!isProfileDirty} onClick={handleSaveProfile} className={`px-8 py-3.5 rounded-xl text-base font-bold text-white transition-all ${!isProfileDirty ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-primary hover:bg-primary/90 shadow-md'}`}>{t('settings.save_profile')}</button></div>
                             </div>
                             
                             <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 space-y-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-secondary">lock</span>{t('settings.change_password')}</h3>
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-secondary text-[24px]">lock</span>{t('settings.change_password')}</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div><label className="block text-sm font-bold text-on-surface mb-2">{t('settings.current_password')}</label><input type="password" name="current_password" value={passwordData.current_password} onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
-                                    <div><label className="block text-sm font-bold text-on-surface mb-2">{t('settings.new_password')}</label><input type="password" name="new_password" value={passwordData.new_password} onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.current_password')}</label><input type="password" name="current_password" value={passwordData.current_password} onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.new_password')}</label><input type="password" name="new_password" value={passwordData.new_password} onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
                                 </div>
-                                <div className="flex justify-end mt-4"><button disabled={!passwordData.current_password || !passwordData.new_password || isSavingPassword} onClick={handleSavePassword} className={`px-8 py-3 rounded-xl font-bold text-white transition-all ${(!passwordData.current_password || !passwordData.new_password || isSavingPassword) ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-secondary hover:bg-secondary/90 shadow-md flex gap-2 items-center'}`}>{isSavingPassword && <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}{t('settings.update_password')}</button></div>
+                                <div className="flex justify-end mt-4"><button disabled={!passwordData.current_password || !passwordData.new_password || isSavingPassword} onClick={handleSavePassword} className={`px-8 py-3.5 rounded-xl text-base font-bold text-white transition-all ${(!passwordData.current_password || !passwordData.new_password || isSavingPassword) ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-secondary hover:bg-secondary/90 shadow-md flex gap-2 items-center'}`}>{isSavingPassword && <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}{t('settings.update_password')}</button></div>
                             </div>
                         </div>
                     )}
 
                     {activeTab === 'general' && (
                         <div className="space-y-6">
-                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary">domain</span>{t('settings.platform_settings')}</h3>
+                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 shadow-sm space-y-6">
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary text-[24px]">domain</span>{t('settings.platform_settings')}</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div className="md:col-span-2"><label className="block text-sm font-bold mb-2">{t('settings.platform_name')}</label><input type="text" name="platform_name" value={sysSettings.platform_name} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.support_email')}</label><input type="email" dir="ltr" name="support_email" value={sysSettings.support_email} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.support_phone')}</label><input type="text" dir="ltr" name="support_phone" value={sysSettings.support_phone} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 font-mono" /></div>
-                                    <div className="md:col-span-2"><label className="block text-sm font-bold mb-2">{t('settings.max_ad_size_mb')}</label><input type="number" name="max_ad_size_mb" value={sysSettings.max_ad_size_mb} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
+                                    <div className="md:col-span-2"><label className="block text-base font-bold text-on-surface mb-2">{t('settings.platform_name')}</label><input type="text" name="platform_name" value={sysSettings.platform_name} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.support_email')}</label><input type="email" dir="ltr" name="support_email" value={sysSettings.support_email} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.support_phone')}</label><input type="text" dir="ltr" name="support_phone" value={sysSettings.support_phone} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                    <div className="md:col-span-2"><label className="block text-base font-bold text-on-surface mb-2">{t('settings.max_ad_size_mb')}</label><input type="number" name="max_ad_size_mb" value={sysSettings.max_ad_size_mb} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
                                 </div>
                                 <div className="mt-6 pt-6 border-t border-outline-variant/40">
-                                    <div className="flex items-center justify-between bg-error-container/20 p-5 rounded-2xl border border-error/20">
-                                        <div><h4 className="font-bold text-error mb-1">{t('settings.maintenance_mode')}</h4><p className="text-sm text-on-surface-variant">{t('settings.maintenance_mode_desc')}</p></div>
-                                        <button type="button" onClick={() => setSysSettings(p => ({ ...p, maintenance_mode: !p.maintenance_mode }))} className={`relative inline-flex h-7 w-12 rounded-full transition-colors ${sysSettings.maintenance_mode ? 'bg-error' : 'bg-outline-variant'}`}><span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${sysSettings.maintenance_mode ? '-translate-x-6' : 'translate-x-0'}`} /></button>
+                                    <div className="flex items-center justify-between bg-surface-container p-5 rounded-2xl border border-outline-variant/60">
+                                        <div><h4 className="font-extrabold text-base text-on-surface">{t('settings.maintenance_mode')}</h4></div>
+                                        <button type="button" onClick={() => setSysSettings(p => ({ ...p, maintenance_mode: !p.maintenance_mode }))} className={`relative inline-flex h-7 w-12 rounded-full transition-colors ${sysSettings.maintenance_mode ? 'bg-primary' : 'bg-outline-variant'}`}><span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${sysSettings.maintenance_mode ? '-translate-x-6' : 'translate-x-0'}`} /></button>
                                     </div>
                                 </div>
                             </div>
@@ -220,12 +220,12 @@ const SettingsPage = () => {
 
                     {activeTab === 'financial' && (
                         <div className="space-y-6">
-                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-emerald-500">payments</span>{t('settings.financial_controls')}</h3>
+                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 shadow-sm space-y-6">
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-emerald-500 text-[24px]">payments</span>{t('settings.financial_controls')}</h3>
                                 <div className="grid md:grid-cols-2 gap-6">
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.platform_commission')}</label><input type="number" name="platform_commission" value={sysSettings.platform_commission} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.exchange_rate')}</label><input type="number" step="0.01" name="currency_rate" value={sysSettings.currency_rate} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.min_withdrawal')}</label><input type="number" name="min_withdrawal" value={sysSettings.min_withdrawal} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.platform_commission')}</label><input type="number" name="platform_commission" value={sysSettings.platform_commission} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.exchange_rate')}</label><input type="number" step="0.01" name="currency_rate" value={sysSettings.currency_rate} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.min_withdrawal')}</label><input type="number" name="min_withdrawal" value={sysSettings.min_withdrawal} onChange={handleSysChange} className="w-full bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
                                 </div>
                             </div>
                             <SystemSaveBar isDirty={isSystemDirty} onRevert={() => setSysSettings({ ...originalSysSettings })} onSave={handleSaveSystemSettings} isPending={isUpdatingSettings} />
@@ -234,15 +234,15 @@ const SettingsPage = () => {
 
                     {activeTab === 'technical' && (
                         <div className="space-y-6">
-                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-blue-500">memory</span>{t('settings.server_settings')}</h3>
-                                <div className="mb-6"><label className="block text-sm font-bold mb-2">{t('settings.heartbeat_interval')}</label><input type="number" name="heartbeat_interval" value={sysSettings.heartbeat_interval} onChange={handleSysChange} className="w-full md:w-1/2 bg-surface-container border border-outline-variant rounded-xl p-3.5" /></div>
-                                <div className="pt-6 border-t border-outline-variant/40"><h4 className="font-bold mb-4">{t('settings.smtp_settings')}</h4>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-bold mb-1">{t('settings.smtp_host')}</label><input type="text" dir="ltr" name="smtp_host" value={sysSettings.smtp_host} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3 font-mono" /></div>
-                                        <div><label className="block text-sm font-bold mb-1">{t('settings.smtp_port')}</label><input type="number" dir="ltr" name="smtp_port" value={sysSettings.smtp_port} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3 font-mono" /></div>
-                                        <div><label className="block text-sm font-bold mb-1">{t('settings.smtp_user')}</label><input type="text" dir="ltr" name="smtp_user" value={sysSettings.smtp_user} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3 font-mono" /></div>
-                                        <div><label className="block text-sm font-bold mb-1">{t('settings.smtp_password')}</label><input type="password" dir="ltr" name="smtp_pass" value={sysSettings.smtp_pass} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3 font-mono" /></div>
+                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 shadow-sm space-y-6">
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-blue-500 text-[24px]">memory</span>{t('settings.server_settings')}</h3>
+                                <div className="mb-6"><label className="block text-base font-bold text-on-surface mb-2">{t('settings.heartbeat_interval')}</label><input type="number" name="heartbeat_interval" value={sysSettings.heartbeat_interval} onChange={handleSysChange} className="w-full md:w-1/2 bg-surface-container border border-outline-variant rounded-xl p-3.5 text-base font-medium text-on-surface" /></div>
+                                <div className="pt-6 border-t border-outline-variant/40"><h4 className="font-extrabold text-base text-on-surface mb-4">{t('settings.smtp_settings')}</h4>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.smtp_host')}</label><input type="text" dir="ltr" name="smtp_host" value={sysSettings.smtp_host} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                        <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.smtp_port')}</label><input type="number" dir="ltr" name="smtp_port" value={sysSettings.smtp_port} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                        <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.smtp_user')}</label><input type="text" dir="ltr" name="smtp_user" value={sysSettings.smtp_user} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
+                                        <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.smtp_password')}</label><input type="password" dir="ltr" name="smtp_pass" value={sysSettings.smtp_pass} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium font-mono text-on-surface" /></div>
                                     </div>
                                 </div>
                             </div>
@@ -252,18 +252,18 @@ const SettingsPage = () => {
 
                     {activeTab === 'backup' && (
                         <div className="space-y-6">
-                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 shadow-sm">
-                                <h3 className="text-lg font-extrabold text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary">cloud_sync</span>{t('settings.backup')}</h3>
+                            <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant p-6 md:p-8 shadow-sm space-y-6">
+                                <h3 className="text-xl font-black text-on-surface flex items-center gap-3 border-b border-outline-variant/60 pb-4 mb-6"><span className="material-symbols-outlined text-primary text-[24px]">cloud_sync</span>{t('settings.backup')}</h3>
                                 <div className="grid md:grid-cols-2 gap-6 mb-6">
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.backup_location')}</label><select name="backup_disk" value={sysSettings.backup_disk} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5"><option value="local">{t('settings.backup_local')}</option><option value="s3">{t('settings.backup_s3')}</option></select></div>
-                                    <div><label className="block text-sm font-bold mb-2">{t('settings.backup_schedule')}</label><select name="auto_backup_schedule" value={sysSettings.auto_backup_schedule} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5"><option value="none">{t('settings.schedule_none')}</option><option value="daily">{t('settings.schedule_daily')}</option><option value="weekly">{t('settings.schedule_weekly')}</option></select></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.backup_location')}</label><select name="backup_disk" value={sysSettings.backup_disk} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium text-on-surface"><option value="local">{t('settings.backup_local')}</option><option value="s3">{t('settings.backup_s3')}</option></select></div>
+                                    <div><label className="block text-base font-bold text-on-surface mb-2">{t('settings.backup_schedule')}</label><select name="auto_backup_schedule" value={sysSettings.auto_backup_schedule} onChange={handleSysChange} className="w-full bg-surface-container border rounded-xl p-3.5 text-base font-medium text-on-surface"><option value="none">{t('settings.schedule_none')}</option><option value="daily">{t('settings.schedule_daily')}</option><option value="weekly">{t('settings.schedule_weekly')}</option></select></div>
                                 </div>
                                 <div className="flex gap-4 pt-4 border-t border-outline-variant/40">
-                                    <button onClick={handleDownloadBackup} disabled={isDownloading} className={`flex-1 bg-primary/10 text-primary px-6 py-3 rounded-xl font-bold flex justify-center items-center gap-2 transition-all ${isDownloading ? 'opacity-70 cursor-wait' : 'hover:bg-primary/20'}`}>
+                                    <button onClick={handleDownloadBackup} disabled={isDownloading} className={`flex-1 bg-primary/10 text-primary px-6 py-3.5 rounded-xl font-bold text-base flex justify-center items-center gap-2 transition-all ${isDownloading ? 'opacity-70 cursor-wait' : 'hover:bg-primary/20'}`}>
                                         {isDownloading ? <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" /> : <span className="material-symbols-outlined">download</span>}
                                         {t('settings.download_data_now')}
                                     </button>
-                                    <button className="flex-1 bg-error/10 text-error px-6 py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-error/20"><span className="material-symbols-outlined">restore</span>{t('settings.restore_from_file')}</button>
+                                    <button className="flex-1 bg-error/10 text-error px-6 py-3.5 rounded-xl font-bold text-base flex justify-center items-center gap-2 hover:bg-error/20"><span className="material-symbols-outlined">restore</span>{t('settings.restore_from_file')}</button>
                                 </div>
                             </div>
                             <SystemSaveBar isDirty={isSystemDirty} onRevert={() => setSysSettings({ ...originalSysSettings })} onSave={handleSaveSystemSettings} isPending={isUpdatingSettings} />
@@ -279,8 +279,8 @@ const SystemSaveBar = ({ isDirty, onRevert, onSave, isPending }) => {
     const { t } = useTranslation();
     return (
         <div className="sticky bottom-6 bg-surface/90 backdrop-blur-xl rounded-2xl border border-outline-variant shadow-lg p-4 flex justify-end gap-3 z-40">
-            {isDirty && <button onClick={onRevert} className="px-5 py-3 rounded-xl font-bold text-on-surface-variant hover:bg-outline-variant/60">{t('common.revert')}</button>}
-            <button disabled={!isDirty || isPending} onClick={onSave} className={`px-8 py-3 rounded-xl font-bold flex items-center gap-2 ${!isDirty || isPending ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-primary text-white hover:bg-primary/90 shadow-md'}`}>
+            {isDirty && <button onClick={onRevert} className="px-5 py-3 rounded-xl font-bold text-base text-on-surface-variant hover:bg-outline-variant/60">{t('common.revert')}</button>}
+            <button disabled={!isDirty || isPending} onClick={onSave} className={`px-8 py-3.5 rounded-xl font-bold text-base flex items-center gap-2 ${!isDirty || isPending ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed' : 'bg-primary text-white hover:bg-primary/90 shadow-md'}`}>
                 {isPending ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <span className="material-symbols-outlined">save</span>}
                 {t('common.save_changes')}
             </button>

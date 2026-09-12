@@ -185,18 +185,17 @@ const PaymentMethodsPage = () => {
     const inactiveMethods = totalMethods - activeMethods;
     const stripeIntegrations = methods.filter(m => m.stripe_publishable_key || m.stripe_secret_key).length;
 
-    const inputClass = "w-full bg-surface text-on-surface border border-outline-variant rounded-lg py-2 px-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-right";
-    const labelClass = "text-label-md font-label-md text-on-surface mb-1.5 block";
+    const inputClass = "w-full bg-surface text-on-surface border border-outline-variant rounded-xl py-3 px-4 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-right text-base font-medium";
+    const labelClass = "text-base font-bold text-on-surface mb-2 block";
 
     return (
         <div className="space-y-6 pb-12" dir="rtl">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-r-4 border-primary bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-surface p-6 rounded-2xl shadow-sm border border-outline-variant relative overflow-hidden">
                 <div className="relative z-10">
-                    <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-2 flex items-center gap-3">
+                    <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface flex items-center gap-3">
                         {t('admin.payment_gateways_title')}
                     </h1>
-                    <p className="text-on-surface-variant font-body-md text-body-md">{t('admin.payment_gateways_subtitle')}</p>
                 </div>
                 {can('manage_all') && (
                     <button
@@ -211,36 +210,24 @@ const PaymentMethodsPage = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors">
-                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.total_channels')}</p>
-                    <p className="font-display-lg text-headline-lg text-on-surface font-extrabold">{totalMethods}</p>
-                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
-                    </div>
+                <div className="bg-surface py-3.5 px-5 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden">
+                    <p className="text-lg font-bold text-on-surface mb-1">{t('admin.total_channels')}</p>
+                    <p className="text-xl font-normal text-on-surface">{totalMethods}</p>
                 </div>
 
-                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-success/30 transition-colors">
-                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.active_channels')}</p>
-                    <p className="font-display-lg text-headline-lg text-[#16a34a] font-extrabold">{activeMethods}</p>
-                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-[#16a34a]/10 flex items-center justify-center text-[#16a34a]">
-                        <span className="material-symbols-outlined text-2xl">check_circle</span>
-                    </div>
+                <div className="bg-surface py-3.5 px-5 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden">
+                    <p className="text-lg font-bold text-on-surface mb-1">{t('admin.active_channels')}</p>
+                    <p className="text-xl font-normal text-[#16a34a]">{activeMethods}</p>
                 </div>
 
-                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-warning/30 transition-colors">
-                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.maintenance_channels')}</p>
-                    <p className="font-display-lg text-headline-lg text-error font-extrabold">{inactiveMethods}</p>
-                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-error/10 flex items-center justify-center text-error">
-                        <span className="material-symbols-outlined text-2xl">cancel</span>
-                    </div>
+                <div className="bg-surface py-3.5 px-5 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden">
+                    <p className="text-lg font-bold text-on-surface mb-1">{t('admin.maintenance_channels')}</p>
+                    <p className="text-xl font-normal text-error">{inactiveMethods}</p>
                 </div>
 
-                <div className="bg-surface p-6 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden group hover:border-secondary/30 transition-colors">
-                    <p className="font-label-md text-label-md text-on-surface-variant mb-4">{t('admin.api_gateways')}</p>
-                    <p className="font-display-lg text-headline-lg text-[#4f46e5] font-extrabold">{stripeIntegrations}</p>
-                    <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-[#4f46e5]/10 flex items-center justify-center text-[#4f46e5]">
-                        <span className="material-symbols-outlined text-2xl">shield</span>
-                    </div>
+                <div className="bg-surface py-3.5 px-5 rounded-2xl border border-outline-variant shadow-sm relative overflow-hidden">
+                    <p className="text-lg font-bold text-on-surface mb-1">{t('admin.api_gateways')}</p>
+                    <p className="text-xl font-normal text-[#4f46e5]">{stripeIntegrations}</p>
                 </div>
             </div>
 
@@ -321,24 +308,24 @@ const PaymentMethodsPage = () => {
                         <table className="w-full text-right border-collapse">
                             <thead className="bg-surface-container-low border-b border-outline-variant">
                                 <tr>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">{t('admin.descriptive_name')}</th>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap">{t('admin.details_directions')}</th>
-                                    <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-center">{t('admin.operational_status')}</th>
-                                    {can('manage_all') && <th className="py-4 px-6 font-label-md text-label-md text-on-surface-variant font-medium whitespace-nowrap text-left">{t('common.actions')}</th>}
+                                    <th className="py-4 px-6 text-lg font-bold text-on-surface whitespace-nowrap">{t('admin.descriptive_name')}</th>
+                                    <th className="py-4 px-6 text-lg font-bold text-on-surface whitespace-nowrap">{t('admin.details_directions')}</th>
+                                    <th className="py-4 px-6 text-lg font-bold text-on-surface whitespace-nowrap text-center">{t('admin.operational_status')}</th>
+                                    {can('manage_all') && <th className="py-4 px-6 text-lg font-bold text-on-surface whitespace-nowrap text-left">{t('common.actions')}</th>}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-outline-variant font-body-md text-body-md text-on-surface">
+                            <tbody className="divide-y divide-outline-variant text-base text-on-surface">
                                 {methods.map(method => {
                                     const isActive = method.is_active == 1 || method.is_active === true || method.is_active === 'true';
                                     const id = method.method_id || method.id;
                                     return (
                                         <tr key={id} className="hover:bg-surface-container-lowest transition-colors group">
-                                            <td className="py-4 px-6 font-medium whitespace-nowrap">
+                                            <td className="py-4 px-6 font-bold text-base whitespace-nowrap">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                                                         <span className="material-symbols-outlined text-xl">credit_card</span>
                                                     </div>
-                                                    <span className="font-medium">{method.name}</span>
+                                                    <span className="font-bold text-lg">{method.name}</span>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6 text-on-surface-variant">
@@ -409,12 +396,12 @@ const PaymentMethodsPage = () => {
                 isOpen={isModalOpen}
                 onClose={closeModal}
                 title={editingMethod ? t('admin.update_gateway_settings') : t('admin.configure_new_gateway')}
-                size="md"
+                size="lg"
             >
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4" dir="rtl">
-                    <div className="bg-surface border border-outline-variant rounded-2xl p-5 shadow-sm space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6 mt-4" dir="rtl">
+                    <div className="bg-surface border border-outline-variant rounded-2xl p-6 shadow-sm space-y-5">
                         <div>
-                            <label className={labelClass}>{t('admin.channel_name')} <span className="text-error">*</span></label>
+                            <label className={labelClass}>{t('admin.channel_name')}</label>
                             <input
                                 type="text"
                                 required
@@ -427,12 +414,12 @@ const PaymentMethodsPage = () => {
                             />
                         </div>
                         <div>
-                            <label className={labelClass}>{t('admin.payment_instructions')} <span className="text-error">*</span></label>
+                            <label className={labelClass}>{t('admin.payment_instructions')}</label>
                             <textarea
                                 required
                                 value={form.account_details}
                                 onChange={(e) => setForm({ ...form, account_details: e.target.value })}
-                                className={`${inputClass} resize-none h-24 leading-relaxed`}
+                                className={`${inputClass} resize-none h-28 leading-relaxed`}
                                 placeholder={t('admin.payment_instructions_placeholder')}
                             ></textarea>
                         </div>
@@ -440,8 +427,8 @@ const PaymentMethodsPage = () => {
                         {/* Status Toggle */}
                         <div className="flex items-center justify-between pt-4 border-t border-outline-variant">
                             <div>
-                                <p className="font-label-md text-label-md text-on-surface">{t('admin.operational_status')}</p>
-                                <p className="font-caption text-caption text-on-surface-variant mt-0.5">{t('admin.operational_status_hint')}</p>
+                                <p className="text-base font-bold text-on-surface">{t('admin.operational_status')}</p>
+                                <p className="text-sm text-on-surface-variant mt-0.5">{t('admin.operational_status_hint')}</p>
                             </div>
                             <label className="relative flex items-center cursor-pointer">
                                 <input type="checkbox" className="sr-only peer" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />
@@ -450,12 +437,12 @@ const PaymentMethodsPage = () => {
                         </div>
                     </div>
 
-                    <div className="border border-outline-variant bg-surface-container-lowest rounded-2xl p-5 mt-4 group">
+                    <div className="border border-outline-variant bg-surface-container-lowest rounded-2xl p-6 mt-4 group">
                         <div className="flex items-center gap-2 mb-4">
-                            <span className="material-symbols-outlined text-primary text-xl">key</span>
-                            <h4 className="font-title-sm text-title-sm text-on-surface font-semibold">الربط البرمجي السري (اختياري لبوابات Stripe)</h4>
+                            <span className="material-symbols-outlined text-primary text-2xl">key</span>
+                            <h4 className="text-lg text-on-surface font-bold">الربط البرمجي السري (اختياري لبوابات Stripe)</h4>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-5">
                             <div>
                                 <label className={labelClass}>Publishable Key (المفتاح العام)</label>
                                 <div className="relative">
@@ -472,7 +459,7 @@ const PaymentMethodsPage = () => {
                                         onClick={() => setShowPk(!showPk)}
                                         className="absolute top-1/2 -translate-y-1/2 right-3 p-1 flex text-on-surface-variant hover:text-primary transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">
+                                        <span className="material-symbols-outlined text-[20px]">
                                             {showPk ? 'visibility_off' : 'visibility'}
                                         </span>
                                     </button>
@@ -494,28 +481,28 @@ const PaymentMethodsPage = () => {
                                         onClick={() => setShowSk(!showSk)}
                                         className="absolute top-1/2 -translate-y-1/2 right-3 p-1 flex text-on-surface-variant hover:text-primary transition-colors"
                                     >
-                                        <span className="material-symbols-outlined text-[18px]">
+                                        <span className="material-symbols-outlined text-[20px]">
                                             {showSk ? 'visibility_off' : 'visibility'}
                                         </span>
                                     </button>
                                 </div>
-                                <p className="font-caption text-caption text-on-surface-variant mt-2 px-1">تشفير تلقائي متاح. لا تشارك المفتاح السري أبداً.</p>
+                                <p className="text-xs text-on-surface-variant mt-2 px-1 font-medium">تشفير تلقائي متاح. لا تشارك المفتاح السري أبداً.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 flex gap-3">
+                    <div className="pt-4 flex gap-4">
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 shadow-sm transition-colors disabled:opacity-50"
+                            className="flex-1 bg-primary text-on-primary py-3.5 rounded-xl text-base font-bold hover:bg-primary/90 shadow-sm transition-colors disabled:opacity-50"
                         >
                             {isSubmitting ? 'جاري المعالجة...' : 'تخزين واعتماد'}
                         </button>
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="flex-1 bg-surface-variant text-on-surface-variant py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container-highest border border-outline-variant transition-colors"
+                            className="flex-1 bg-surface-variant text-on-surface-variant py-3.5 rounded-xl text-base font-bold hover:bg-surface-container-highest border border-outline-variant transition-colors"
                         >
                             إلغاء
                         </button>
@@ -534,13 +521,13 @@ const PaymentMethodsPage = () => {
             />
 
             {/* AUDIT LOG MODAL */}
-            <Modal isOpen={isAuditModalOpen} onClose={() => setIsAuditModalOpen(false)} title="سجل التدقيق الأمني (Audit Logs)" size="md">
+            <Modal isOpen={isAuditModalOpen} onClose={() => setIsAuditModalOpen(false)} title="سجل التدقيق الأمني (Audit Logs)" size="lg">
                 <div className="space-y-4 p-2 text-right mt-2" dir="rtl">
-                    <p className="text-on-surface-variant text-sm mb-4 leading-relaxed bg-[#fef2f2] p-3 rounded-lg border border-[#fecaca] text-[#991b1b] flex items-center gap-2 font-medium">
-                        <span className="material-symbols-outlined">gpp_maybe</span>
+                    <p className="text-on-surface-variant text-base mb-4 leading-relaxed bg-[#fef2f2] p-4 rounded-xl border border-[#fecaca] text-[#991b1b] flex items-center gap-2 font-bold">
+                        <span className="material-symbols-outlined text-xl">gpp_maybe</span>
                         هذا السجل موثوق ويعكس أحدث التدخلات الأمنية على مستوى ملفات التكوين.
                     </p>
-                    <div className="border border-outline-variant rounded-xl divide-y divide-outline-variant bg-surface overflow-hidden">
+                    <div className="border border-outline-variant rounded-2xl divide-y divide-outline-variant bg-surface overflow-hidden">
                         {[
                             { action: 'تم تصدير ملف التهيئة المشفّر', user: 'مدير النظام (أنت)', gate: 'النظام', date: 'قبل 2 دقيقة', color: 'text-[#16a34a]', icon: 'download' },
                             { action: 'اختبار الاتصال بالخوادم المباشرة', user: 'مدير النظام (أنت)', gate: 'جميع القنوات', date: 'قبل 15 دقيقة', color: 'text-primary', icon: 'speed' },
@@ -548,25 +535,25 @@ const PaymentMethodsPage = () => {
                             { action: 'تفعيل إجباري للبوابة', user: 'مدير النظام (أنت)', gate: 'حوالة مصرفية', date: 'قبل 1 يوم', color: 'text-[#16a34a]', icon: 'power' },
                         ].map((log, i) => (
                             <div key={i} className="flex items-center justify-between p-4 bg-surface hover:bg-surface-container-lowest transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center ${log.color}`}>
-                                        <span className="material-symbols-outlined text-[20px]">{log.icon}</span>
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-11 h-11 rounded-full bg-surface-variant flex items-center justify-center ${log.color}`}>
+                                        <span className="material-symbols-outlined text-2xl">{log.icon}</span>
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-on-surface mb-0.5">{log.action}</h4>
-                                        <p className="text-xs text-on-surface-variant">الكيان المرتبط: <span className="font-semibold">{log.gate}</span></p>
+                                        <h4 className="text-base font-bold text-on-surface mb-1">{log.action}</h4>
+                                        <p className="text-sm text-on-surface-variant">الكيان المرتبط: <span className="font-bold text-on-surface">{log.gate}</span></p>
                                     </div>
                                 </div>
                                 <div className="text-left">
-                                    <span className="text-[11px] font-mono text-on-surface-variant block">{log.date}</span>
-                                    <span className="text-[10px] font-bold mt-1 block">{log.user}</span>
+                                    <span className="text-xs font-mono text-on-surface-variant block">{log.date}</span>
+                                    <span className="text-xs font-bold text-on-surface mt-1 block">{log.user}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                     
                     <div className="pt-4 flex justify-end">
-                        <button onClick={() => setIsAuditModalOpen(false)} className="px-6 py-2 bg-surface-variant text-on-surface hover:bg-surface-container-highest transition-colors rounded-lg text-sm font-bold">
+                        <button onClick={() => setIsAuditModalOpen(false)} className="px-8 py-3 bg-surface-variant text-on-surface hover:bg-surface-container-highest transition-colors rounded-xl text-base font-bold border border-outline-variant">
                             إغلاق واجهة السجل
                         </button>
                     </div>
