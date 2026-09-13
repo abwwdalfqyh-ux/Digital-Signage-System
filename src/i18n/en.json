@@ -1169,7 +1169,9 @@
     "tab_expired": "Expired",
     "status_expired": "Expired",
     "confirm_rejection_msg": "Are you sure you want to reject this ad? The advertiser will be notified.",
-    "confirm_waiting_payment_msg": "The ad will be approved and its status changed to 'Waiting for Payment'."
+    "confirm_waiting_payment_msg": "The ad will be approved and its status changed to 'Waiting for Payment'.",
+    "no_screens_available": "No screens available currently",
+    "please_add_screens": "Please add screens or check their availability"
   },
   "financial": {
     "sav_transaction": "Save Transaction",

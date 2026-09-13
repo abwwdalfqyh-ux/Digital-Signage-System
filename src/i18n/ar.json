@@ -1172,7 +1172,9 @@
     "tab_expired": "منتهية الصلاحية",
     "status_expired": "منتهي",
     "confirm_rejection_msg": "هل أنت متأكد من رفض هذا الإعلان؟ سيتم إشعار المعلن.",
-    "confirm_waiting_payment_msg": "سيتم الموافقة على الإعلان وتحويل حالته إلى 'بانتظار الدفع'."
+    "confirm_waiting_payment_msg": "سيتم الموافقة على الإعلان وتحويل حالته إلى 'بانتظار الدفع'.",
+    "no_screens_available": "لا توجد شاشات متاحة حالياً",
+    "please_add_screens": "الرجاء إضافة شاشات أو التحقق من توفرها"
   },
   "financial": {
     "sav_transaction": "حفظ العملية",
